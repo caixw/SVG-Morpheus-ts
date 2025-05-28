@@ -7,6 +7,12 @@
 
 JavaScript library enabling SVG icons to morph from one to the other. It implements Material Design's Delightful Details transitions.
 
+## 🌐 Live Demo
+
+**[🎯 View Live Demo](https://adoin.github.io/SVG-Morpheus-ts/)**
+
+Try the interactive demo to see SVG morphing animations in action, featuring both static and dynamic examples with multilingual support.
+
 ## 🚀 Modernization Highlights
 
 This project has been refactored from Gulp to a modern TypeScript + Vite + pnpm build system:

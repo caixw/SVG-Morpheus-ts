@@ -7,6 +7,12 @@
 
 JavaScript库，使SVG图标能够从一个变形到另一个。它实现了Material Design的精美细节过渡效果。
 
+## 🌐 在线演示
+
+**[🎯 查看在线演示](https://adoin.github.io/SVG-Morpheus-ts/)**
+
+体验交互式演示，观看SVG变形动画效果，包含静态和动态示例，支持中英文界面。
+
 ## 🚀 重构亮点
 
 这个项目已经从 Gulp 重构为现代化的 TypeScript + Vite + pnpm 构建系统：
