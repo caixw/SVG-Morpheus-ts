@@ -31,9 +31,8 @@ export {
   trans2string,
   curveCalc,
   clone,
-  bundleSvgs,              // 🆕 动态SVG合并
-  bundleAndInsertSvgs,     // 🆕 合并并插入DOM
-  insertBundledSvg         // 🆕 插入合并的SVG到DOM
+  bundleSvgs,             // 🆕 动态SVG合并，返回 Blob URL
+  bundleSvgsString        // 🆕 动态SVG合并，返回 SVG 字符串
 } from './helpers';
 
 // Export path utilities (if needed)

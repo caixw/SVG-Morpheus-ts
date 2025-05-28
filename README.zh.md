@@ -1,5 +1,8 @@
 # SVG Morpheus TypeScript
 
+> **⚡ 本项目基于 [alexk111/SVG-Morpheus](https://github.com/alexk111/SVG-Morpheus) 进行 TypeScript 重构**  
+> 原始项目作者：[@alexk111](https://github.com/alexk111) - 使用现代化 TypeScript + Vite + pnpm 重构
+
 **中文** | [English](./README.md)
 
 JavaScript库，使SVG图标能够从一个变形到另一个。它实现了Material Design的精美细节过渡效果。
@@ -66,9 +69,8 @@ import {
   pathToAbsolute,    // 路径转换工具
   styleNormCalc,     // 样式计算工具
   curveCalc,         // 曲线计算工具
-  bundleSvgs,        // 🆕 动态SVG合并
-  bundleAndInsertSvgs, // 🆕 合并并插入DOM
-  insertBundledSvg   // 🆕 插入合并的SVG到DOM
+  bundleSvgs,        // 🆕 动态SVG合并，返回 Blob URL
+  bundleSvgsString   // 🆕 动态SVG合并，返回 SVG 字符串
 } from 'svg-morpheus';
 
 // 使用预定义的缓动函数
@@ -82,7 +84,8 @@ const svgMap = {
   'icon1': '<svg>...</svg>',
   'icon2': '/path/to/icon.svg'
 };
-const bundledSvg = await bundleSvgs(svgMap);
+const bundledSvgUrl = await bundleSvgs(svgMap);
+const bundledSvgString = await bundleSvgsString(svgMap);
 ```
 
 ### 完整示例
@@ -196,8 +199,7 @@ const morpheus = new SVGMorpheus('#my-svg', options, () => {
 - `path2string` - 路径转字符串
 - `curvePathBBox` - 计算曲线边界框
 - `bundleSvgs` - 🆕 动态SVG合并工具
-- `bundleAndInsertSvgs` - 🆕 合并SVG并插入DOM
-- `insertBundledSvg` - 🆕 插入合并的SVG到DOM
+- `bundleSvgsString` - 🆕 动态SVG合并，返回 SVG 字符串
 
 ## 🛠️ 开发
 
@@ -337,14 +339,10 @@ const svgMap = {
   'settings': '/icons/settings.svg'
 };
 
-// 生成合并的SVG
-const bundledSvg = await bundleSvgs(svgMap);
-console.log(bundledSvg);
-// 输出: <svg xmlns="http://www.w3.org/2000/svg" style="display:none;">
-//   <g id="home">...</g>
-//   <g id="user">...</g>
-//   <g id="settings">...</g>
-// </svg>
+// 生成合并的SVG Blob URL
+const bundledSvgUrl = await bundleSvgs(svgMap);
+console.log(bundledSvgUrl);
+// 输出: blob:null/12345678-1234-1234-1234-123456789abc
 ```
 
 ### 自定义SVG属性
@@ -359,40 +357,35 @@ const customAttributes = {
   'data-version': '1.0'
 };
 
-const bundledSvg = await bundleSvgs(svgMap, customAttributes);
-// 输出: <svg xmlns="http://www.w3.org/2000/svg" style="display:none;" viewBox="0 0 24 24" width="100%" height="100%" class="my-iconset" data-version="1.0">
-//   <g id="home">...</g>
-//   ...
-// </svg>
-```
-
-### 便捷的DOM集成
-
-```typescript
-import { bundleAndInsertSvgs } from 'svg-morpheus';
-
-// 合并并自动插入到DOM
-await bundleAndInsertSvgs(svgMap, 'my-iconset-container', customAttributes);
-
-// 或使用默认容器ID
-await bundleAndInsertSvgs(svgMap);
+const bundledSvgUrl = await bundleSvgs(svgMap, customAttributes);
+// 生成的SVG将应用自定义属性
 ```
 
 ### 与Object元素配合使用
 
 ```typescript
-// 为object元素创建Blob URL
-const bundledSvg = await bundleSvgs(svgMap, { viewBox: '0 0 24 24' });
-const blob = new Blob([bundledSvg], { type: 'image/svg+xml' });
-const url = URL.createObjectURL(blob);
+// 直接使用bundleSvgs与object元素
+const bundledSvgUrl = await bundleSvgs(svgMap, { viewBox: '0 0 24 24' });
 
 // 用于object元素
 const objectElement = document.getElementById('my-svg-object');
-objectElement.data = url;
+objectElement.data = bundledSvgUrl;
 
 // 初始化SVGMorpheus
 const morpheus = new SVGMorpheus('#my-svg-object');
 morpheus.to('home');
+```
+
+### 获取SVG字符串（用于备用方案）
+
+```typescript
+import { bundleSvgsString } from 'svg-morpheus';
+
+// 获取SVG字符串而不是Blob URL
+const bundledSvgString = await bundleSvgsString(svgMap, customAttributes);
+
+// 用于内联SVG
+document.getElementById('svg-container').innerHTML = bundledSvgString;
 ```
 
 ### 高级特性
@@ -430,17 +423,10 @@ const svgAttributes: Record<string, string | number> = {
 
 - **svgMap**: `Record<string, string>` - 将图标ID映射到SVG源的对象
 - **svgAttributes**: `Record<string, string | number>` (可选) - 根SVG元素的自定义属性
-- **返回值**: `Promise<string>` - 合并的SVG字符串
+- **返回值**: `Promise<string>` - 生成的 Blob URL
 
-#### bundleAndInsertSvgs(svgMap, containerId?, svgAttributes?)
+#### bundleSvgsString(svgMap, svgAttributes?)
 
 - **svgMap**: `Record<string, string>` - 将图标ID映射到SVG源的对象
-- **containerId**: `string` (可选，默认: 'svg-iconset') - 容器元素ID
 - **svgAttributes**: `Record<string, string | number>` (可选) - 根SVG元素的自定义属性
-- **返回值**: `Promise<void>`
-
-#### insertBundledSvg(bundledSvg, containerId?)
-
-- **bundledSvg**: `string` - 预生成的SVG字符串
-- **containerId**: `string` (可选，默认: 'svg-iconset') - 容器元素ID
-- **返回值**: `void` 
+- **返回值**: `Promise<string>` - 合并的SVG字符串 

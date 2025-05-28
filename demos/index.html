@@ -258,6 +258,12 @@
       .demo-section .option select {
         width: 100%;
       }
+      
+      .project-source {
+        position: static;
+        margin: 0 auto 10px auto;
+        justify-content: center;
+      }
     }
     
     /* 添加一些动画效果 */
@@ -316,6 +322,35 @@
       background: rgba(255, 255, 255, 0.1);
     }
     
+    .project-source {
+      position: absolute;
+      bottom: 15px;
+      left: 20px;
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 8px 16px;
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.9);
+      text-decoration: none;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    
+    .project-source:hover {
+      background: rgba(255, 255, 255, 0.25);
+      color: white;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+    
+    .project-source .icon {
+      font-size: 11px;
+    }
+    
     /* 改善页面背景 */
     body {
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -349,6 +384,10 @@
       <button class="lang-btn active" onclick="switchLanguage('en')">English</button>
       <button class="lang-btn" onclick="switchLanguage('zh')">中文</button>
     </div>
+    <a href="https://github.com/alexk111/SVG-Morpheus" target="_blank" class="project-source" data-i18n-title="project.source">
+      <span class="icon">⚡</span>
+      <span data-i18n="project.basedOn">Based on SVG-Morpheus</span>
+    </a>
     <h1 data-i18n="title">SVG Morpheus TypeScript</h1>
     <h2 data-i18n="subtitle">Demo: SVG placed via &lt;Object&gt;</h2>
     <p data-i18n="description">Modern TypeScript + Vite + pnpm refactored version</p>
@@ -485,26 +524,20 @@
   <span class="string">'star'</span>: <span class="string">'/icons/star.svg'</span>, <span class="comment">// 文件路径</span>
 };
 
-<span class="comment">// 3. 自定义 SVG 属性</span>
+<span class="comment">// 3. 自定义 SVG 属性 (可选)</span>
 <span class="keyword">const</span> <span class="variable">customAttributes</span> = {
   <span class="property">viewBox</span>: <span class="string">'0 0 24 24'</span>,
   <span class="property">class</span>: <span class="string">'dynamic-iconset'</span>,
   <span class="string">'data-version'</span>: <span class="string">'1.0'</span>
 };
 
-<span class="comment">// 4. 生成合并的 SVG</span>
-<span class="keyword">const</span> <span class="variable">bundledSvg</span> = <span class="keyword">await</span> <span class="function">bundleSvgs</span>(<span class="variable">svgMap</span>, <span class="variable">customAttributes</span>);
+<span class="comment">// 4. 生成合并的 SVG Blob URL (一步完成)</span>
+<span class="keyword">const</span> <span class="variable">bundledSvgUrl</span> = <span class="keyword">await</span> <span class="function">bundleSvgs</span>(<span class="variable">svgMap</span>, <span class="variable">customAttributes</span>);
 
-<span class="comment">// 5. 创建 Blob URL</span>
-<span class="keyword">const</span> <span class="variable">blob</span> = <span class="keyword">new</span> <span class="function">Blob</span>([<span class="variable">bundledSvg</span>], { 
-  <span class="property">type</span>: <span class="string">'image/svg+xml'</span> 
-});
-<span class="keyword">const</span> <span class="variable">url</span> = <span class="function">URL</span>.<span class="function">createObjectURL</span>(<span class="variable">blob</span>);
+<span class="comment">// 5. 设置到 object 元素</span>
+<span class="variable">objectElement</span>.<span class="property">data</span> = <span class="variable">bundledSvgUrl</span>;
 
-<span class="comment">// 6. 设置到 object 元素</span>
-<span class="variable">objectElement</span>.<span class="property">data</span> = <span class="variable">url</span>;
-
-<span class="comment">// 7. 初始化 SVGMorpheus</span>
+<span class="comment">// 6. 初始化 SVGMorpheus</span>
 <span class="keyword">const</span> <span class="variable">morpheus</span> = <span class="keyword">new</span> <span class="function">SVGMorpheus</span>(<span class="string">'#iconDynamic'</span>);
 <span class="variable">morpheus</span>.<span class="function">to</span>(<span class="string">'circle'</span>);</code></pre>
         </div>
@@ -514,6 +547,7 @@
 
   <script type="module">
     import { SVGMorpheus } from '../src/svg-morpheus.ts';
+    import { bundleSvgs } from '../src/helpers.ts';
     
     // 多语言支持
     const i18nData = {
@@ -535,13 +569,11 @@
         'button.copied': 'Copied!',
         'button.copyFailed': 'Copy Failed',
         'loading.text': 'Generating dynamic SVG...',
-        'error.loadFailed': '❌ Dynamic SVG loading failed, please refresh and try again',
-        'error.bundleFailed': '❌ bundleSvgs function import failed, please check helpers.ts file',
-        'error.objectLoadFailed': '❌ SVG object loading failed',
-        'error.allFailed': '❌ All SVG loading methods failed',
-        'console.staticComplete': 'Static SVG example initialization complete!',
-        'console.dynamicComplete': 'Dynamic SVG example initialization complete!',
-        'console.fallbackSuccess': 'Inline SVG fallback successful!',
+        'error.loadFailed': '❌ 动态 SVG 加载失败，请刷新页面重试',
+        'error.bundleFailed': '❌ bundleSvgs 函数导入失败，请检查 helpers.ts 文件',
+        'error.objectLoadFailed': '❌ SVG 对象加载失败',
+        'console.staticComplete': '静态 SVG 示例初始化完成!',
+        'console.dynamicComplete': '动态 SVG 示例初始化完成!',
         'easings.linear': 'Linear',
         'rotations.clock': 'Clockwise',
         'rotations.counterclock': 'Counterclockwise',
@@ -553,6 +585,8 @@
         'icons.star': 'Star',
         'icons.heart': 'Heart',
         'icons.diamond': 'Diamond',
+        'project.basedOn': 'Based on SVG-Morpheus',
+        'project.source': 'View Original Project',
         'code.example1': `<span class="comment">// 1. 准备静态 iconset.svg 文件</span>
 <span class="comment">// iconset.svg 包含所有图标的 &lt;g&gt; 元素</span>
 
@@ -596,26 +630,20 @@
   <span class="string">'star'</span>: <span class="string">'/icons/star.svg'</span>, <span class="comment">// 文件路径</span>
 };
 
-<span class="comment">// 3. 自定义 SVG 属性</span>
+<span class="comment">// 3. 自定义 SVG 属性 (可选)</span>
 <span class="keyword">const</span> <span class="variable">customAttributes</span> = {
   <span class="property">viewBox</span>: <span class="string">'0 0 24 24'</span>,
   <span class="property">class</span>: <span class="string">'dynamic-iconset'</span>,
   <span class="string">'data-version'</span>: <span class="string">'1.0'</span>
 };
 
-<span class="comment">// 4. 生成合并的 SVG</span>
-<span class="keyword">const</span> <span class="variable">bundledSvg</span> = <span class="keyword">await</span> <span class="function">bundleSvgs</span>(<span class="variable">svgMap</span>, <span class="variable">customAttributes</span>);
+<span class="comment">// 4. 生成合并的 SVG Blob URL (一步完成)</span>
+<span class="keyword">const</span> <span class="variable">bundledSvgUrl</span> = <span class="keyword">await</span> <span class="function">bundleSvgs</span>(<span class="variable">svgMap</span>, <span class="variable">customAttributes</span>);
 
-<span class="comment">// 5. 创建 Blob URL</span>
-<span class="keyword">const</span> <span class="variable">blob</span> = <span class="keyword">new</span> <span class="function">Blob</span>([<span class="variable">bundledSvg</span>], { 
-  <span class="property">type</span>: <span class="string">'image/svg+xml'</span> 
-});
-<span class="keyword">const</span> <span class="variable">url</span> = <span class="function">URL</span>.<span class="function">createObjectURL</span>(<span class="variable">blob</span>);
+<span class="comment">// 5. 设置到 object 元素</span>
+<span class="variable">objectElement</span>.<span class="property">data</span> = <span class="variable">bundledSvgUrl</span>;
 
-<span class="comment">// 6. 设置到 object 元素</span>
-<span class="variable">objectElement</span>.<span class="property">data</span> = <span class="variable">url</span>;
-
-<span class="comment">// 7. 初始化 SVGMorpheus</span>
+<span class="comment">// 6. 初始化 SVGMorpheus</span>
 <span class="keyword">const</span> <span class="variable">morpheus</span> = <span class="keyword">new</span> <span class="function">SVGMorpheus</span>(<span class="string">'#iconDynamic'</span>);
 <span class="variable">morpheus</span>.<span class="function">to</span>(<span class="string">'circle'</span>);`
       },
@@ -640,10 +668,8 @@
         'error.loadFailed': '❌ 动态 SVG 加载失败，请刷新页面重试',
         'error.bundleFailed': '❌ bundleSvgs 函数导入失败，请检查 helpers.ts 文件',
         'error.objectLoadFailed': '❌ SVG 对象加载失败',
-        'error.allFailed': '❌ 所有 SVG 加载方案都失败了',
         'console.staticComplete': '静态 SVG 示例初始化完成!',
         'console.dynamicComplete': '动态 SVG 示例初始化完成!',
-        'console.fallbackSuccess': '内联 SVG 备用方案成功!',
         'easings.linear': '线性',
         'rotations.clock': '顺时针',
         'rotations.counterclock': '逆时针',
@@ -655,6 +681,8 @@
         'icons.star': '星形',
         'icons.heart': '心形',
         'icons.diamond': '菱形',
+        'project.basedOn': '基于 SVG-Morpheus',
+        'project.source': '查看原始项目',
         'code.example1': `<span class="comment">// 1. 准备静态 iconset.svg 文件</span>
 <span class="comment">// iconset.svg 包含所有图标的 &lt;g&gt; 元素</span>
 
@@ -698,26 +726,20 @@
   <span class="string">'star'</span>: <span class="string">'/icons/star.svg'</span>, <span class="comment">// 文件路径</span>
 };
 
-<span class="comment">// 3. 自定义 SVG 属性</span>
+<span class="comment">// 3. 自定义 SVG 属性 (可选)</span>
 <span class="keyword">const</span> <span class="variable">customAttributes</span> = {
   <span class="property">viewBox</span>: <span class="string">'0 0 24 24'</span>,
   <span class="property">class</span>: <span class="string">'dynamic-iconset'</span>,
   <span class="string">'data-version'</span>: <span class="string">'1.0'</span>
 };
 
-<span class="comment">// 4. 生成合并的 SVG</span>
-<span class="keyword">const</span> <span class="variable">bundledSvg</span> = <span class="keyword">await</span> <span class="function">bundleSvgs</span>(<span class="variable">svgMap</span>, <span class="variable">customAttributes</span>);
+<span class="comment">// 4. 生成合并的 SVG Blob URL (一步完成)</span>
+<span class="keyword">const</span> <span class="variable">bundledSvgUrl</span> = <span class="keyword">await</span> <span class="function">bundleSvgs</span>(<span class="variable">svgMap</span>, <span class="variable">customAttributes</span>);
 
-<span class="comment">// 5. 创建 Blob URL</span>
-<span class="keyword">const</span> <span class="variable">blob</span> = <span class="keyword">new</span> <span class="function">Blob</span>([<span class="variable">bundledSvg</span>], { 
-  <span class="property">type</span>: <span class="string">'image/svg+xml'</span> 
-});
-<span class="keyword">const</span> <span class="variable">url</span> = <span class="function">URL</span>.<span class="function">createObjectURL</span>(<span class="variable">blob</span>);
+<span class="comment">// 5. 设置到 object 元素</span>
+<span class="variable">objectElement</span>.<span class="property">data</span> = <span class="variable">bundledSvgUrl</span>;
 
-<span class="comment">// 6. 设置到 object 元素</span>
-<span class="variable">objectElement</span>.<span class="property">data</span> = <span class="variable">url</span>;
-
-<span class="comment">// 7. 初始化 SVGMorpheus</span>
+<span class="comment">// 6. 初始化 SVGMorpheus</span>
 <span class="keyword">const</span> <span class="variable">morpheus</span> = <span class="keyword">new</span> <span class="function">SVGMorpheus</span>(<span class="string">'#iconDynamic'</span>);
 <span class="variable">morpheus</span>.<span class="function">to</span>(<span class="string">'circle'</span>);`
       }
@@ -822,54 +844,6 @@
     
     // 使函数在全局可用
     window.switchLanguage = switchLanguage;
-    
-    // 尝试导入 bundleSvgs，如果失败则使用本地实现
-    let bundleSvgs;
-    try {
-      const helpersModule = await import('../src/helpers.ts');
-      bundleSvgs = helpersModule.bundleSvgs;
-      console.log('成功导入 bundleSvgs 函数');
-    } catch (error) {
-      console.warn('导入 bundleSvgs 失败，使用本地实现:', error);
-      
-      // 本地 bundleSvgs 实现
-      bundleSvgs = async function(svgMap, svgAttributes) {
-        const svgGroups = [];
-        
-        for (const [id, svgSource] of Object.entries(svgMap)) {
-          // 提取 SVG 内容
-          const cleanContent = svgSource.trim()
-            .replace(/<\?xml[^?]*\?>\s*/gi, '')
-            .replace(/<!DOCTYPE[^>]*>\s*/gi, '')
-            .replace(/<\?[^?]*\?>\s*/gi, '')
-            .trim();
-          
-          const svgMatch = cleanContent.match(/<svg[^>]*>([\s\S]*?)<\/svg>/i);
-          const innerContent = svgMatch && svgMatch[1] ? svgMatch[1].trim() : cleanContent;
-          
-          const groupContent = `<g id="${id}">${innerContent}</g>`;
-          svgGroups.push(groupContent);
-        }
-        
-        // 构建 SVG 属性字符串
-        const defaultAttributes = {
-          xmlns: 'http://www.w3.org/2000/svg',
-          style: 'display:none;'
-        };
-        
-        // 合并默认属性和用户自定义属性
-        const finalAttributes = { ...defaultAttributes, ...svgAttributes };
-        
-        // 将属性对象转换为字符串
-        const attributesString = Object.entries(finalAttributes)
-          .map(([key, value]) => `${key}="${value}"`)
-          .join(' ');
-        
-        return `<svg ${attributesString}>
-${svgGroups.join('\n')}
-</svg>`;
-      };
-    }
     
     window.onload = async function () {
       // 初始化语言设置
@@ -977,7 +951,9 @@ ${svgGroups.join('\n')}
         };
 
         try {
-          console.log('调用 bundleSvgs...');
+          console.log('准备调用 bundleSvgs...');
+          console.log('bundleSvgs 函数类型:', typeof bundleSvgs);
+          console.log('dynamicSvgMap 内容:', dynamicSvgMap);
           
           // 自定义 SVG 属性
           const customSvgAttributes = {
@@ -988,20 +964,20 @@ ${svgGroups.join('\n')}
             'data-source': 'bundleSvgs-dynamic'
           };
           
-          // 使用 bundleSvgs 生成合并的 SVG，并传入自定义属性
-          const bundledSvg = await bundleSvgs(dynamicSvgMap, customSvgAttributes);
-          console.log('bundleSvgs 完成，生成的 SVG 长度:', bundledSvg.length);
-          console.log('生成的 SVG 预览:', bundledSvg.substring(0, 200) + '...');
+          console.log('customSvgAttributes:', customSvgAttributes);
+          console.log('开始调用 bundleSvgs...');
           
-          // 创建 Blob URL
-          const blob = new Blob([bundledSvg], { type: 'image/svg+xml' });
-          const url = URL.createObjectURL(blob);
-          console.log('创建的 Blob URL:', url);
+          // 使用 bundleSvgs 生成合并的 SVG Blob URL，并传入自定义属性
+          const bundledSvgUrl = await bundleSvgs(dynamicSvgMap, customSvgAttributes);
+          console.log('bundleSvgs 调用成功，生成的 Blob URL:', bundledSvgUrl);
           
           // 设置 object 元素的 data 属性
           const iconObject = document.getElementById('iconDynamic');
           const loadingIndicator = document.getElementById('loadingIndicator');
           const dynamicOptionsContainer = document.getElementById('dynamicOptionsContainer');
+
+          console.log('iconObject 元素:', iconObject);
+          console.log('loadingIndicator 元素:', loadingIndicator);
 
           // 设置超时机制，防止一直卡在加载状态
           const loadTimeout = setTimeout(() => {
@@ -1024,8 +1000,9 @@ ${svgGroups.join('\n')}
           };
 
           // 设置 data 属性
-          iconObject.data = url;
-          console.log('已设置 object.data');
+          console.log('设置 iconObject.data 为:', bundledSvgUrl);
+          iconObject.data = bundledSvgUrl;
+          console.log('已设置 object.data，等待加载完成...');
 
           function showDynamicExample() {
             // 隐藏加载指示器
@@ -1061,9 +1038,8 @@ ${svgGroups.join('\n')}
 
               console.log(t('console.dynamicComplete'));
             } catch (morpheusError) {
-              console.error('SVGMorpheus 初始化失败，尝试备用方案:', morpheusError);
-              // 如果 SVGMorpheus 初始化失败，尝试内联 SVG 方案
-              tryInlineSvgFallback();
+              console.error('SVGMorpheus 初始化失败:', morpheusError);
+              showErrorMessage(t('error.loadFailed'));
             }
           }
 
@@ -1073,69 +1049,6 @@ ${svgGroups.join('\n')}
               loadingIndicator.innerHTML = `<span style="color: #f44336;">${message}</span>`;
             }
           }
-
-          // 备用方案：使用内联 SVG
-          function tryInlineSvgFallback() {
-            console.log('尝试内联 SVG 备用方案...');
-            
-            // 隐藏 Object 元素
-            iconObject.style.display = 'none';
-            
-            // 创建内联 SVG 容器
-            const svgContainer = document.createElement('div');
-            svgContainer.id = 'inlineSvgContainer';
-            svgContainer.style.cssText = `
-              display: block;
-              box-sizing: border-box;
-              width: 100%;
-              height: 250px;
-              background: #ffffff;
-              margin: 20px auto;
-              padding: 60px;
-              border-radius: 8px;
-              box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-              border: 2px solid #e0e0e0;
-            `;
-            
-            // 插入生成的 SVG
-            svgContainer.innerHTML = bundledSvg;
-            
-            // 替换 Object 元素
-            iconObject.parentNode.insertBefore(svgContainer, iconObject);
-            
-            // 使用内联 SVG 初始化 SVGMorpheus
-            try {
-              const svgMorpheusDynamic = new SVGMorpheus('#inlineSvgContainer svg');
-              const selIconDynamic = document.getElementById('selIconDynamic');
-              const selEasingDynamic = document.getElementById('selEasingDynamic');
-              const selDurationDynamic = document.getElementById('selDurationDynamic');
-              const selRotationDynamic = document.getElementById('selRotationDynamic');
-
-              // 为动态示例创建图标选项
-              const dynamicIcons = {
-                'circle': t('icons.circle'),
-                'square': t('icons.square'),
-                'triangle': t('icons.triangle'),
-                'star': t('icons.star'),
-                'heart': t('icons.heart'),
-                'diamond': t('icons.diamond')
-              };
-
-              populateSelectsDynamic(selIconDynamic, selEasingDynamic, selDurationDynamic, selRotationDynamic, dynamicIcons);
-              setupEventHandlers(svgMorpheusDynamic, selIconDynamic, selEasingDynamic, selDurationDynamic, selRotationDynamic, true);
-
-              // 显示选项
-              if (dynamicOptionsContainer) {
-                dynamicOptionsContainer.style.display = 'block';
-              }
-
-              console.log(t('console.fallbackSuccess'));
-            } catch (fallbackError) {
-              console.error('内联 SVG 备用方案也失败了:', fallbackError);
-              showErrorMessage(t('error.allFailed'));
-            }
-          }
-
         } catch (error) {
           console.error('动态 SVG 初始化失败:', error);
           // 检查是否是因为模块导入失败

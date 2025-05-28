@@ -1,5 +1,8 @@
 # SVG Morpheus TypeScript
 
+> **⚡ This project is a TypeScript refactoring based on [alexk111/SVG-Morpheus](https://github.com/alexk111/SVG-Morpheus)**  
+> Original project by [@alexk111](https://github.com/alexk111) - refactored with modern TypeScript + Vite + pnpm
+
 [中文](./README.zh.md) | **English**
 
 JavaScript library enabling SVG icons to morph from one to the other. It implements Material Design's Delightful Details transitions.
@@ -66,9 +69,8 @@ import {
   pathToAbsolute,    // Path conversion utilities
   styleNormCalc,     // Style calculation utilities
   curveCalc,         // Curve calculation utilities
-  bundleSvgs,        // 🆕 Dynamic SVG bundling
-  bundleAndInsertSvgs, // 🆕 Bundle and insert to DOM
-  insertBundledSvg   // 🆕 Insert bundled SVG to DOM
+  bundleSvgs,        // 🆕 Dynamic SVG bundling, returns Blob URL
+  bundleSvgsString   // 🆕 Dynamic SVG bundling, returns SVG string
 } from 'svg-morpheus';
 
 // Use predefined easing functions
@@ -82,7 +84,8 @@ const svgMap = {
   'icon1': '<svg>...</svg>',
   'icon2': '/path/to/icon.svg'
 };
-const bundledSvg = await bundleSvgs(svgMap);
+const bundledSvgUrl = await bundleSvgs(svgMap);
+const bundledSvgString = await bundleSvgsString(svgMap);
 ```
 
 ### Complete Example
@@ -196,8 +199,7 @@ const morpheus = new SVGMorpheus('#my-svg', options, () => {
 - `path2string` - Path to string conversion
 - `curvePathBBox` - Calculate curve bounding box
 - `bundleSvgs` - 🆕 Dynamic SVG bundling utility
-- `bundleAndInsertSvgs` - 🆕 Bundle SVGs and insert to DOM
-- `insertBundledSvg` - 🆕 Insert bundled SVG to DOM
+- `bundleSvgsString` - 🆕 Dynamic SVG bundling, returns SVG string
 
 ## 🛠️ Development
 
@@ -337,14 +339,10 @@ const svgMap = {
   'settings': '/icons/settings.svg'
 };
 
-// Generate bundled SVG
-const bundledSvg = await bundleSvgs(svgMap);
-console.log(bundledSvg);
-// Output: <svg xmlns="http://www.w3.org/2000/svg" style="display:none;">
-//   <g id="home">...</g>
-//   <g id="user">...</g>
-//   <g id="settings">...</g>
-// </svg>
+// Generate bundled SVG Blob URL
+const bundledSvgUrl = await bundleSvgs(svgMap);
+console.log(bundledSvgUrl);
+// Output: blob:null/12345678-1234-1234-1234-123456789abc
 ```
 
 ### Custom SVG Attributes
@@ -359,40 +357,35 @@ const customAttributes = {
   'data-version': '1.0'
 };
 
-const bundledSvg = await bundleSvgs(svgMap, customAttributes);
-// Output: <svg xmlns="http://www.w3.org/2000/svg" style="display:none;" viewBox="0 0 24 24" width="100%" height="100%" class="my-iconset" data-version="1.0">
-//   <g id="home">...</g>
-//   ...
-// </svg>
-```
-
-### Convenient DOM Integration
-
-```typescript
-import { bundleAndInsertSvgs } from 'svg-morpheus';
-
-// Bundle and automatically insert into DOM
-await bundleAndInsertSvgs(svgMap, 'my-iconset-container', customAttributes);
-
-// Or use with default container ID
-await bundleAndInsertSvgs(svgMap);
+const bundledSvgUrl = await bundleSvgs(svgMap, customAttributes);
+// The generated SVG will have custom attributes applied
 ```
 
 ### Use with Object Element
 
 ```typescript
-// Create Blob URL for object element
-const bundledSvg = await bundleSvgs(svgMap, { viewBox: '0 0 24 24' });
-const blob = new Blob([bundledSvg], { type: 'image/svg+xml' });
-const url = URL.createObjectURL(blob);
+// Use bundleSvgs directly with object element
+const bundledSvgUrl = await bundleSvgs(svgMap, { viewBox: '0 0 24 24' });
 
 // Use with object element
 const objectElement = document.getElementById('my-svg-object');
-objectElement.data = url;
+objectElement.data = bundledSvgUrl;
 
 // Initialize SVGMorpheus
 const morpheus = new SVGMorpheus('#my-svg-object');
 morpheus.to('home');
+```
+
+### Get SVG String (for fallback scenarios)
+
+```typescript
+import { bundleSvgsString } from 'svg-morpheus';
+
+// Get SVG string instead of Blob URL
+const bundledSvgString = await bundleSvgsString(svgMap, customAttributes);
+
+// Use for inline SVG
+document.getElementById('svg-container').innerHTML = bundledSvgString;
 ```
 
 ### Advanced Features
@@ -430,17 +423,10 @@ const svgAttributes: Record<string, string | number> = {
 
 - **svgMap**: `Record<string, string>` - Object mapping icon IDs to SVG sources
 - **svgAttributes**: `Record<string, string | number>` (optional) - Custom attributes for root SVG element
-- **Returns**: `Promise<string>` - Combined SVG string
+- **Returns**: `Promise<string>` - Generated Blob URL
 
-#### bundleAndInsertSvgs(svgMap, containerId?, svgAttributes?)
+#### bundleSvgsString(svgMap, svgAttributes?)
 
-- **svgMap**: `Record<string, string>` - Object mapping icon IDs to SVG sources  
-- **containerId**: `string` (optional, default: 'svg-iconset') - Container element ID
+- **svgMap**: `Record<string, string>` - Object mapping icon IDs to SVG sources
 - **svgAttributes**: `Record<string, string | number>` (optional) - Custom attributes for root SVG element
-- **Returns**: `Promise<void>`
-
-#### insertBundledSvg(bundledSvg, containerId?)
-
-- **bundledSvg**: `string` - Pre-generated SVG string
-- **containerId**: `string` (optional, default: 'svg-iconset') - Container element ID
-- **Returns**: `void`
+- **Returns**: `Promise<string>` - Combined SVG string

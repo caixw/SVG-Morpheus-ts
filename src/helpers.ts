@@ -344,12 +344,12 @@ const getRGB = function (colour: any) {
 };
 
 /**
- * 动态合并多个 SVG 为类似 iconset.svg 的格式
+ * 内部函数：动态合并多个 SVG 为类似 iconset.svg 的格式字符串
  * @param svgMap 对象，key 为 g 标签的 id，value 为 svg 路径或 svg 代码
  * @param svgAttributes 可选，生成的 SVG 根元素的属性集合
  * @returns Promise<string> 合并后的 SVG 字符串
  */
-export async function bundleSvgs(
+async function createBundledSvgString(
   svgMap: Record<string, string>, 
   svgAttributes?: Record<string, string | number>
 ): Promise<string> {
@@ -405,6 +405,38 @@ ${svgGroups.join('\n')}
 </svg>`;
   
   return bundledSvg;
+}
+
+/**
+ * 动态合并多个 SVG 为类似 iconset.svg 的格式，并返回 Blob URL
+ * @param svgMap 对象，key 为 g 标签的 id，value 为 svg 路径或 svg 代码
+ * @param svgAttributes 可选，生成的 SVG 根元素的属性集合
+ * @returns Promise<string> 生成的 Blob URL
+ */
+export async function bundleSvgs(
+  svgMap: Record<string, string>, 
+  svgAttributes?: Record<string, string | number>
+): Promise<string> {
+  const bundledSvg = await createBundledSvgString(svgMap, svgAttributes);
+  
+  // 创建 Blob 和 URL
+  const blob = new Blob([bundledSvg], { type: 'image/svg+xml' });
+  const url = URL.createObjectURL(blob);
+  
+  return url;
+}
+
+/**
+ * 动态合并多个 SVG 为类似 iconset.svg 的格式，并返回 SVG 字符串（用于需要直接操作 SVG 内容的场景）
+ * @param svgMap 对象，key 为 g 标签的 id，value 为 svg 路径或 svg 代码
+ * @param svgAttributes 可选，生成的 SVG 根元素的属性集合
+ * @returns Promise<string> 合并后的 SVG 字符串
+ */
+export async function bundleSvgsString(
+  svgMap: Record<string, string>, 
+  svgAttributes?: Record<string, string | number>
+): Promise<string> {
+  return createBundledSvgString(svgMap, svgAttributes);
 }
 
 /**
@@ -478,40 +510,4 @@ function extractSvgInnerContent(svgContent: string): string {
   
   // 如果都不匹配，返回原内容（可能已经是内部内容）
   return cleanContent;
-}
-
-/**
- * 将合并后的 SVG 插入到 DOM 中
- * @param bundledSvg 合并后的 SVG 字符串
- * @param containerId 容器 ID，默认为 'svg-iconset'
- */
-export function insertBundledSvg(bundledSvg: string, containerId: string = 'svg-iconset'): void {
-  // 移除已存在的容器
-  const existingContainer = document.getElementById(containerId);
-  if (existingContainer) {
-    existingContainer.remove();
-  }
-  
-  // 创建新的容器
-  const container = document.createElement('div');
-  container.id = containerId;
-  container.innerHTML = bundledSvg;
-  
-  // 插入到 body 的开头
-  document.body.insertBefore(container, document.body.firstChild);
-}
-
-/**
- * 便捷方法：合并 SVG 并直接插入到 DOM
- * @param svgMap SVG 映射对象
- * @param containerId 容器 ID
- * @param svgAttributes 可选，生成的 SVG 根元素的属性集合
- */
-export async function bundleAndInsertSvgs(
-  svgMap: Record<string, string>, 
-  containerId: string = 'svg-iconset',
-  svgAttributes?: Record<string, string | number>
-): Promise<void> {
-  const bundledSvg = await bundleSvgs(svgMap, svgAttributes);
-  insertBundledSvg(bundledSvg, containerId);
 } 

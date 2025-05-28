@@ -36,7 +36,7 @@ export default defineConfig({
     },
   },
   server: {
-    port: 9000,
-    open: '/demos/object.html',
+    port: 9001,
+    open: '/demos/index.html',
   },
 }); 
