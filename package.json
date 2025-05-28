@@ -1,37 +1,60 @@
 {
-  "author": {
-    "name": "Alex Kaul",
-    "email": "alexkaul@googlemail.com"
-  },
   "name": "svg-morpheus",
   "prettyName": "SVG Morpheus",
   "version": "0.3.2",
-  "main": "compile/minified/svg-morpheus.js",
-  "description": "JavaScript library enabling SVG icons to morph from one to the other. It implements Material Design's Delightful Details transitions.",
+  "type": "module",
+  "main": "./dist/svg-morpheus.js",
+  "module": "./dist/svg-morpheus.js",
+  "types": "./dist/svg-morpheus.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/svg-morpheus.d.ts",
+      "import": "./dist/svg-morpheus.js",
+      "require": "./dist/svg-morpheus.cjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "description": "JavaScript library enabling SVG icons to morph from one to the other. It implements Material Design's Delightful Details transitions. Refactored with modern TypeScript + Vite + pnpm stack. Supports both Chinese and English documentation.",
   "homepage": "https://github.com/alexk111/SVG-Morpheus",
   "repository": {
     "type": "git",
     "url": "https://github.com/alexk111/SVG-Morpheus.git"
   },
   "license": "MIT",
+  "author": {
+    "name": "Alex Kaul",
+    "email": "alexkaul@googlemail.com"
+  },
+  "keywords": [
+    "svg",
+    "animation",
+    "morphing",
+    "icons",
+    "material-design"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "lint": "eslint src/**/*.ts",
+    "lint:fix": "eslint src/**/*.ts --fix",
+    "type-check": "tsc --noEmit"
+  },
+  "packageManager": "pnpm@8.15.0",
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=8.0.0"
+  },
   "dependencies": {},
   "devDependencies": {
-    "connect-livereload": "^0.4.0",
-    "express": "^4.4.5",
-    "gulp": "^3.8.5",
-    "gulp-autoprefixer": "0.0.8",
-    "gulp-concat": "^2.2.0",
-    "gulp-concat-util": "^0.2.3",
-    "gulp-header": "^1.0.2",
-    "gulp-jshint": "^1.6.4",
-    "gulp-livereload": "^2.1.0",
-    "gulp-open": "^0.2.8",
-    "gulp-rimraf": "^0.1.0",
-    "gulp-uglify": "^0.3.1",
-    "gulp-util": "^2.2.19",
-    "jshint-stylish": "^0.2.0",
-    "minimist": "^0.2.0",
-    "opn": "^0.1.2",
-    "tiny-lr": "0.0.7"
+    "@types/node": "^20.10.0",
+    "@typescript-eslint/eslint-plugin": "^6.13.0",
+    "@typescript-eslint/parser": "^6.13.0",
+    "eslint": "^8.54.0",
+    "typescript": "^5.3.0",
+    "vite": "^5.0.0",
+    "vite-plugin-dts": "^3.6.0"
   }
 }
