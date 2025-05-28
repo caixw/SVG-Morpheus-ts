@@ -38,10 +38,10 @@ npm install svg-morpheus
 
 ```typescript
 // 默认导入
-import SVGMorpheus from 'svg-morpheus';
+import SVGMorpheus from 'svg-morpheus-ts';
 
 // 或者命名导入
-import { SVGMorpheus } from 'svg-morpheus';
+import { SVGMorpheus } from 'svg-morpheus-ts';
 
 // 创建实例
 const myMorpheus = new SVGMorpheus('#my-svg');
@@ -55,7 +55,7 @@ import type {
   IconItem, 
   EasingFunction,
   RGBColor 
-} from 'svg-morpheus';
+} from 'svg-morpheus-ts';
 
 // 使用类型
 const options: SVGMorpheusOptions = {
@@ -77,7 +77,7 @@ import {
   curveCalc,         // 曲线计算工具
   bundleSvgs,        // 🆕 动态SVG合并，返回 Blob URL
   bundleSvgsString   // 🆕 动态SVG合并，返回 SVG 字符串
-} from 'svg-morpheus';
+} from 'svg-morpheus-ts';
 
 // 使用预定义的缓动函数
 console.log(easings.easeInOut);
@@ -100,7 +100,7 @@ const bundledSvgString = await bundleSvgsString(svgMap);
 import SVGMorpheus, { 
   type SVGMorpheusOptions, 
   easings 
-} from 'svg-morpheus';
+} from 'svg-morpheus-ts';
 
 // 配置选项
 const options: SVGMorpheusOptions = {
@@ -122,7 +122,7 @@ morpheus.to('icon2', { duration: 1200 });
 ### ES 模块 (推荐)
 
 ```typescript
-import { SVGMorpheus } from 'svg-morpheus';
+import { SVGMorpheus } from 'svg-morpheus-ts';
 
 const morpheus = new SVGMorpheus('svg', {
   duration: 600,
@@ -158,7 +158,7 @@ morpheus.to('icon-name');
 项目提供完整的 TypeScript 类型定义：
 
 ```typescript
-import { SVGMorpheus, type SVGMorpheusOptions } from 'svg-morpheus';
+import { SVGMorpheus, type SVGMorpheusOptions } from 'svg-morpheus-ts';
 
 const options: SVGMorpheusOptions = {
   duration: 500,
@@ -309,7 +309,7 @@ morpheus.registerEasing('my-easing', (t: number) => {
 const morpheus = new SVGMorpheus('svg');
 
 // 新版本 (ESM)
-import { SVGMorpheus } from 'svg-morpheus';
+import { SVGMorpheus } from 'svg-morpheus-ts';
 const morpheus = new SVGMorpheus('svg');
 ```
 
@@ -337,7 +337,7 @@ MIT License
 ### 基础用法
 
 ```typescript
-import { bundleSvgs } from 'svg-morpheus';
+import { bundleSvgs } from 'svg-morpheus-ts';
 
 const svgMap = {
   'home': '<svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>',
@@ -385,7 +385,7 @@ morpheus.to('home');
 ### 获取SVG字符串（用于备用方案）
 
 ```typescript
-import { bundleSvgsString } from 'svg-morpheus';
+import { bundleSvgsString } from 'svg-morpheus-ts';
 
 // 获取SVG字符串而不是Blob URL
 const bundledSvgString = await bundleSvgsString(svgMap, customAttributes);
@@ -415,7 +415,7 @@ const bundledSvg = await bundleSvgs({
 
 **TypeScript支持**: 包含完整的类型定义
 ```typescript
-import type { bundleSvgs } from 'svg-morpheus';
+import type { bundleSvgs } from 'svg-morpheus-ts';
 
 const svgAttributes: Record<string, string | number> = {
   'data-theme': 'dark',

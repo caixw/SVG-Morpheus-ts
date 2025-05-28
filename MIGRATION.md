@@ -91,7 +91,7 @@ class SVGMorpheus {
 var morpheus = new SVGMorpheus('svg');
 
 // 重构后 (ESM)
-import { SVGMorpheus } from 'svg-morpheus';
+import { SVGMorpheus } from 'svg-morpheus-ts';
 const morpheus = new SVGMorpheus('svg');
 ```
 
@@ -163,7 +163,7 @@ const morpheus = new SVGMorpheus('svg', {
 morpheus.to('icon-name');
 
 // 新TypeScript API - 增强版
-import { SVGMorpheus, type SVGMorpheusOptions } from 'svg-morpheus';
+import { SVGMorpheus, type SVGMorpheusOptions } from 'svg-morpheus-ts';
 const options: SVGMorpheusOptions = { duration: 750 };
 const morpheus = new SVGMorpheus('svg', options);
 morpheus.to('icon-name');
@@ -180,13 +180,13 @@ morpheus.to('icon-name');
 const morpheus = new SVGMorpheus('svg');
 
 // 新版本
-import { SVGMorpheus } from 'svg-morpheus';
+import { SVGMorpheus } from 'svg-morpheus-ts';
 const morpheus = new SVGMorpheus('svg');
 ```
 
 #### TypeScript项目
 ```typescript
-import { SVGMorpheus, type SVGMorpheusOptions } from 'svg-morpheus';
+import { SVGMorpheus, type SVGMorpheusOptions } from 'svg-morpheus-ts';
 
 const options: SVGMorpheusOptions = {
   duration: 500,

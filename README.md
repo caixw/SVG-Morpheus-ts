@@ -38,10 +38,10 @@ npm install svg-morpheus
 
 ```typescript
 // Default import
-import SVGMorpheus from 'svg-morpheus';
+import SVGMorpheus from 'svg-morpheus-ts';
 
 // Or named import
-import { SVGMorpheus } from 'svg-morpheus';
+import { SVGMorpheus } from 'svg-morpheus-ts';
 
 // Create instance
 const myMorpheus = new SVGMorpheus('#my-svg');
@@ -55,7 +55,7 @@ import type {
   IconItem, 
   EasingFunction,
   RGBColor 
-} from 'svg-morpheus';
+} from 'svg-morpheus-ts';
 
 // Use types
 const options: SVGMorpheusOptions = {
@@ -77,7 +77,7 @@ import {
   curveCalc,         // Curve calculation utilities
   bundleSvgs,        // 🆕 Dynamic SVG bundling, returns Blob URL
   bundleSvgsString   // 🆕 Dynamic SVG bundling, returns SVG string
-} from 'svg-morpheus';
+} from 'svg-morpheus-ts';
 
 // Use predefined easing functions
 console.log(easings.easeInOut);
@@ -100,7 +100,7 @@ const bundledSvgString = await bundleSvgsString(svgMap);
 import SVGMorpheus, { 
   type SVGMorpheusOptions, 
   easings 
-} from 'svg-morpheus';
+} from 'svg-morpheus-ts';
 
 // Configuration options
 const options: SVGMorpheusOptions = {
@@ -122,7 +122,7 @@ morpheus.to('icon2', { duration: 1200 });
 ### ES Modules (Recommended)
 
 ```typescript
-import { SVGMorpheus } from 'svg-morpheus';
+import { SVGMorpheus } from 'svg-morpheus-ts';
 
 const morpheus = new SVGMorpheus('svg', {
   duration: 600,
@@ -158,7 +158,7 @@ morpheus.to('icon-name');
 The project provides complete TypeScript type definitions:
 
 ```typescript
-import { SVGMorpheus, type SVGMorpheusOptions } from 'svg-morpheus';
+import { SVGMorpheus, type SVGMorpheusOptions } from 'svg-morpheus-ts';
 
 const options: SVGMorpheusOptions = {
   duration: 500,
@@ -309,7 +309,7 @@ morpheus.registerEasing('my-easing', (t: number) => {
 const morpheus = new SVGMorpheus('svg');
 
 // New version (ESM)
-import { SVGMorpheus } from 'svg-morpheus';
+import { SVGMorpheus } from 'svg-morpheus-ts';
 const morpheus = new SVGMorpheus('svg');
 ```
 
@@ -337,7 +337,7 @@ The new `bundleSvgs` functionality allows you to dynamically create iconset-styl
 ### Basic Usage
 
 ```typescript
-import { bundleSvgs } from 'svg-morpheus';
+import { bundleSvgs } from 'svg-morpheus-ts';
 
 const svgMap = {
   'home': '<svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>',
@@ -385,7 +385,7 @@ morpheus.to('home');
 ### Get SVG String (for fallback scenarios)
 
 ```typescript
-import { bundleSvgsString } from 'svg-morpheus';
+import { bundleSvgsString } from 'svg-morpheus-ts';
 
 // Get SVG string instead of Blob URL
 const bundledSvgString = await bundleSvgsString(svgMap, customAttributes);
@@ -415,7 +415,7 @@ const bundledSvg = await bundleSvgs({
 
 **TypeScript Support**: Full type definitions included
 ```typescript
-import type { bundleSvgs } from 'svg-morpheus';
+import type { bundleSvgs } from 'svg-morpheus-ts';
 
 const svgAttributes: Record<string, string | number> = {
   'data-theme': 'dark',
