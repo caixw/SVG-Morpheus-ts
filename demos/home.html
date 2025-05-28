@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SVG Morpheus TypeScript Demo</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            line-height: 1.6;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            color: #333;
+        }
+        .demo-link {
+            display: block;
+            padding: 20px;
+            margin: 15px 0;
+            background: #f8f9fa;
+            border-radius: 8px;
+            text-decoration: none;
+            color: #333;
+            border: 1px solid #e9ecef;
+            transition: all 0.3s;
+        }
+        .demo-link:hover {
+            background: #e9ecef;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .demo-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .demo-desc {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .badge {
+            display: inline-block;
+            padding: 6px 12px;
+            background: #4CAF50;
+            color: white;
+            border-radius: 20px;
+            font-size: 12px;
+            margin: 0 4px;
+            font-weight: 500;
+        }
+        .source-badge {
+            background: #007bff;
+            margin-top: 10px;
+            padding: 8px 16px;
+            text-decoration: none;
+            color: white;
+            border-radius: 20px;
+            font-size: 13px;
+            display: inline-block;
+            transition: all 0.3s;
+        }
+        .source-badge:hover {
+            background: #0056b3;
+            transform: translateY(-1px);
+        }
+        .link-style {
+            color: #007bff;
+            text-decoration: none;
+        }
+        .link-style:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>SVG Morpheus TypeScript</h1>
+            <p>Modern TypeScript + Vite + pnpm refactored version</p>
+            <div>
+                <span class="badge">TypeScript</span>
+                <span class="badge">Vite</span>
+                <span class="badge">pnpm</span>
+                <span class="badge">ESM</span>
+            </div>
+            <a href="https://github.com/alexk111/SVG-Morpheus" target="_blank" class="source-badge">
+                ⚡ Based on SVG-Morpheus
+            </a>
+        </div>
+        
+        <h2>🎯 Demo Pages</h2>
+        
+        <a href="./demo.html" class="demo-link">
+            <div class="demo-title">🎯 Main Demo</div>
+            <div class="demo-desc">Complete demo with static and dynamic SVG examples, multilingual support (English/Chinese)</div>
+        </a>
+        
+        <a href="./debug-bundleSvgs.html" class="demo-link">
+            <div class="demo-title">🔧 Debug bundleSvgs</div>
+            <div class="demo-desc">Debug page for testing bundleSvgs function with detailed logging</div>
+        </a>
+        
+        <a href="./test-bundleSvgs.html" class="demo-link">
+            <div class="demo-title">🧪 Test bundleSvgs</div>
+            <div class="demo-desc">Simple test page for bundleSvgs functionality verification</div>
+        </a>
+        
+        <h2>📚 Documentation</h2>
+        <p>
+            <a href="https://github.com/adoin/SVG-Morpheus-ts" target="_blank" class="link-style">📚 View on GitHub</a> |
+            <a href="https://github.com/alexk111/SVG-Morpheus" target="_blank" class="link-style">🔗 Original Project</a>
+        </p>
+        
+        <h2>✨ Features</h2>
+        <ul>
+            <li>🔄 Smooth SVG morphing animations</li>
+            <li>🛠️ Modern TypeScript implementation</li>
+            <li>🚀 Dynamic SVG bundling with <code>bundleSvgs()</code></li>
+            <li>🌍 Multilingual support (English/Chinese)</li>
+            <li>📱 Responsive design</li>
+            <li>⚡ ESM module support</li>
+        </ul>
+        
+        <h2>🚀 Quick Start</h2>
+        <pre style="background: #263238; color: #eeffff; padding: 15px; border-radius: 6px; overflow-x: auto;">
+<code># Install
+npm install svg-morpheus-ts
+
+# Usage
+import { SVGMorpheus, bundleSvgs } from 'svg-morpheus-ts';
+
+// Create morph instance
+const morpheus = new SVGMorpheus('#icon');
+
+// Morph to different icon
+morpheus.to('new-icon', {
+  duration: 600,
+  easing: 'quad-in-out'
+});</code>
+        </pre>
+    </div>
+</body>
+</html> 
