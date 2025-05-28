@@ -3,14 +3,14 @@
   "prettyName": "SVG Morpheus",
   "version": "0.3.2",
   "type": "module",
-  "main": "./dist/svg-morpheus.js",
-  "module": "./dist/svg-morpheus.js",
-  "types": "./dist/svg-morpheus.d.ts",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/svg-morpheus.d.ts",
-      "import": "./dist/svg-morpheus.js",
-      "require": "./dist/svg-morpheus.cjs"
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
     }
   },
   "files": [

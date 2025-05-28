@@ -1,13 +1,3 @@
-import type {
-  SVGMorpheusOptions,
-  CallbackFunction,
-  Icon,
-  IconItem,
-  MorphNode,
-  StyleAttributes,
-  BoundingBox
-} from './types.ts';
-
 import { 
   styleNormCalc, 
   styleNormToString, 
@@ -18,213 +8,212 @@ import {
   clone,
   reqAnimFrame,
   cancelAnimFrame
-} from './helpers.js';
+} from './helpers';
 
-import { easings } from './easings.js';
-import { path2curve, path2string, curvePathBBox } from './svg-path.js';
+import { easings } from './easings';
+import { path2curve, path2string, curvePathBBox } from './svg-path';
 
 export class SVGMorpheus {
-  private _icons: Record<string, Icon> = {};
+  private _icons: any = {};
   private _curIconId: string = '';
   private _toIconId: string = '';
-  private _curIconItems: IconItem[] = [];
-  private _fromIconItems: IconItem[] = [];
-  private _toIconItems: IconItem[] = [];
-  private _morphNodes: MorphNode[] = [];
-  private _morphG: SVGGElement | null = null;
-  private _startTime: number | undefined;
+  private _curIconItems: any[] = [];
+  private _fromIconItems: any[] = [];
+  private _toIconItems: any[] = [];
+  private _morphNodes: any[] = [];
+  private _morphG: any;
+  private _startTime: any;
   private _defDuration: number;
   private _defEasing: string;
   private _defRotation: string;
-  private _defCallback: CallbackFunction;
+  private _defCallback: any;
   private _duration: number;
   private _easing: string;
   private _rotation: string;
-  private _callback: CallbackFunction;
-  private _rafid: number | undefined;
-  private _svgDoc: SVGSVGElement | null = null;
-  private _fnTick: (timePassed: number) => void;
+  private _callback: any;
+  private _rafid: any;
+  private _svgDoc: any = null;
+  private _fnTick: any;
 
   constructor(
-    element: string | SVGSVGElement | HTMLObjectElement,
-    options?: SVGMorpheusOptions,
-    callback?: CallbackFunction
+    element: any,
+    options?: any,
+    callback?: any
   ) {
     if (!element) {
       throw new Error('SVGMorpheus > "element" is required');
     }
 
-    let targetElement: SVGSVGElement | HTMLObjectElement;
-
-    if (typeof element === 'string') {
-      const found = document.querySelector(element) as SVGSVGElement | HTMLObjectElement;
-      if (!found) {
+    if(typeof element === typeof '') {
+      element=document.querySelector(element);
+      if (!element) {
         throw new Error('SVGMorpheus > "element" query is not related to an existing DOM node');
       }
-      targetElement = found;
-    } else {
-      targetElement = element;
     }
 
-    if (options && typeof options !== 'object') {
+    if (!!options && typeof options !== typeof {}) {
       throw new Error('SVGMorpheus > "options" parameter must be an object');
     }
     options = options || {};
 
-    if (callback && typeof callback !== 'function') {
+    if (!!callback && typeof callback !== typeof (function(){})) {
       throw new Error('SVGMorpheus > "callback" parameter must be a function');
     }
 
-    this._curIconId = options.iconId || '';
-    this._defDuration = options.duration || 750;
-    this._defEasing = options.easing || 'quad-in-out';
-    this._defRotation = options.rotation || 'clock';
-    this._defCallback = callback || (() => {});
-    this._duration = this._defDuration;
-    this._easing = this._defEasing;
-    this._rotation = this._defRotation;
-    this._callback = this._defCallback;
+    var that=this;
 
-    this._fnTick = (timePassed: number) => {
-      if (!this._startTime) {
-        this._startTime = timePassed;
+    this._icons={};
+    this._curIconId=options.iconId || '';
+    this._toIconId='';
+    this._curIconItems=[];
+    this._fromIconItems=[];
+    this._toIconItems=[];
+    this._morphNodes=[];
+    this._morphG;
+    this._startTime;
+    this._defDuration=options.duration || 750;
+    this._defEasing=options.easing || 'quad-in-out';
+    this._defRotation=options.rotation || 'clock';
+    this._defCallback = callback || function () {};
+    this._duration=this._defDuration;
+    this._easing=this._defEasing;
+    this._rotation=this._defRotation;
+    this._callback=this._defCallback;
+    this._rafid;
+
+    this._fnTick=function(timePassed: any) {
+      if(!that._startTime) {
+        that._startTime=timePassed;
       }
-      const progress = Math.min((timePassed - this._startTime) / this._duration, 1);
-      this._updateAnimationProgress(progress);
-      if (progress < 1) {
-        this._rafid = reqAnimFrame(this._fnTick);
+      var progress=Math.min((timePassed-that._startTime)/that._duration,1);
+      that._updateAnimationProgress(progress);
+      if(progress<1) {
+        that._rafid=reqAnimFrame(that._fnTick);
       } else {
-        if (this._toIconId !== '') {
-          this._animationEnd();
+        if (that._toIconId != '') {
+          that._animationEnd();
         }
       }
     };
 
-    if (targetElement.nodeName.toUpperCase() === 'SVG') {
-      this._svgDoc = targetElement as SVGSVGElement;
-      this._init();
+    if(element.nodeName.toUpperCase()==='SVG') {
+      this._svgDoc=element;
     } else {
-      const objectElement = targetElement as HTMLObjectElement;
-      this._svgDoc = objectElement.contentDocument?.querySelector('svg') || null;
-      if (!this._svgDoc) {
-        objectElement.addEventListener('load', () => {
-          this._svgDoc = objectElement.contentDocument?.querySelector('svg') || null;
-          this._init();
-        }, false);
-      } else {
-        this._init();
-      }
+      this._svgDoc = (element as any).getSVGDocument();
+    }
+    if(!this._svgDoc) {
+      element.addEventListener("load",function(){
+        that._svgDoc = (element as any).getSVGDocument();
+        that._init();
+      },false);
+    } else {
+      that._init();
     }
   }
 
   private _init(): void {
-    if (!this._svgDoc) return;
-
-    if (this._svgDoc.nodeName.toUpperCase() !== 'SVG') {
-      this._svgDoc = this._svgDoc.querySelector('svg');
-      if (!this._svgDoc) return;
+    if(this._svgDoc.nodeName.toUpperCase()!=='SVG') {
+      this._svgDoc=this._svgDoc.getElementsByTagName('svg')[0];
     }
 
-    let lastIconId = '';
+    if(!!this._svgDoc) {
+      var lastIconId='',
+          i: any, len: any, id: any, items: any, item: any, j: any, len2: any, icon: any;
 
-    // Read Icons Data - Icons = 1st tier G nodes having ID
-    const childNodes = Array.from(this._svgDoc.childNodes);
-    for (let i = childNodes.length - 1; i >= 0; i--) {
-      const nodeIcon = childNodes[i] as Element;
-      if (nodeIcon.nodeName.toUpperCase() === 'G') {
-        const id = nodeIcon.getAttribute('id');
-        if (id) {
-          const items: IconItem[] = [];
-          const nodeChildren = Array.from(nodeIcon.childNodes);
-          
-          for (const nodeItem of nodeChildren) {
-            if (nodeItem.nodeType !== Node.ELEMENT_NODE) continue;
-            
-            const element = nodeItem as SVGElement;
-            const item: IconItem = {
-              path: '',
-              attrs: {},
-              style: {}
-            };
+      // Read Icons Data
+      // Icons = 1st tier G nodes having ID
+      for(i=this._svgDoc.childNodes.length-1;i>=0;i--) {
+        var nodeIcon=this._svgDoc.childNodes[i];
+        if(nodeIcon.nodeName.toUpperCase()==='G') {
+          id=nodeIcon.getAttribute('id');
+          if(!!id) {
+            items=[];
+            for(j=0, len2=nodeIcon.childNodes.length;j<len2;j++) {
+              var nodeItem=nodeIcon.childNodes[j];
+              item={
+                path: '',
+                attrs: {},
+                style: {}
+              };
 
-            // Get Item Path (Convert all shapes into Path Data)
-            switch (element.nodeName.toUpperCase()) {
-              case 'PATH':
-                item.path = element.getAttribute('d') || '';
-                break;
-              case 'CIRCLE': {
-                const cx = Number(element.getAttribute('cx')) || 0;
-                const cy = Number(element.getAttribute('cy')) || 0;
-                const r = Number(element.getAttribute('r')) || 0;
-                item.path = `M${cx - r},${cy}a${r},${r} 0 1,0 ${r * 2},0a${r},${r} 0 1,0 -${r * 2},0z`;
-                break;
+              // Get Item Path (Convert all shapes into Path Data)
+              switch(nodeItem.nodeName.toUpperCase()) {
+                case 'PATH':
+                  item.path=nodeItem.getAttribute('d');
+                  break;
+                case 'CIRCLE':
+                  var cx=nodeItem.getAttribute('cx')*1,
+                      cy=nodeItem.getAttribute('cy')*1,
+                      r=nodeItem.getAttribute('r')*1;
+                  item.path='M'+(cx-r)+','+cy+'a'+r+','+r+' 0 1,0 '+(r*2)+',0a'+r+','+r+' 0 1,0 -'+(r*2)+',0z';
+                  break;
+                case 'ELLIPSE':
+                  var cx=nodeItem.getAttribute('cx')*1,
+                      cy=nodeItem.getAttribute('cy')*1,
+                      rx=nodeItem.getAttribute('rx')*1,
+                      ry=nodeItem.getAttribute('ry')*1;
+                  item.path='M'+(cx-rx)+','+cy+'a'+rx+','+ry+' 0 1,0 '+(rx*2)+',0a'+rx+','+ry+' 0 1,0 -'+(rx*2)+',0z';
+                  break;
+                case 'RECT':
+                  var x=nodeItem.getAttribute('x')*1,
+                      y=nodeItem.getAttribute('y')*1,
+                      w=nodeItem.getAttribute('width')*1,
+                      h=nodeItem.getAttribute('height')*1,
+                      rx=nodeItem.getAttribute('rx')*1,
+                      ry=nodeItem.getAttribute('ry')*1;
+                  if(!rx && !ry) {
+                    item.path='M'+x+','+y+'l'+w+',0l0,'+h+'l-'+w+',0z';
+                  } else {
+                    item.path='M'+(x+rx)+','+y+
+                              'l'+(w-rx*2)+',0'+
+                              'a'+rx+','+ry+' 0 0,1 '+rx+','+ry+
+                              'l0,'+(h-ry*2)+
+                              'a'+rx+','+ry+' 0 0,1 -'+rx+','+ry+
+                              'l'+(rx*2-w)+',0'+
+                              'a'+rx+','+ry+' 0 0,1 -'+rx+',-'+ry+
+                              'l0,'+(ry*2-h)+
+                              'a'+rx+','+ry+' 0 0,1 '+rx+',-'+ry+
+                              'z';
+                  }
+                  break;
+                case 'POLYGON':
+                  var points=nodeItem.getAttribute('points');
+                  var p = points.split(/\s+/);
+                  var path = "";
+                  for( var k = 0, len = p.length; k < len; k++ ){
+                      path += (k && "L" || "M") + p[k]
+                  }
+                  item.path=path+'z';
+                  break;
+                case 'LINE':
+                  var x1=nodeItem.getAttribute('x1')*1,
+                      y1=nodeItem.getAttribute('y1')*1,
+                      x2=nodeItem.getAttribute('x2')*1,
+                      y2=nodeItem.getAttribute('y2')*1;
+                  item.path='M'+x1+','+y1+'L'+x2+','+y2+'z';
+                  break;
               }
-              case 'ELLIPSE': {
-                const cx = Number(element.getAttribute('cx')) || 0;
-                const cy = Number(element.getAttribute('cy')) || 0;
-                const rx = Number(element.getAttribute('rx')) || 0;
-                const ry = Number(element.getAttribute('ry')) || 0;
-                item.path = `M${cx - rx},${cy}a${rx},${ry} 0 1,0 ${rx * 2},0a${rx},${ry} 0 1,0 -${rx * 2},0z`;
-                break;
-              }
-              case 'RECT': {
-                const x = Number(element.getAttribute('x')) || 0;
-                const y = Number(element.getAttribute('y')) || 0;
-                const w = Number(element.getAttribute('width')) || 0;
-                const h = Number(element.getAttribute('height')) || 0;
-                const rx = Number(element.getAttribute('rx')) || 0;
-                const ry = Number(element.getAttribute('ry')) || 0;
-                if (!rx && !ry) {
-                  item.path = `M${x},${y}l${w},0l0,${h}l-${w},0z`;
-                } else {
-                  item.path = `M${x + rx},${y}l${w - rx * 2},0a${rx},${ry} 0 0,1 ${rx},${ry}l0,${h - ry * 2}a${rx},${ry} 0 0,1 -${rx},${ry}l${rx * 2 - w},0a${rx},${ry} 0 0,1 -${rx},-${ry}l0,${ry * 2 - h}a${rx},${ry} 0 0,1 ${rx},-${ry}z`;
-                }
-                break;
-              }
-              case 'POLYGON': {
-                const points = element.getAttribute('points') || '';
-                const p = points.split(/\s+/);
-                let path = '';
-                for (let k = 0, len = p.length; k < len; k++) {
-                  path += (k && 'L' || 'M') + p[k];
-                }
-                item.path = path + 'z';
-                break;
-              }
-              case 'LINE': {
-                const x1 = Number(element.getAttribute('x1')) || 0;
-                const y1 = Number(element.getAttribute('y1')) || 0;
-                const x2 = Number(element.getAttribute('x2')) || 0;
-                const y2 = Number(element.getAttribute('y2')) || 0;
-                item.path = `M${x1},${y1}L${x2},${y2}z`;
-                break;
-              }
-            }
-
-            if (item.path !== '') {
-              // Traverse all attributes and get style values
-              const attributes = element.attributes;
-              for (let k = 0; k < attributes.length; k++) {
-                const attrib = attributes[k];
-                if (attrib.specified) {
-                  const name = attrib.name.toLowerCase() as keyof StyleAttributes;
-                  switch (name) {
-                    case 'fill':
-                    case 'fill-opacity':
-                    case 'opacity':
-                    case 'stroke':
-                    case 'stroke-opacity':
-                    case 'stroke-width':
-                      item.attrs[name] = attrib.value;
+              if(item.path!='') {
+                // Traverse all attributes and get style values
+                for (var k = 0, len3=nodeItem.attributes.length; k < len3; k++) {
+                  var attrib = nodeItem.attributes[k];
+                  if (attrib.specified) {
+                    var name=attrib.name.toLowerCase();
+                    switch (name) {
+                      case 'fill':
+                      case 'fill-opacity':
+                      case 'opacity':
+                      case 'stroke':
+                      case 'stroke-opacity':
+                      case 'stroke-width':
+                        item.attrs[name]=attrib.value;
+                    }
                   }
                 }
-              }
 
-              // Traverse all inline styles and get supported values
-              const style = (element as any).style;
-              if (style) {
-                for (let l = 0; l < style.length; l++) {
-                  const styleName = style[l] as keyof StyleAttributes;
+                // Traverse all inline styles and get supported values
+                for (var l = 0, len4=nodeItem.style.length; l < len4; l++) {
+                  var styleName = nodeItem.style[l];
                   switch (styleName) {
                     case 'fill':
                     case 'fill-opacity':
@@ -232,235 +221,230 @@ export class SVGMorpheus {
                     case 'stroke':
                     case 'stroke-opacity':
                     case 'stroke-width':
-                      item.style[styleName] = style[styleName];
+                      item.style[styleName]=nodeItem.style[styleName];
                   }
                 }
+
+                items.push(item);
               }
-
-              items.push(item);
             }
-          }
 
-          // Add Icon
-          if (items.length > 0) {
-            const icon: Icon = {
-              id: id,
-              items: items
-            };
-            this._icons[id] = icon;
-          }
+            // Add Icon
+            if(items.length>0) {
+              icon={
+                id: id,
+                items: items
+              };
+              this._icons[id]=icon;
+            }
 
-          // Init Node for Icons Items and remove Icon Nodes
-          if (!this._morphG) {
-            lastIconId = id;
-            this._morphG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-            this._svgDoc.replaceChild(this._morphG, nodeIcon);
-          } else {
-            this._svgDoc.removeChild(nodeIcon);
+            // Init Node for Icons Items and remove Icon Nodes
+            if(!this._morphG) {
+              lastIconId=id;
+              this._morphG=document.createElementNS('http://www.w3.org/2000/svg', 'g');
+              this._svgDoc.replaceChild(this._morphG,nodeIcon);
+            } else {
+              this._svgDoc.removeChild(nodeIcon);
+            }
           }
         }
       }
-    }
-
-    // To Default Icon
-    const defaultIcon = this._curIconId || lastIconId;
-    if (defaultIcon !== '') {
-      this._setupAnimation(defaultIcon);
-      this._updateAnimationProgress(1);
-      this._animationEnd();
+      // To Default Icon
+      var defaultIcon = this._curIconId || lastIconId;
+      if(defaultIcon!=='') {
+        this._setupAnimation(defaultIcon);
+        this._updateAnimationProgress(1);
+        this._animationEnd();
+      }
     }
   }
 
-  private _setupAnimation(toIconId: string): void {
-    if (!toIconId || !this._icons[toIconId]) return;
+  private _setupAnimation(toIconId: any): void {
+    if(!!toIconId && !!this._icons[toIconId]) {
+      this._toIconId=toIconId;
+      this._startTime=undefined;
+      var i: any, len: any;
+      this._fromIconItems=clone(this._curIconItems);
+      this._toIconItems=clone(this._icons[toIconId].items);
 
-    this._toIconId = toIconId;
-    this._startTime = undefined;
-    this._fromIconItems = clone(this._curIconItems);
-    this._toIconItems = clone(this._icons[toIconId].items);
+      for(i=0, len=this._morphNodes.length;i<len;i++) {
+        var morphNode=this._morphNodes[i];
+        morphNode.fromIconItemIdx=i;
+        morphNode.toIconItemIdx=i;
+      }
 
-    for (let i = 0; i < this._morphNodes.length; i++) {
-      const morphNode = this._morphNodes[i];
-      morphNode.fromIconItemIdx = i;
-      morphNode.toIconItemIdx = i;
-    }
+      var maxNum=Math.max(this._fromIconItems.length, this._toIconItems.length);
+      var toBB: any;
+      for(i=0;i<maxNum;i++) {
+        // Add items to fromIcon/toIcon if needed
+        if(!this._fromIconItems[i]) {
+          if(!!this._toIconItems[i]) {
+            toBB=curvePathBBox(path2curve(this._toIconItems[i].path));
+            this._fromIconItems.push({
+              path: 'M'+toBB.cx+','+toBB.cy+'l0,0',
+              attrs: {},
+              style: {},
+              trans: {
+                'rotate': [0,toBB.cx,toBB.cy]
+              }
+            });
+          } else {
+            this._fromIconItems.push({
+              path: 'M0,0l0,0',
+              attrs: {},
+              style: {},
+              trans: {
+                'rotate': [0,0,0]
+              }
+            });
+          }
+        }
+        if(!this._toIconItems[i]) {
+          if(!!this._fromIconItems[i]) {
+            toBB=curvePathBBox(path2curve(this._fromIconItems[i].path));
+            this._toIconItems.push({
+              path: 'M'+toBB.cx+','+toBB.cy+'l0,0',
+              attrs: {},
+              style: {},
+              trans: {
+                'rotate': [0,toBB.cx,toBB.cy]
+              }
+            });
+          } else {
+            this._toIconItems.push({
+              path: 'M0,0l0,0',
+              attrs: {},
+              style: {},
+              trans: {
+                'rotate': [0,0,0]
+              }
+            });
+          }
+        }
 
-    const maxNum = Math.max(this._fromIconItems.length, this._toIconItems.length);
-    let toBB: BoundingBox;
-
-    for (let i = 0; i < maxNum; i++) {
-      // Add items to fromIcon/toIcon if needed
-      if (!this._fromIconItems[i]) {
-        if (this._toIconItems[i]) {
-          toBB = curvePathBBox(path2curve(this._toIconItems[i].path)[0]);
-          this._fromIconItems.push({
-            path: `M${toBB.cx},${toBB.cy}l0,0`,
-            attrs: {},
-            style: {},
-            trans: {
-              'rotate': [0, toBB.cx, toBB.cy]
-            }
-          });
-        } else {
-          this._fromIconItems.push({
-            path: 'M0,0l0,0',
-            attrs: {},
-            style: {},
-            trans: {
-              'rotate': [0, 0, 0]
-            }
+        // Add Node to DOM if needed
+        if(!this._morphNodes[i]) {
+          var node=document.createElementNS('http://www.w3.org/2000/svg', 'path');
+          this._morphG.appendChild(node);
+          this._morphNodes.push({
+            node: node,
+            fromIconItemIdx: i,
+            toIconItemIdx: i
           });
         }
       }
-      if (!this._toIconItems[i]) {
-        if (this._fromIconItems[i]) {
-          toBB = curvePathBBox(path2curve(this._fromIconItems[i].path)[0]);
-          this._toIconItems.push({
-            path: `M${toBB.cx},${toBB.cy}l0,0`,
-            attrs: {},
-            style: {},
-            trans: {
-              'rotate': [0, toBB.cx, toBB.cy]
+
+      for(i=0;i<maxNum;i++) {
+        var fromIconItem=this._fromIconItems[i];
+        var toIconItem=this._toIconItems[i];
+
+        // Calculate from/to curve data and set to fromIcon/toIcon
+        var curves=path2curve(this._fromIconItems[i].path,this._toIconItems[i].path);
+        fromIconItem.curve=curves[0];
+        toIconItem.curve=curves[1];
+
+        // Normalize from/to attrs
+        var attrsNorm=styleToNorm(this._fromIconItems[i].attrs,this._toIconItems[i].attrs);
+        fromIconItem.attrsNorm=attrsNorm[0];
+        toIconItem.attrsNorm=attrsNorm[1];
+        fromIconItem.attrs=styleNormToString(fromIconItem.attrsNorm);
+        toIconItem.attrs=styleNormToString(toIconItem.attrsNorm);
+
+        // Normalize from/to style
+        var styleNorm=styleToNorm(this._fromIconItems[i].style,this._toIconItems[i].style);
+        fromIconItem.styleNorm=styleNorm[0];
+        toIconItem.styleNorm=styleNorm[1];
+        fromIconItem.style=styleNormToString(fromIconItem.styleNorm);
+        toIconItem.style=styleNormToString(toIconItem.styleNorm);
+
+        // Calculate from/to transform
+        toBB=curvePathBBox(toIconItem.curve);
+        toIconItem.trans={
+          'rotate': [0,toBB.cx,toBB.cy]
+        };
+        var rotation=this._rotation, degAdd: any;
+        if(rotation==='random') {
+          rotation=Math.random()<0.5?'counterclock':'clock';
+        }
+        switch(rotation) {
+          case 'none':
+            if(!!fromIconItem.trans.rotate) {
+              toIconItem.trans.rotate[0]=fromIconItem.trans.rotate[0];
             }
-          });
-        } else {
-          this._toIconItems.push({
-            path: 'M0,0l0,0',
-            attrs: {},
-            style: {},
-            trans: {
-              'rotate': [0, 0, 0]
+            break;
+          case 'counterclock':
+            if(!!fromIconItem.trans.rotate) {
+              toIconItem.trans.rotate[0]=fromIconItem.trans.rotate[0]-360;
+              degAdd=-fromIconItem.trans.rotate[0]%360;
+              toIconItem.trans.rotate[0]+=(degAdd<180?degAdd:degAdd-360);
+            } else {
+              toIconItem.trans.rotate[0]=-360;
             }
-          });
+            break;
+          default: // Clockwise
+            if(!!fromIconItem.trans.rotate) {
+              toIconItem.trans.rotate[0]=fromIconItem.trans.rotate[0]+360;
+              degAdd=fromIconItem.trans.rotate[0]%360;
+              toIconItem.trans.rotate[0]+=(degAdd<180?-degAdd:360-degAdd);
+            } else {
+              toIconItem.trans.rotate[0]=360;
+            }
+            break;
         }
       }
 
-      // Add Node to DOM if needed
-      if (!this._morphNodes[i]) {
-        const node = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-        this._morphG!.appendChild(node);
-        this._morphNodes.push({
-          node: node,
-          fromIconItemIdx: i,
-          toIconItemIdx: i
-        });
-      }
+      this._curIconItems=clone(this._fromIconItems);
     }
-
-    for (let i = 0; i < maxNum; i++) {
-      const fromIconItem = this._fromIconItems[i];
-      const toIconItem = this._toIconItems[i];
-
-      // Calculate from/to curve data and set to fromIcon/toIcon
-      const curves = path2curve(this._fromIconItems[i].path, this._toIconItems[i].path);
-      fromIconItem.curve = curves[0];
-      toIconItem.curve = curves[1];
-
-      // Normalize from/to attrs
-      const attrsNorm = styleToNorm(this._fromIconItems[i].attrs, this._toIconItems[i].attrs);
-      fromIconItem.attrsNorm = attrsNorm[0];
-      toIconItem.attrsNorm = attrsNorm[1];
-      fromIconItem.attrs = styleNormToString(fromIconItem.attrsNorm);
-      toIconItem.attrs = styleNormToString(toIconItem.attrsNorm);
-
-      // Normalize from/to style
-      const styleNorm = styleToNorm(this._fromIconItems[i].style, this._toIconItems[i].style);
-      fromIconItem.styleNorm = styleNorm[0];
-      toIconItem.styleNorm = styleNorm[1];
-      fromIconItem.style = styleNormToString(fromIconItem.styleNorm);
-      toIconItem.style = styleNormToString(toIconItem.styleNorm);
-
-      // Calculate from/to transform
-      toBB = curvePathBBox(toIconItem.curve!);
-      toIconItem.trans = {
-        'rotate': [0, toBB.cx, toBB.cy]
-      };
-      
-      let rotation = this._rotation;
-      if (rotation === 'random') {
-        rotation = Math.random() < 0.5 ? 'counterclock' : 'clock';
-      }
-      
-      switch (rotation) {
-        case 'none':
-          if (fromIconItem.trans && fromIconItem.trans.rotate) {
-            toIconItem.trans.rotate![0] = fromIconItem.trans.rotate[0];
-          }
-          break;
-        case 'counterclock':
-          if (fromIconItem.trans && fromIconItem.trans.rotate) {
-            toIconItem.trans.rotate![0] = fromIconItem.trans.rotate[0] - 360;
-            const degAdd = -fromIconItem.trans.rotate[0] % 360;
-            toIconItem.trans.rotate![0] += (degAdd < 180 ? degAdd : degAdd - 360);
-          } else {
-            toIconItem.trans.rotate![0] = -360;
-          }
-          break;
-        default: // Clockwise
-          if (fromIconItem.trans && fromIconItem.trans.rotate) {
-            toIconItem.trans.rotate![0] = fromIconItem.trans.rotate[0] + 360;
-            const degAdd = fromIconItem.trans.rotate[0] % 360;
-            toIconItem.trans.rotate![0] += (degAdd < 180 ? -degAdd : 360 - degAdd);
-          } else {
-            toIconItem.trans.rotate![0] = 360;
-          }
-          break;
-      }
-    }
-
-    this._curIconItems = clone(this._fromIconItems);
   }
 
-  private _updateAnimationProgress(progress: number): void {
-    progress = easings[this._easing](progress);
+  private _updateAnimationProgress(progress: any): void {
+    progress=easings[this._easing](progress);
 
+    var i: any, j: any, k: any, len: any;
     // Update path/attrs/transform
-    for (let i = 0; i < this._curIconItems.length; i++) {
-      this._curIconItems[i].curve = curveCalc(this._fromIconItems[i].curve!, this._toIconItems[i].curve!, progress);
-      this._curIconItems[i].path = path2string(this._curIconItems[i].curve!);
+    for(i=0, len=this._curIconItems.length;i<len;i++) {
+      this._curIconItems[i].curve=curveCalc(this._fromIconItems[i].curve, this._toIconItems[i].curve, progress);
+      this._curIconItems[i].path=path2string(this._curIconItems[i].curve);
 
-      this._curIconItems[i].attrsNorm = styleNormCalc(this._fromIconItems[i].attrsNorm!, this._toIconItems[i].attrsNorm!, progress);
-      this._curIconItems[i].attrs = styleNormToString(this._curIconItems[i].attrsNorm!);
+      this._curIconItems[i].attrsNorm=styleNormCalc(this._fromIconItems[i].attrsNorm, this._toIconItems[i].attrsNorm, progress);
+      this._curIconItems[i].attrs=styleNormToString(this._curIconItems[i].attrsNorm);
 
-      this._curIconItems[i].styleNorm = styleNormCalc(this._fromIconItems[i].styleNorm!, this._toIconItems[i].styleNorm!, progress);
-      this._curIconItems[i].style = styleNormToString(this._curIconItems[i].styleNorm!);
+      this._curIconItems[i].styleNorm=styleNormCalc(this._fromIconItems[i].styleNorm, this._toIconItems[i].styleNorm, progress);
+      this._curIconItems[i].style=styleNormToString(this._curIconItems[i].styleNorm);
 
-      this._curIconItems[i].trans = transCalc(this._fromIconItems[i].trans!, this._toIconItems[i].trans!, progress);
-      this._curIconItems[i].transStr = trans2string(this._curIconItems[i].trans!);
+      this._curIconItems[i].trans=transCalc(this._fromIconItems[i].trans, this._toIconItems[i].trans, progress);
+      this._curIconItems[i].transStr=trans2string(this._curIconItems[i].trans);
     }
 
     // Update DOM
-    for (let i = 0; i < this._morphNodes.length; i++) {
-      const morphNode = this._morphNodes[i];
-      morphNode.node.setAttribute("d", this._curIconItems[i].path);
-      
-      const attrs = this._curIconItems[i].attrs;
-      for (const key in attrs) {
-        morphNode.node.setAttribute(key, attrs[key as keyof StyleAttributes]!);
+    for(i=0, len=this._morphNodes.length;i<len;i++) {
+      var morphNode=this._morphNodes[i];
+      morphNode.node.setAttribute("d",this._curIconItems[i].path);
+      var attrs=this._curIconItems[i].attrs;
+      for(j in attrs) {
+        morphNode.node.setAttribute(j,attrs[j]);
       }
-      
-      const style = this._curIconItems[i].style;
-      for (const key in style) {
-        (morphNode.node.style as any)[key] = style[key as keyof StyleAttributes];
+      var style=this._curIconItems[i].style;
+      for(k in style) {
+        morphNode.node.style[k]=style[k];
       }
-      
-      morphNode.node.setAttribute("transform", this._curIconItems[i].transStr || '');
+      morphNode.node.setAttribute("transform",this._curIconItems[i].transStr);
     }
   }
 
   private _animationEnd(): void {
-    for (let i = this._morphNodes.length - 1; i >= 0; i--) {
-      const morphNode = this._morphNodes[i];
-      if (this._icons[this._toIconId].items[i]) {
-        morphNode.node.setAttribute("d", this._icons[this._toIconId].items[i].path);
+    for(var i=this._morphNodes.length-1;i>=0;i--) {
+      var morphNode=this._morphNodes[i];
+      if(!!this._icons[this._toIconId].items[i]) {
+        morphNode.node.setAttribute("d",this._icons[this._toIconId].items[i].path);
       } else {
-        morphNode.node.parentNode?.removeChild(morphNode.node);
-        this._morphNodes.splice(i, 1);
+        morphNode.node.parentNode.removeChild(morphNode.node);
+        this._morphNodes.splice(i,1);
       }
     }
 
-    this._curIconId = this._toIconId;
-    this._toIconId = '';
+    this._curIconId=this._toIconId;
+    this._toIconId='';
 
     this._callback();
   }
@@ -468,33 +452,31 @@ export class SVGMorpheus {
   // Public methods
 
   // Morph To Icon
-  public to(iconId: string, options?: SVGMorpheusOptions, callback?: CallbackFunction): void {
-    if (iconId !== this._toIconId) {
-      if (options && typeof options !== 'object') {
+  public to(iconId: any, options?: any, callback?: any): void {
+    if(iconId!==this._toIconId) {
+      if (!!options && typeof options !== typeof {}) {
         throw new Error('SVGMorpheus.to() > "options" parameter must be an object');
       }
       options = options || {};
 
-      if (callback && typeof callback !== 'function') {
+      if (!!callback && typeof callback !== typeof (function(){})) {
         throw new Error('SVGMorpheus.to() > "callback" parameter must be a function');
       }
 
-      if (this._rafid) {
-        cancelAnimFrame(this._rafid);
-      }
+      cancelAnimFrame(this._rafid);
 
-      this._duration = options.duration || this._defDuration;
-      this._easing = options.easing || this._defEasing;
-      this._rotation = options.rotation || this._defRotation;
-      this._callback = callback || this._defCallback;
+      this._duration=options.duration || this._defDuration;
+      this._easing=options.easing || this._defEasing;
+      this._rotation=options.rotation || this._defRotation;
+      this._callback=callback || this._defCallback;
 
       this._setupAnimation(iconId);
-      this._rafid = reqAnimFrame(this._fnTick);
+      this._rafid=reqAnimFrame(this._fnTick);
     }
   }
 
   // Register custom Easing function
-  public registerEasing(name: string, fn: (t: number) => number): void {
+  public registerEasing(name: any, fn: any): void {
     easings[name] = fn;
   }
 }

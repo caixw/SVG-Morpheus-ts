@@ -19,10 +19,85 @@ JavaScript库，使SVG图标能够从一个变形到另一个。它实现了Mate
 ## 🏗️ 安装
 
 ```bash
-pnpm add svg-morpheus
+npm install svg-morpheus
 ```
 
 ## 📖 使用方法
+
+### 导入核心类
+
+```typescript
+// 默认导入
+import SVGMorpheus from 'svg-morpheus';
+
+// 或者命名导入
+import { SVGMorpheus } from 'svg-morpheus';
+
+// 创建实例
+const myMorpheus = new SVGMorpheus('#my-svg');
+```
+
+### 导入类型定义
+
+```typescript
+import type { 
+  SVGMorpheusOptions, 
+  IconItem, 
+  EasingFunction,
+  RGBColor 
+} from 'svg-morpheus';
+
+// 使用类型
+const options: SVGMorpheusOptions = {
+  duration: 1000,
+  easing: 'ease-in-out',
+  rotation: 'clock'
+};
+
+const customEasing: EasingFunction = (t: number) => t * t;
+```
+
+### 导入工具函数
+
+```typescript
+import { 
+  easings,           // 预定义的缓动函数
+  pathToAbsolute,    // 路径转换工具
+  styleNormCalc,     // 样式计算工具
+  curveCalc          // 曲线计算工具
+} from 'svg-morpheus';
+
+// 使用预定义的缓动函数
+console.log(easings.easeInOut);
+
+// 使用路径工具
+const absolutePath = pathToAbsolute('m10,10 l20,20');
+```
+
+### 完整示例
+
+```typescript
+import SVGMorpheus, { 
+  type SVGMorpheusOptions, 
+  easings 
+} from 'svg-morpheus';
+
+// 配置选项
+const options: SVGMorpheusOptions = {
+  duration: 800,
+  easing: 'easeInOut',
+  rotation: 'clock'
+};
+
+// 创建morpheus实例
+const morpheus = new SVGMorpheus('#my-svg', options);
+
+// 注册自定义缓动函数
+morpheus.registerEasing('customEase', easings.easeInQuad);
+
+// 开始动画
+morpheus.to('icon2', { duration: 1200 });
+```
 
 ### ES 模块 (推荐)
 
@@ -76,6 +151,40 @@ const morpheus = new SVGMorpheus('#my-svg', options, () => {
 });
 ```
 
+## 📦 导出清单
+
+### 核心类
+- `SVGMorpheus` (默认导出)
+- `SVGMorpheus` (命名导出)
+
+### 类型定义
+- `EasingFunction` - 缓动函数类型
+- `SVGMorpheusOptions` - 配置选项接口
+- `StyleAttributes` - 样式属性接口
+- `RGBColor` - RGB颜色接口
+- `NormalizedStyle` - 标准化样式接口
+- `Transform` - 变换接口
+- `IconItem` - 图标项接口
+- `Icon` - 图标接口
+- `MorphNode` - 变形节点接口
+- `BoundingBox` - 边界框接口
+- `CallbackFunction` - 回调函数类型
+
+### 工具函数
+- `easings` - 预定义缓动函数对象
+- `styleNormCalc` - 样式标准化计算
+- `styleNormToString` - 样式对象转字符串
+- `styleToNorm` - 样式转标准化格式
+- `transCalc` - 变换计算
+- `trans2string` - 变换转字符串
+- `curveCalc` - 曲线计算
+- `clone` - 深度克隆
+- `parsePathString` - 解析路径字符串
+- `pathToAbsolute` - 转换为绝对路径
+- `path2curve` - 路径转曲线
+- `path2string` - 路径转字符串
+- `curvePathBBox` - 计算曲线边界框
+
 ## 🛠️ 开发
 
 ### 安装依赖
@@ -99,10 +208,10 @@ pnpm build
 ```
 
 构建产物将输出到 `dist/` 目录：
-- `svg-morpheus.js` - ES 模块
-- `svg-morpheus.cjs` - CommonJS 模块  
-- `svg-morpheus.umd.js` - UMD 模块
-- `svg-morpheus.d.ts` - TypeScript 类型定义
+- `index.js` - ES 模块
+- `index.cjs` - CommonJS 模块  
+- `index.umd.js` - UMD 模块
+- `index.d.ts` - TypeScript 类型定义
 
 ### 代码检查
 
@@ -147,6 +256,7 @@ morpheus.registerEasing('my-easing', (t: number) => {
 
 ```
 ├── src/                  # TypeScript 源码
+│   ├── index.ts         # 主入口文件
 │   ├── types.ts         # 类型定义
 │   ├── helpers.ts       # 工具函数
 │   ├── easings.ts       # 缓动函数

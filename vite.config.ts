@@ -9,25 +9,26 @@ export default defineConfig({
   ],
   build: {
     lib: {
-      entry: 'src/svg-morpheus.ts',
+      entry: 'src/index.ts',
       name: 'SVGMorpheus',
       formats: ['es', 'cjs', 'umd'],
       fileName: (format) => {
         switch (format) {
           case 'es':
-            return 'svg-morpheus.js';
+            return 'index.js';
           case 'cjs':
-            return 'svg-morpheus.cjs';
+            return 'index.cjs';
           case 'umd':
-            return 'svg-morpheus.umd.js';
+            return 'index.umd.js';
           default:
-            return `svg-morpheus.${format}.js`;
+            return `index.${format}.js`;
         }
       },
     },
     rollupOptions: {
       external: [],
       output: {
+        exports: 'named',
         globals: {
           // No external dependencies currently
         },

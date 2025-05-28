@@ -19,10 +19,85 @@ This project has been refactored from Gulp to a modern TypeScript + Vite + pnpm 
 ## 🏗️ Installation
 
 ```bash
-pnpm add svg-morpheus
+npm install svg-morpheus
 ```
 
 ## 📖 Usage
+
+### Import Core Class
+
+```typescript
+// Default import
+import SVGMorpheus from 'svg-morpheus';
+
+// Or named import
+import { SVGMorpheus } from 'svg-morpheus';
+
+// Create instance
+const myMorpheus = new SVGMorpheus('#my-svg');
+```
+
+### Import Type Definitions
+
+```typescript
+import type { 
+  SVGMorpheusOptions, 
+  IconItem, 
+  EasingFunction,
+  RGBColor 
+} from 'svg-morpheus';
+
+// Use types
+const options: SVGMorpheusOptions = {
+  duration: 1000,
+  easing: 'ease-in-out',
+  rotation: 'clock'
+};
+
+const customEasing: EasingFunction = (t: number) => t * t;
+```
+
+### Import Utility Functions
+
+```typescript
+import { 
+  easings,           // Predefined easing functions
+  pathToAbsolute,    // Path conversion utilities
+  styleNormCalc,     // Style calculation utilities
+  curveCalc          // Curve calculation utilities
+} from 'svg-morpheus';
+
+// Use predefined easing functions
+console.log(easings.easeInOut);
+
+// Use path utilities
+const absolutePath = pathToAbsolute('m10,10 l20,20');
+```
+
+### Complete Example
+
+```typescript
+import SVGMorpheus, { 
+  type SVGMorpheusOptions, 
+  easings 
+} from 'svg-morpheus';
+
+// Configuration options
+const options: SVGMorpheusOptions = {
+  duration: 800,
+  easing: 'easeInOut',
+  rotation: 'clock'
+};
+
+// Create morpheus instance
+const morpheus = new SVGMorpheus('#my-svg', options);
+
+// Register custom easing function
+morpheus.registerEasing('customEase', easings.easeInQuad);
+
+// Start animation
+morpheus.to('icon2', { duration: 1200 });
+```
 
 ### ES Modules (Recommended)
 
@@ -76,6 +151,40 @@ const morpheus = new SVGMorpheus('#my-svg', options, () => {
 });
 ```
 
+## 📦 Export List
+
+### Core Classes
+- `SVGMorpheus` (default export)
+- `SVGMorpheus` (named export)
+
+### Type Definitions
+- `EasingFunction` - Easing function type
+- `SVGMorpheusOptions` - Configuration options interface
+- `StyleAttributes` - Style attributes interface
+- `RGBColor` - RGB color interface
+- `NormalizedStyle` - Normalized style interface
+- `Transform` - Transform interface
+- `IconItem` - Icon item interface
+- `Icon` - Icon interface
+- `MorphNode` - Morph node interface
+- `BoundingBox` - Bounding box interface
+- `CallbackFunction` - Callback function type
+
+### Utility Functions
+- `easings` - Predefined easing functions object
+- `styleNormCalc` - Style normalization calculation
+- `styleNormToString` - Style object to string conversion
+- `styleToNorm` - Style to normalized format conversion
+- `transCalc` - Transform calculation
+- `trans2string` - Transform to string conversion
+- `curveCalc` - Curve calculation
+- `clone` - Deep clone utility
+- `parsePathString` - Parse path string
+- `pathToAbsolute` - Convert to absolute path
+- `path2curve` - Path to curve conversion
+- `path2string` - Path to string conversion
+- `curvePathBBox` - Calculate curve bounding box
+
 ## 🛠️ Development
 
 ### Install Dependencies
@@ -99,10 +208,10 @@ pnpm build
 ```
 
 Build output will be generated in the `dist/` directory:
-- `svg-morpheus.js` - ES module
-- `svg-morpheus.cjs` - CommonJS module  
-- `svg-morpheus.umd.js` - UMD module
-- `svg-morpheus.d.ts` - TypeScript type definitions
+- `index.js` - ES module
+- `index.cjs` - CommonJS module  
+- `index.umd.js` - UMD module
+- `index.d.ts` - TypeScript type definitions
 
 ### Code Quality
 
@@ -147,6 +256,7 @@ morpheus.registerEasing('my-easing', (t: number) => {
 
 ```
 ├── src/                  # TypeScript source code
+│   ├── index.ts         # Main entry file
 │   ├── types.ts         # Type definitions
 │   ├── helpers.ts       # Utility functions
 │   ├── easings.ts       # Easing functions
