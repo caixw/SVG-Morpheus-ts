@@ -1,13 +1,26 @@
-// Request animation frame polyfills
-export const reqAnimFrame = window.requestAnimationFrame || 
-  (window as any).mozRequestAnimationFrame || 
-  (window as any).webkitRequestAnimationFrame || 
-  (window as any).oRequestAnimationFrame;
+// 定义包含浏览器前缀方法的接口
+interface ExtendedWindow extends Window {
+  mozRequestAnimationFrame?: typeof requestAnimationFrame;
+  webkitRequestAnimationFrame?: typeof requestAnimationFrame;
+  oRequestAnimationFrame?: typeof requestAnimationFrame;
+  mozCancelAnimationFrame?: typeof cancelAnimationFrame;
+  webkitCancelAnimationFrame?: typeof cancelAnimationFrame;
+  oCancelAnimationFrame?: typeof cancelAnimationFrame;
+}
 
-export const cancelAnimFrame = window.cancelAnimationFrame || 
-  (window as any).mozCancelAnimationFrame || 
-  (window as any).webkitCancelAnimationFrame || 
-  (window as any).oCancelAnimationFrame;
+// 类型安全的 window 引用
+const extendedWindow = window as ExtendedWindow;
+
+// Request animation frame polyfills
+export const reqAnimFrame = extendedWindow.requestAnimationFrame || 
+  extendedWindow.mozRequestAnimationFrame || 
+  extendedWindow.webkitRequestAnimationFrame || 
+  extendedWindow.oRequestAnimationFrame;
+
+export const cancelAnimFrame = extendedWindow.cancelAnimationFrame || 
+  extendedWindow.mozCancelAnimationFrame || 
+  extendedWindow.webkitCancelAnimationFrame || 
+  extendedWindow.oCancelAnimationFrame;
 
 // Calculate style
 export function styleNormCalc(styleNormFrom: any, styleNormTo: any, progress: any): any {
@@ -328,4 +341,177 @@ const getRGB = function (colour: any) {
     return rgb;
   }
   return {r: -1, g: -1, b: -1, opacity: -1, error: 1};
-}; 
+};
+
+/**
+ * 动态合并多个 SVG 为类似 iconset.svg 的格式
+ * @param svgMap 对象，key 为 g 标签的 id，value 为 svg 路径或 svg 代码
+ * @param svgAttributes 可选，生成的 SVG 根元素的属性集合
+ * @returns Promise<string> 合并后的 SVG 字符串
+ */
+export async function bundleSvgs(
+  svgMap: Record<string, string>, 
+  svgAttributes?: Record<string, string | number>
+): Promise<string> {
+  const svgGroups: string[] = [];
+  
+  for (const [id, svgSource] of Object.entries(svgMap)) {
+    let svgContent: string;
+    
+    // 判断是 SVG 代码还是路径
+    if (isSvgContent(svgSource)) {
+      // 直接是 SVG 代码
+      svgContent = svgSource;
+    } else {
+      // 是路径，需要加载
+      try {
+        const response = await fetch(svgSource);
+        if (!response.ok) {
+          console.warn(`Failed to load SVG from ${svgSource}`);
+          continue;
+        }
+        svgContent = await response.text();
+      } catch (error) {
+        console.warn(`Error loading SVG from ${svgSource}:`, error);
+        continue;
+      }
+    }
+    
+    // 提取 SVG 内容（去除外层 svg 标签）
+    const innerContent = extractSvgInnerContent(svgContent);
+    
+    // 用 g 标签包裹，设置 id
+    const groupContent = `<g id="${id}">${innerContent}</g>`;
+    svgGroups.push(groupContent);
+  }
+  
+  // 构建 SVG 属性字符串
+  const defaultAttributes = {
+    xmlns: 'http://www.w3.org/2000/svg',
+    style: 'display:none;'
+  };
+  
+  // 合并默认属性和用户自定义属性
+  const finalAttributes = { ...defaultAttributes, ...svgAttributes };
+  
+  // 将属性对象转换为字符串
+  const attributesString = Object.entries(finalAttributes)
+    .map(([key, value]) => `${key}="${value}"`)
+    .join(' ');
+  
+  // 合并所有 g 标签到一个 SVG 容器中
+  const bundledSvg = `<svg ${attributesString}>
+${svgGroups.join('\n')}
+</svg>`;
+  
+  return bundledSvg;
+}
+
+/**
+ * 判断字符串是否为 SVG 内容
+ * @param content 待检查的字符串
+ * @returns 是否为 SVG 内容
+ */
+function isSvgContent(content: string): boolean {
+  const trimmedContent = content.trim();
+  
+  // 检查是否以 XML 声明开头
+  if (trimmedContent.startsWith('<?xml')) {
+    return trimmedContent.includes('<svg');
+  }
+  
+  // 检查是否直接以 <svg 开头
+  if (trimmedContent.startsWith('<svg')) {
+    return true;
+  }
+  
+  // 检查是否以 DOCTYPE 开头（某些 SVG 可能只有 DOCTYPE 而没有 XML 声明）
+  if (trimmedContent.startsWith('<!DOCTYPE svg')) {
+    return true;
+  }
+  
+  return false;
+}
+
+/**
+ * 提取 SVG 标签内的内容
+ * @param svgContent SVG 字符串
+ * @returns 内部内容
+ */
+function extractSvgInnerContent(svgContent: string): string {
+  // 移除多余的空白字符
+  let cleanContent = svgContent.trim();
+  
+  // 移除 XML 声明（<?xml ... ?>）
+  cleanContent = cleanContent.replace(/<\?xml[^?]*\?>\s*/gi, '');
+  
+  // 移除 DOCTYPE 声明
+  cleanContent = cleanContent.replace(/<!DOCTYPE[^>]*>\s*/gi, '');
+  
+  // 移除其他可能的处理指令
+  cleanContent = cleanContent.replace(/<\?[^?]*\?>\s*/gi, '');
+  
+  // 重新移除可能产生的多余空白
+  cleanContent = cleanContent.trim();
+  
+  // 使用正则表达式匹配 svg 开始和结束标签
+  const svgMatch = cleanContent.match(/<svg[^>]*>([\s\S]*?)<\/svg>/i);
+  
+  if (svgMatch && svgMatch[1]) {
+    return svgMatch[1].trim();
+  }
+  
+  // 如果没有匹配到 svg 标签，可能内容本身就不是完整的 svg
+  // 尝试检查是否以 svg 标签开头
+  if (cleanContent.startsWith('<svg')) {
+    // 找到第一个 > 后的内容
+    const firstTagEnd = cleanContent.indexOf('>');
+    if (firstTagEnd !== -1) {
+      const withoutOpenTag = cleanContent.substring(firstTagEnd + 1);
+      // 移除最后的 </svg>
+      const lastSvgTag = withoutOpenTag.lastIndexOf('</svg>');
+      if (lastSvgTag !== -1) {
+        return withoutOpenTag.substring(0, lastSvgTag).trim();
+      }
+    }
+  }
+  
+  // 如果都不匹配，返回原内容（可能已经是内部内容）
+  return cleanContent;
+}
+
+/**
+ * 将合并后的 SVG 插入到 DOM 中
+ * @param bundledSvg 合并后的 SVG 字符串
+ * @param containerId 容器 ID，默认为 'svg-iconset'
+ */
+export function insertBundledSvg(bundledSvg: string, containerId: string = 'svg-iconset'): void {
+  // 移除已存在的容器
+  const existingContainer = document.getElementById(containerId);
+  if (existingContainer) {
+    existingContainer.remove();
+  }
+  
+  // 创建新的容器
+  const container = document.createElement('div');
+  container.id = containerId;
+  container.innerHTML = bundledSvg;
+  
+  // 插入到 body 的开头
+  document.body.insertBefore(container, document.body.firstChild);
+}
+
+/**
+ * 便捷方法：合并 SVG 并直接插入到 DOM
+ * @param svgMap SVG 映射对象
+ * @param containerId 容器 ID
+ * @param svgAttributes 可选，生成的 SVG 根元素的属性集合
+ */
+export async function bundleAndInsertSvgs(
+  svgMap: Record<string, string>, 
+  containerId: string = 'svg-iconset',
+  svgAttributes?: Record<string, string | number>
+): Promise<void> {
+  const bundledSvg = await bundleSvgs(svgMap, svgAttributes);
+  insertBundledSvg(bundledSvg, containerId);
+} 

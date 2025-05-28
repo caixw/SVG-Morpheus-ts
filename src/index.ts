@@ -22,7 +22,7 @@ export type {
 // Export easing functions object
 export { easings } from './easings';
 
-// Export utility functions (if needed)
+// Export utility functions and SVG bundling functions
 export {
   styleNormCalc,
   styleNormToString,
@@ -30,7 +30,10 @@ export {
   transCalc,
   trans2string,
   curveCalc,
-  clone
+  clone,
+  bundleSvgs,              // 🆕 动态SVG合并
+  bundleAndInsertSvgs,     // 🆕 合并并插入DOM
+  insertBundledSvg         // 🆕 插入合并的SVG到DOM
 } from './helpers';
 
 // Export path utilities (if needed)

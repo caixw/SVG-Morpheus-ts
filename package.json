@@ -1,7 +1,7 @@
 {
-  "name": "svg-morpheus",
+  "name": "svg-morpheus-ts",
   "prettyName": "SVG Morpheus",
-  "version": "0.3.2",
+  "version": "1.0.0",
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -16,16 +16,16 @@
   "files": [
     "dist"
   ],
-  "description": "JavaScript library enabling SVG icons to morph from one to the other. It implements Material Design's Delightful Details transitions. Refactored with modern TypeScript + Vite + pnpm stack. Supports both Chinese and English documentation.",
-  "homepage": "https://github.com/alexk111/SVG-Morpheus",
+  "description": "ESM TypeScript library enabling SVG icons to morph from one to the other. It implements Material Design's Delightful Details transitions. Refactored with modern TypeScript + Vite + pnpm stack. Supports both Chinese and English documentation.",
+  "homepage": "https://github.com/adoin/SVG-Morpheus-ts",
   "repository": {
     "type": "git",
-    "url": "https://github.com/alexk111/SVG-Morpheus.git"
+    "url": "https://github.com/adoin/SVG-Morpheus-ts.git"
   },
   "license": "MIT",
   "author": {
-    "name": "Alex Kaul",
-    "email": "alexkaul@googlemail.com"
+    "name": "Adoin",
+    "email": "adoin@qq.com"
   },
   "keywords": [
     "svg",

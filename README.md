@@ -15,6 +15,7 @@ This project has been refactored from Gulp to a modern TypeScript + Vite + pnpm 
 - ✅ **Modern Toolchain** - ESLint, TypeScript type checking
 - ✅ **Development Experience** - HMR, fast reload
 - ✅ **pnpm** - Efficient package manager
+- ✅ **Dynamic SVG Bundling** - 🆕 Runtime SVG iconset generation
 
 ## 🏗️ Installation
 
@@ -64,7 +65,10 @@ import {
   easings,           // Predefined easing functions
   pathToAbsolute,    // Path conversion utilities
   styleNormCalc,     // Style calculation utilities
-  curveCalc          // Curve calculation utilities
+  curveCalc,         // Curve calculation utilities
+  bundleSvgs,        // 🆕 Dynamic SVG bundling
+  bundleAndInsertSvgs, // 🆕 Bundle and insert to DOM
+  insertBundledSvg   // 🆕 Insert bundled SVG to DOM
 } from 'svg-morpheus';
 
 // Use predefined easing functions
@@ -72,6 +76,13 @@ console.log(easings.easeInOut);
 
 // Use path utilities
 const absolutePath = pathToAbsolute('m10,10 l20,20');
+
+// 🆕 Bundle multiple SVGs dynamically
+const svgMap = {
+  'icon1': '<svg>...</svg>',
+  'icon2': '/path/to/icon.svg'
+};
+const bundledSvg = await bundleSvgs(svgMap);
 ```
 
 ### Complete Example
@@ -184,6 +195,9 @@ const morpheus = new SVGMorpheus('#my-svg', options, () => {
 - `path2curve` - Path to curve conversion
 - `path2string` - Path to string conversion
 - `curvePathBBox` - Calculate curve bounding box
+- `bundleSvgs` - 🆕 Dynamic SVG bundling utility
+- `bundleAndInsertSvgs` - 🆕 Bundle SVGs and insert to DOM
+- `insertBundledSvg` - 🆕 Insert bundled SVG to DOM
 
 ## 🛠️ Development
 
@@ -258,12 +272,12 @@ morpheus.registerEasing('my-easing', (t: number) => {
 ├── src/                  # TypeScript source code
 │   ├── index.ts         # Main entry file
 │   ├── types.ts         # Type definitions
-│   ├── helpers.ts       # Utility functions
+│   ├── helpers.ts       # Utility functions (includes bundleSvgs 🆕)
 │   ├── easings.ts       # Easing functions
 │   ├── svg-path.ts      # SVG path processing
 │   └── svg-morpheus.ts  # Main class
 ├── dist/                # Build output
-├── demos/               # Demo files
+├── demos/               # Demo files (includes bundleSvgs examples 🆕)
 ├── vite.config.ts       # Vite configuration
 ├── tsconfig.json        # TypeScript configuration
 ├── package.json
@@ -307,3 +321,126 @@ MIT License
 ## 🙏 Acknowledgments
 
 Based on the original [SVG Morpheus](https://github.com/alexk111/SVG-Morpheus) project, refactored with modern technology stack.
+
+## 🆕 Dynamic SVG Bundling
+
+The new `bundleSvgs` functionality allows you to dynamically create iconset-style SVG files at runtime, perfect for modern applications that need flexible icon management.
+
+### Basic Usage
+
+```typescript
+import { bundleSvgs } from 'svg-morpheus';
+
+const svgMap = {
+  'home': '<svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>',
+  'user': '/icons/user.svg',  // Can also load from file
+  'settings': '/icons/settings.svg'
+};
+
+// Generate bundled SVG
+const bundledSvg = await bundleSvgs(svgMap);
+console.log(bundledSvg);
+// Output: <svg xmlns="http://www.w3.org/2000/svg" style="display:none;">
+//   <g id="home">...</g>
+//   <g id="user">...</g>
+//   <g id="settings">...</g>
+// </svg>
+```
+
+### Custom SVG Attributes
+
+```typescript
+// Customize the root SVG element attributes
+const customAttributes = {
+  viewBox: '0 0 24 24',
+  width: '100%',
+  height: '100%',
+  class: 'my-iconset',
+  'data-version': '1.0'
+};
+
+const bundledSvg = await bundleSvgs(svgMap, customAttributes);
+// Output: <svg xmlns="http://www.w3.org/2000/svg" style="display:none;" viewBox="0 0 24 24" width="100%" height="100%" class="my-iconset" data-version="1.0">
+//   <g id="home">...</g>
+//   ...
+// </svg>
+```
+
+### Convenient DOM Integration
+
+```typescript
+import { bundleAndInsertSvgs } from 'svg-morpheus';
+
+// Bundle and automatically insert into DOM
+await bundleAndInsertSvgs(svgMap, 'my-iconset-container', customAttributes);
+
+// Or use with default container ID
+await bundleAndInsertSvgs(svgMap);
+```
+
+### Use with Object Element
+
+```typescript
+// Create Blob URL for object element
+const bundledSvg = await bundleSvgs(svgMap, { viewBox: '0 0 24 24' });
+const blob = new Blob([bundledSvg], { type: 'image/svg+xml' });
+const url = URL.createObjectURL(blob);
+
+// Use with object element
+const objectElement = document.getElementById('my-svg-object');
+objectElement.data = url;
+
+// Initialize SVGMorpheus
+const morpheus = new SVGMorpheus('#my-svg-object');
+morpheus.to('home');
+```
+
+### Advanced Features
+
+**Smart Content Detection**: Automatically detects whether input is SVG code or file path
+```typescript
+const mixedSources = {
+  'inline': '<svg>...</svg>',      // Direct SVG code
+  'external': '/icons/icon.svg',   // File path
+  'with-xml': '<?xml version="1.0"?><svg>...</svg>' // XML declaration
+};
+```
+
+**Error Handling**: Gracefully handles loading failures
+```typescript
+const bundledSvg = await bundleSvgs({
+  'valid': '<svg>...</svg>',
+  'invalid': '/non-existent.svg'  // Will be skipped with warning
+});
+```
+
+**TypeScript Support**: Full type definitions included
+```typescript
+import type { bundleSvgs } from 'svg-morpheus';
+
+const svgAttributes: Record<string, string | number> = {
+  'data-theme': 'dark',
+  'data-count': 5
+};
+```
+
+### API Reference
+
+#### bundleSvgs(svgMap, svgAttributes?)
+
+- **svgMap**: `Record<string, string>` - Object mapping icon IDs to SVG sources
+- **svgAttributes**: `Record<string, string | number>` (optional) - Custom attributes for root SVG element
+- **Returns**: `Promise<string>` - Combined SVG string
+
+#### bundleAndInsertSvgs(svgMap, containerId?, svgAttributes?)
+
+- **svgMap**: `Record<string, string>` - Object mapping icon IDs to SVG sources  
+- **containerId**: `string` (optional, default: 'svg-iconset') - Container element ID
+- **svgAttributes**: `Record<string, string | number>` (optional) - Custom attributes for root SVG element
+- **Returns**: `Promise<void>`
+
+#### insertBundledSvg(bundledSvg, containerId?)
+
+- **bundledSvg**: `string` - Pre-generated SVG string
+- **containerId**: `string` (optional, default: 'svg-iconset') - Container element ID
+- **Returns**: `void`

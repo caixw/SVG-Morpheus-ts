@@ -15,6 +15,7 @@ JavaScript库，使SVG图标能够从一个变形到另一个。它实现了Mate
 - ✅ **现代工具链** - ESLint、TypeScript 类型检查
 - ✅ **开发体验** - HMR、快速重载
 - ✅ **pnpm** - 高效的包管理器
+- ✅ **动态SVG合并** - 🆕 运行时SVG图标集生成
 
 ## 🏗️ 安装
 
@@ -64,7 +65,10 @@ import {
   easings,           // 预定义的缓动函数
   pathToAbsolute,    // 路径转换工具
   styleNormCalc,     // 样式计算工具
-  curveCalc          // 曲线计算工具
+  curveCalc,         // 曲线计算工具
+  bundleSvgs,        // 🆕 动态SVG合并
+  bundleAndInsertSvgs, // 🆕 合并并插入DOM
+  insertBundledSvg   // 🆕 插入合并的SVG到DOM
 } from 'svg-morpheus';
 
 // 使用预定义的缓动函数
@@ -72,6 +76,13 @@ console.log(easings.easeInOut);
 
 // 使用路径工具
 const absolutePath = pathToAbsolute('m10,10 l20,20');
+
+// 🆕 动态合并多个SVG
+const svgMap = {
+  'icon1': '<svg>...</svg>',
+  'icon2': '/path/to/icon.svg'
+};
+const bundledSvg = await bundleSvgs(svgMap);
 ```
 
 ### 完整示例
@@ -184,6 +195,9 @@ const morpheus = new SVGMorpheus('#my-svg', options, () => {
 - `path2curve` - 路径转曲线
 - `path2string` - 路径转字符串
 - `curvePathBBox` - 计算曲线边界框
+- `bundleSvgs` - 🆕 动态SVG合并工具
+- `bundleAndInsertSvgs` - 🆕 合并SVG并插入DOM
+- `insertBundledSvg` - 🆕 插入合并的SVG到DOM
 
 ## 🛠️ 开发
 
@@ -258,12 +272,12 @@ morpheus.registerEasing('my-easing', (t: number) => {
 ├── src/                  # TypeScript 源码
 │   ├── index.ts         # 主入口文件
 │   ├── types.ts         # 类型定义
-│   ├── helpers.ts       # 工具函数
+│   ├── helpers.ts       # 工具函数 (包含 bundleSvgs 🆕)
 │   ├── easings.ts       # 缓动函数
 │   ├── svg-path.ts      # SVG 路径处理
 │   └── svg-morpheus.ts  # 主类
 ├── dist/                # 构建产物
-├── demos/               # 演示文件
+├── demos/               # 演示文件 (包含 bundleSvgs 示例 🆕)
 ├── vite.config.ts       # Vite 配置
 ├── tsconfig.json        # TypeScript 配置
 ├── package.json
@@ -307,3 +321,126 @@ MIT License
 ## 🙏 致谢
 
 基于原始的 [SVG Morpheus](https://github.com/alexk111/SVG-Morpheus) 项目，使用现代化技术栈重构。 
+
+## 🆕 动态SVG合并
+
+新的 `bundleSvgs` 功能允许你在运行时动态创建iconset风格的SVG文件，非常适合需要灵活图标管理的现代应用程序。
+
+### 基础用法
+
+```typescript
+import { bundleSvgs } from 'svg-morpheus';
+
+const svgMap = {
+  'home': '<svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>',
+  'user': '/icons/user.svg',      // 也可以从文件加载
+  'settings': '/icons/settings.svg'
+};
+
+// 生成合并的SVG
+const bundledSvg = await bundleSvgs(svgMap);
+console.log(bundledSvg);
+// 输出: <svg xmlns="http://www.w3.org/2000/svg" style="display:none;">
+//   <g id="home">...</g>
+//   <g id="user">...</g>
+//   <g id="settings">...</g>
+// </svg>
+```
+
+### 自定义SVG属性
+
+```typescript
+// 自定义根SVG元素的属性
+const customAttributes = {
+  viewBox: '0 0 24 24',
+  width: '100%',
+  height: '100%',
+  class: 'my-iconset',
+  'data-version': '1.0'
+};
+
+const bundledSvg = await bundleSvgs(svgMap, customAttributes);
+// 输出: <svg xmlns="http://www.w3.org/2000/svg" style="display:none;" viewBox="0 0 24 24" width="100%" height="100%" class="my-iconset" data-version="1.0">
+//   <g id="home">...</g>
+//   ...
+// </svg>
+```
+
+### 便捷的DOM集成
+
+```typescript
+import { bundleAndInsertSvgs } from 'svg-morpheus';
+
+// 合并并自动插入到DOM
+await bundleAndInsertSvgs(svgMap, 'my-iconset-container', customAttributes);
+
+// 或使用默认容器ID
+await bundleAndInsertSvgs(svgMap);
+```
+
+### 与Object元素配合使用
+
+```typescript
+// 为object元素创建Blob URL
+const bundledSvg = await bundleSvgs(svgMap, { viewBox: '0 0 24 24' });
+const blob = new Blob([bundledSvg], { type: 'image/svg+xml' });
+const url = URL.createObjectURL(blob);
+
+// 用于object元素
+const objectElement = document.getElementById('my-svg-object');
+objectElement.data = url;
+
+// 初始化SVGMorpheus
+const morpheus = new SVGMorpheus('#my-svg-object');
+morpheus.to('home');
+```
+
+### 高级特性
+
+**智能内容检测**: 自动检测输入是SVG代码还是文件路径
+```typescript
+const mixedSources = {
+  'inline': '<svg>...</svg>',      // 直接的SVG代码
+  'external': '/icons/icon.svg',   // 文件路径
+  'with-xml': '<?xml version="1.0"?><svg>...</svg>' // XML声明
+};
+```
+
+**错误处理**: 优雅地处理加载失败
+```typescript
+const bundledSvg = await bundleSvgs({
+  'valid': '<svg>...</svg>',
+  'invalid': '/non-existent.svg'  // 将被跳过并显示警告
+});
+```
+
+**TypeScript支持**: 包含完整的类型定义
+```typescript
+import type { bundleSvgs } from 'svg-morpheus';
+
+const svgAttributes: Record<string, string | number> = {
+  'data-theme': 'dark',
+  'data-count': 5
+};
+```
+
+### API参考
+
+#### bundleSvgs(svgMap, svgAttributes?)
+
+- **svgMap**: `Record<string, string>` - 将图标ID映射到SVG源的对象
+- **svgAttributes**: `Record<string, string | number>` (可选) - 根SVG元素的自定义属性
+- **返回值**: `Promise<string>` - 合并的SVG字符串
+
+#### bundleAndInsertSvgs(svgMap, containerId?, svgAttributes?)
+
+- **svgMap**: `Record<string, string>` - 将图标ID映射到SVG源的对象
+- **containerId**: `string` (可选，默认: 'svg-iconset') - 容器元素ID
+- **svgAttributes**: `Record<string, string | number>` (可选) - 根SVG元素的自定义属性
+- **返回值**: `Promise<void>`
+
+#### insertBundledSvg(bundledSvg, containerId?)
+
+- **bundledSvg**: `string` - 预生成的SVG字符串
+- **containerId**: `string` (可选，默认: 'svg-iconset') - 容器元素ID
+- **返回值**: `void` 
