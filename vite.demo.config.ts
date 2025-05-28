@@ -7,12 +7,11 @@ export default defineConfig({
   build: {
     outDir: '../dist-demo',
     emptyOutDir: true,
+    target: ['es2022', 'chrome89', 'firefox89', 'safari15'],
     rollupOptions: {
       input: {
         home: resolve(__dirname, 'demos/home.html'),
         index: resolve(__dirname, 'demos/index.html'),
-        'debug-bundleSvgs': resolve(__dirname, 'demos/debug-bundleSvgs.html'),
-        'test-bundleSvgs': resolve(__dirname, 'demos/test-bundleSvgs.html'),
       },
     },
   },
