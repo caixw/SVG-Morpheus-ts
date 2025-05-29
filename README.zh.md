@@ -436,3 +436,48 @@ const svgAttributes: Record<string, string | number> = {
 - **svgMap**: `Record<string, string>` - 将图标ID映射到SVG源的对象
 - **svgAttributes**: `Record<string, string | number>` (可选) - 根SVG元素的自定义属性
 - **返回值**: `Promise<string>` - 合并的SVG字符串 
+
+## 浏览器兼容性
+
+此库使用现代 Web API。以下是实现完整功能所需的最低浏览器版本：
+
+### 核心功能兼容性
+
+| 浏览器 | 最低版本 | 说明 |
+|--------|---------|------|
+| **Chrome** | 42+ | 完全支持所有功能 |
+| **Firefox** | 39+ | 完全支持所有功能 |
+| **Safari** | 10.1+ | 完全支持所有功能 |
+| **Edge** | 14+ | 完全支持所有功能 |
+| **Internet Explorer** | ❌ 不支持 | 缺少 fetch API 和其他现代功能 |
+
+### 功能特定兼容性
+
+| API/功能 | Chrome | Firefox | Safari | Edge | IE |
+|----------|--------|---------|--------|------|-----|
+| **SVG 变形 (核心)** | 22+ | 11+ | 6+ | 12+ | 10+ |
+| **bundleSvgs (fetch API)** | 42+ | 39+ | 10.1+ | 14+ | ❌ |
+| **Blob/URL.createObjectURL** | 8+ | 4+ | 6+ | 12+ | 10+ |
+| **querySelector/querySelectorAll** | 4+ | 3.5+ | 3.1+ | 12+ | 9+ |
+| **requestAnimationFrame** | 22+ | 11+ | 6+ | 12+ | 10+ |
+| **addEventListener** | 1+ | 1+ | 1+ | 12+ | 9+ |
+| **createElementNS** | 1+ | 1+ | 1+ | 12+ | 9+ |
+| **getComputedStyle** | 1+ | 1+ | 1+ | 12+ | 9+ |
+
+### 建议
+
+- **现代开发**: 使用 Chrome 42+、Firefox 39+、Safari 10.1+ 或 Edge 14+
+- **旧版支持**: 对于 IE 支持，考虑使用 fetch API 的 polyfill 或使用 XMLHttpRequest
+- **移动浏览器**: 支持所有现代移动浏览器
+- **bundleSvgs 功能**: 需要支持 fetch API 的现代浏览器
+
+### 旧版浏览器的 Polyfill
+
+如果需要支持旧版浏览器，请考虑这些 polyfill：
+
+```html
+<!-- 适用于 IE 11 和更旧的浏览器 -->
+<script src="https://polyfill.io/v3/polyfill.min.js?features=fetch,Promise"></script>
+```
+
+**注意**：核心 SVG 变形功能在较旧的浏览器中有效（IE 10+），但新的 `bundleSvgs` 功能需要支持 fetch API 的现代浏览器。 

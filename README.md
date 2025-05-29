@@ -436,3 +436,48 @@ const svgAttributes: Record<string, string | number> = {
 - **svgMap**: `Record<string, string>` - Object mapping icon IDs to SVG sources
 - **svgAttributes**: `Record<string, string | number>` (optional) - Custom attributes for root SVG element
 - **Returns**: `Promise<string>` - Combined SVG string
+
+## Browser Compatibility
+
+This library uses modern Web APIs. Here are the minimum browser versions required for full functionality:
+
+### Core Features Compatibility
+
+| Browser | Minimum Version | Notes |
+|---------|----------------|-------|
+| **Chrome** | 42+ | Full support for all features |
+| **Firefox** | 39+ | Full support for all features |
+| **Safari** | 10.1+ | Full support for all features |
+| **Edge** | 14+ | Full support for all features |
+| **Internet Explorer** | ❌ Not Supported | Missing fetch API and other modern features |
+
+### Feature-specific Compatibility
+
+| API/Feature | Chrome | Firefox | Safari | Edge | IE |
+|------------|--------|---------|--------|------|-----|
+| **SVG Morphing (Core)** | 22+ | 11+ | 6+ | 12+ | 10+ |
+| **bundleSvgs (fetch API)** | 42+ | 39+ | 10.1+ | 14+ | ❌ |
+| **Blob/URL.createObjectURL** | 8+ | 4+ | 6+ | 12+ | 10+ |
+| **querySelector/querySelectorAll** | 4+ | 3.5+ | 3.1+ | 12+ | 9+ |
+| **requestAnimationFrame** | 22+ | 11+ | 6+ | 12+ | 10+ |
+| **addEventListener** | 1+ | 1+ | 1+ | 12+ | 9+ |
+| **createElementNS** | 1+ | 1+ | 1+ | 12+ | 9+ |
+| **getComputedStyle** | 1+ | 1+ | 1+ | 12+ | 9+ |
+
+### Recommendations
+
+- **Modern Development**: Use Chrome 42+, Firefox 39+, Safari 10.1+, or Edge 14+
+- **Legacy Support**: For IE support, consider using polyfills for fetch API or use XMLHttpRequest
+- **Mobile Browsers**: All modern mobile browsers are supported
+- **bundleSvgs Feature**: Requires modern browsers with fetch API support
+
+### Polyfills for Legacy Support
+
+If you need to support older browsers, consider these polyfills:
+
+```html
+<!-- For IE 11 and older browsers -->
+<script src="https://polyfill.io/v3/polyfill.min.js?features=fetch,Promise"></script>
+```
+
+**Note**: The core SVG morphing functionality works in older browsers (IE 10+), but the new `bundleSvgs` feature requires modern browsers with fetch API support.
