@@ -22,91 +22,117 @@ export const cancelAnimFrame = extendedWindow.cancelAnimationFrame ||
   extendedWindow.webkitCancelAnimationFrame || 
   extendedWindow.oCancelAnimationFrame;
 
+import { NormalizedStyle, RGBColor, StyleAttributes, Transform, CurveData } from './types';
+
 // Calculate style
-export function styleNormCalc(styleNormFrom: any, styleNormTo: any, progress: any): any {
-  var i: any, styleNorm: any={};
-  for(i in styleNormFrom) {
+export function styleNormCalc(styleNormFrom: NormalizedStyle, styleNormTo: NormalizedStyle, progress: number): NormalizedStyle {
+  const styleNorm: NormalizedStyle = {};
+  
+  for (const key in styleNormFrom) {
+    const i = key as keyof NormalizedStyle;
     switch (i) {
       case 'fill':
       case 'stroke':
-        styleNorm[i]=clone(styleNormFrom[i]);
-        styleNorm[i].r=styleNormFrom[i].r+(styleNormTo[i].r-styleNormFrom[i].r)*progress;
-        styleNorm[i].g=styleNormFrom[i].g+(styleNormTo[i].g-styleNormFrom[i].g)*progress;
-        styleNorm[i].b=styleNormFrom[i].b+(styleNormTo[i].b-styleNormFrom[i].b)*progress;
-        styleNorm[i].opacity=styleNormFrom[i].opacity+(styleNormTo[i].opacity-styleNormFrom[i].opacity)*progress;
+        if (styleNormFrom[i] && styleNormTo[i]) {
+          const fromColor = styleNormFrom[i] as RGBColor;
+          const toColor = styleNormTo[i] as RGBColor;
+          styleNorm[i] = clone(fromColor);
+          (styleNorm[i] as RGBColor).r = fromColor.r + (toColor.r - fromColor.r) * progress;
+          (styleNorm[i] as RGBColor).g = fromColor.g + (toColor.g - fromColor.g) * progress;
+          (styleNorm[i] as RGBColor).b = fromColor.b + (toColor.b - fromColor.b) * progress;
+          (styleNorm[i] as RGBColor).opacity = fromColor.opacity + (toColor.opacity - fromColor.opacity) * progress;
+        }
         break;
       case 'opacity':
       case 'fill-opacity':
       case 'stroke-opacity':
       case 'stroke-width':
-        styleNorm[i]=styleNormFrom[i]+(styleNormTo[i]-styleNormFrom[i])*progress;
+        if (typeof styleNormFrom[i] === 'number' && typeof styleNormTo[i] === 'number') {
+          (styleNorm[i] as number) = styleNormFrom[i] as number + ((styleNormTo[i] as number) - (styleNormFrom[i] as number)) * progress;
+        }
         break;
     }
   }
   return styleNorm;
 }
 
-export function styleNormToString(styleNorm: any): any {
-  var i: any;
-  var style: any={};
-  for(i in styleNorm) {
+export function styleNormToString(styleNorm: NormalizedStyle): StyleAttributes {
+  const style: StyleAttributes = {};
+  
+  for (const key in styleNorm) {
+    const i = key as keyof NormalizedStyle;
     switch (i) {
       case 'fill':
       case 'stroke':
-        style[i]=rgbToString(styleNorm[i]);
+        if (styleNorm[i]) {
+          style[i] = rgbToString(styleNorm[i] as RGBColor);
+        }
         break;
       case 'opacity':
       case 'fill-opacity':
       case 'stroke-opacity':
       case 'stroke-width':
-        style[i]=styleNorm[i];
+        if (typeof styleNorm[i] === 'number') {
+          (style[i] as any) = styleNorm[i];
+        }
         break;
     }
   }
   return style;
 }
 
-export function styleToNorm(styleFrom: any, styleTo: any): any {
-  var styleNorm: any=[{},{}];
-  var i: any;
-  for(i in styleFrom) {
+export function styleToNorm(styleFrom: StyleAttributes, styleTo: StyleAttributes): [NormalizedStyle, NormalizedStyle] {
+  const styleNorm: [NormalizedStyle, NormalizedStyle] = [{}, {}];
+  
+  for (const key in styleFrom) {
+    const i = key as keyof StyleAttributes;
     switch(i) {
       case 'fill':
       case 'stroke':
-        styleNorm[0][i]=getRGB(styleFrom[i]);
-        if(styleTo[i]===undefined) {
-          styleNorm[1][i]=getRGB(styleFrom[i]);
-          styleNorm[1][i].opacity=0;
+        if (styleFrom[i]) {
+          styleNorm[0][i] = getRGB(styleFrom[i]);
+          if (styleTo[i] === undefined) {
+            styleNorm[1][i] = getRGB(styleFrom[i]);
+            (styleNorm[1][i] as RGBColor).opacity = 0;
+          }
         }
         break;
       case 'opacity':
       case 'fill-opacity':
       case 'stroke-opacity':
       case 'stroke-width':
-        styleNorm[0][i]=styleFrom[i];
-        if(styleTo[i]===undefined) {
-          styleNorm[1][i]=1;
+        if (styleFrom[i]) {
+          (styleNorm[0][i] as any) = styleFrom[i];
+          if (styleTo[i] === undefined) {
+            (styleNorm[1][i] as any) = 1;
+          }
         }
         break;
     }
   }
-  for(i in styleTo) {
+  
+  for (const key in styleTo) {
+    const i = key as keyof StyleAttributes;
     switch(i) {
       case 'fill':
       case 'stroke':
-        styleNorm[1][i]=getRGB(styleTo[i]);
-        if(styleFrom[i]===undefined) {
-          styleNorm[0][i]=getRGB(styleTo[i]);
-          styleNorm[0][i].opacity=0;
+        if (styleTo[i]) {
+          styleNorm[1][i] = getRGB(styleTo[i]);
+          if (styleFrom[i] === undefined) {
+            styleNorm[0][i] = getRGB(styleTo[i]);
+            (styleNorm[0][i] as RGBColor).opacity = 0;
+          }
         }
         break;
       case 'opacity':
       case 'fill-opacity':
       case 'stroke-opacity':
       case 'stroke-width':
-        styleNorm[1][i]=styleTo[i];
-        if(styleFrom[i]===undefined) {
-          styleNorm[0][i]=1;
+        if (styleTo[i]) {
+          (styleNorm[1][i] as any) = styleTo[i];
+          if (styleFrom[i] === undefined) {
+            (styleNorm[0][i] as any) = 1;
+          }
         }
         break;
     }
@@ -115,14 +141,24 @@ export function styleToNorm(styleFrom: any, styleTo: any): any {
 }
 
 // Calculate transform progress
-export function transCalc(transFrom: any, transTo: any, progress: any): any {
-  var res: any={};
-  for(var i in transFrom) {
+export function transCalc(transFrom: Transform, transTo: Transform, progress: number): Transform {
+  const res: Transform = {};
+  for (const key in transFrom) {
+    const i = key as keyof Transform;
     switch(i) {
       case 'rotate':
-        res[i]=[0,0,0];
-        for(var j=0;j<3;j++) {
-          res[i][j]=transFrom[i][j]+(transTo[i][j]-transFrom[i][j])*progress;
+        if (transFrom[i] && transTo[i]) {
+          res[i] = [0, 0, 0];
+          for (let j = 0; j < 3; j++) {
+            const fromVal = transFrom[i]![j];
+            const toVal = transTo[i]![j];
+            if (isFinite(fromVal) && isFinite(toVal) && isFinite(progress)) {
+              res[i]![j] = fromVal + (toVal - fromVal) * progress;
+            } else {
+              // 如果任何值无效，使用 from 值或默认值
+              res[i]![j] = isFinite(fromVal) ? fromVal : 0;
+            }
+          }
         }
         break;
     }
@@ -130,33 +166,42 @@ export function transCalc(transFrom: any, transTo: any, progress: any): any {
   return res;
 }
 
-export function trans2string(trans: any): any {
-  var res='';
-  if(!!trans.rotate) {
-    res+='rotate('+trans.rotate.join(' ')+')';
+export function trans2string(trans: Transform): string {
+  let res = '';
+  if (trans.rotate && trans.rotate.length === 3) {
+    // 检查所有值是否为有效数字
+    const [angle, centerX, centerY] = trans.rotate;
+    if (isFinite(angle) && isFinite(centerX) && isFinite(centerY)) {
+      res += 'rotate(' + trans.rotate.join(' ') + ')';
+    } else {
+      // 如果有无效值，使用默认的变换
+      res += 'rotate(0 0 0)';
+    }
   }
   return res;
 }
 
 // Calculate curve progress
-export function curveCalc(curveFrom: any, curveTo: any, progress: any): any {
-  var curve: any=[];
-  for(var i=0,len1=curveFrom.length;i<len1;i++) {
+export function curveCalc(curveFrom: CurveData, curveTo: CurveData, progress: number): CurveData {
+  const curve: CurveData = [];
+  for (let i = 0, len1 = curveFrom.length; i < len1; i++) {
     curve.push([curveFrom[i][0]]);
-    for(var j=1,len2=curveFrom[i].length;j<len2;j++) {
-      curve[i].push(curveFrom[i][j]+(curveTo[i][j]-curveFrom[i][j])*progress);
+    for (let j = 1, len2 = curveFrom[i].length; j < len2; j++) {
+      const fromVal = curveFrom[i][j] as number;
+      const toVal = curveTo[i][j] as number;
+      curve[i].push(fromVal + (toVal - fromVal) * progress);
     }
   }
   return curve;
 }
 
-export function clone(obj: any): any {
-  var copy: any;
+export function clone<T>(obj: T): T {
+  let copy: any;
 
   // Handle Array
   if (obj instanceof Array) {
     copy = [];
-    for (var i = 0, len = obj.length; i < len; i++) {
+    for (let i = 0, len = obj.length; i < len; i++) {
       copy[i] = clone(obj[i]);
     }
     return copy;
@@ -165,9 +210,9 @@ export function clone(obj: any): any {
   // Handle Object
   if (obj instanceof Object) {
     copy = {};
-    for (var attr in obj) {
+    for (const attr in obj) {
       if (obj.hasOwnProperty(attr)) {
-        copy[attr] = clone(obj[attr]);
+        (copy as any)[attr] = clone((obj as any)[attr]);
       }
     }
     return copy;
@@ -184,106 +229,138 @@ const colourRegExp = /^\s*((#[a-f\d]{6})|(#[a-f\d]{3})|rgba?\(\s*([\d\.]+%?\s*,\
 const commaSpaces = new RegExp("[" + spaces + "]*,[" + spaces + "]*");
 
 // Converts RGB values to a hex representation of the color
-const rgbToString = function (rgb: any) {
-  var round = Math.round;
+const rgbToString = function (rgb: RGBColor): string {
+  const round = Math.round;
   return "rgba(" + [round(rgb.r), round(rgb.g), round(rgb.b), +rgb.opacity.toFixed(2)] + ")";
 };
 
-const toHex = function (color: any) {
-  var i = window.document.getElementsByTagName("head")[0] || window.document.getElementsByTagName("svg")[0],
-      red = "rgb(255, 0, 0)";
-  const toHexFunc = function (color: any) {
-    if (color.toLowerCase() == "red") {
+const toHex = function (color: string): string | null {
+  const i = window.document.getElementsByTagName("head")[0] || window.document.getElementsByTagName("svg")[0];
+  const red = "rgb(255, 0, 0)";
+  const toHexFunc = function (color: string): string | null {
+    if (color.toLowerCase() === "red") {
       return red;
     }
     i.style.color = red;
     i.style.color = color;
-    var out = window.document.defaultView?.getComputedStyle(i, "").getPropertyValue("color");
-    return out == red ? null : out;
+    const out = window.document.defaultView?.getComputedStyle(i, "").getPropertyValue("color");
+    return out === red ? null : (out || null);
   };
   return toHexFunc(color);
 };
 
-const packageRGB = function (r: any, g: any, b: any, o: any) {
-  r = Math.round(r * 255);
-  g = Math.round(g * 255);
-  b = Math.round(b * 255);
-  var rgb = {
-      r: r,
-      g: g,
-      b: b,
-      opacity: isFinite(o) ? o : 1
+const packageRGB = function (r: number, g: number, b: number, o: number): RGBColor {
+  const red = Math.round(r * 255);
+  const green = Math.round(g * 255);
+  const blue = Math.round(b * 255);
+  return {
+    r: red,
+    g: green,
+    b: blue,
+    opacity: isFinite(o) ? o : 1
   };
-  return rgb;
 };
 
-// Converts HSB values to an RGB object
-const hsb2rgb = function (h: any, s: any, v: any, o: any) {
-  if (typeof h === typeof {} && "h" in h && "s" in h && "b" in h) {
-      v = h.b;
-      s = h.s;
-      h = h.h;
-      o = h.o;
-  }
-  h *= 360;
-  var R: any, G: any, B: any, X: any, C: any;
-  h = (h % 360) / 60;
-  C = v * s;
-  X = C * (1 - Math.abs(h % 2 - 1));
-  R = G = B = v - C;
+interface HSBColor {
+  h: number;
+  s: number;
+  b: number;
+  o?: number;
+}
 
-  h = ~~h;
-  R += [C, X, 0, 0, X, C][h];
-  G += [X, C, C, X, 0, 0][h];
-  B += [0, 0, X, C, C, X][h];
-  return packageRGB(R, G, B, o);
+interface HSLColor {
+  h: number;
+  s: number;
+  l: number;
+  o?: number;
+}
+
+// Converts HSB values to an RGB object
+const hsb2rgb = function (h: number | HSBColor, s?: number, v?: number, o?: number): RGBColor {
+  if (typeof h === 'object' && "h" in h && "s" in h && "b" in h) {
+    v = h.b;
+    s = h.s;
+    o = h.o;
+    h = h.h;
+  }
+  
+  const hue = (h as number) * 360;
+  let R: number, G: number, B: number, X: number, C: number;
+  const normalizedHue = (hue % 360) / 60;
+  C = (v as number) * (s as number);
+  X = C * (1 - Math.abs(normalizedHue % 2 - 1));
+  R = G = B = (v as number) - C;
+
+  const hueIndex = ~~normalizedHue;
+  R += [C, X, 0, 0, X, C][hueIndex];
+  G += [X, C, C, X, 0, 0][hueIndex];
+  B += [0, 0, X, C, C, X][hueIndex];
+  return packageRGB(R, G, B, o as number);
 };
 
 // Converts HSL values to an RGB object
-const hsl2rgb = function (h: any, s: any, l: any, o: any) {
-  if (typeof h === typeof {} && "h" in h && "s" in h && "l" in h) {
+const hsl2rgb = function (h: number | HSLColor, s?: number, l?: number, o?: number): RGBColor {
+  if (typeof h === 'object' && "h" in h && "s" in h && "l" in h) {
     l = h.l;
     s = h.s;
+    o = h.o;
     h = h.h;
   }
-  if (h > 1 || s > 1 || l > 1) {
-    h /= 360;
-    s /= 100;
-    l /= 100;
+  
+  let hue = h as number;
+  let saturation = s as number;
+  let lightness = l as number;
+  
+  if (hue > 1 || saturation > 1 || lightness > 1) {
+    hue /= 360;
+    saturation /= 100;
+    lightness /= 100;
   }
-  h *= 360;
-  var R: any, G: any, B: any, X: any, C: any;
-  h = (h % 360) / 60;
-  C = 2 * s * (l < .5 ? l : 1 - l);
-  X = C * (1 - Math.abs(h % 2 - 1));
-  R = G = B = l - C / 2;
+  
+  hue *= 360;
+  let R: number, G: number, B: number, X: number, C: number;
+  const normalizedHue = (hue % 360) / 60;
+  C = 2 * saturation * (lightness < 0.5 ? lightness : 1 - lightness);
+  X = C * (1 - Math.abs(normalizedHue % 2 - 1));
+  R = G = B = lightness - C / 2;
 
-  h = ~~h;
-  R += [C, X, 0, 0, X, C][h];
-  G += [X, C, C, X, 0, 0][h];
-  B += [0, 0, X, C, C, X][h];
-  return packageRGB(R, G, B, o);
+  const hueIndex = ~~normalizedHue;
+  R += [C, X, 0, 0, X, C][hueIndex];
+  G += [X, C, C, X, 0, 0][hueIndex];
+  B += [0, 0, X, C, C, X][hueIndex];
+  return packageRGB(R, G, B, o as number);
 };
 
+interface RGBColorWithError extends RGBColor {
+  error?: number;
+}
+
 // Parses color string as RGB object
-const getRGB = function (colour: any) {
+const getRGB = function (colour: string): RGBColorWithError {
   if (!colour || !!((colour = String(colour)).indexOf("-") + 1)) {
     return {r: -1, g: -1, b: -1, opacity: -1, error: 1};
   }
-  if (colour == "none") {
+  if (colour === "none") {
     return {r: -1, g: -1, b: -1, opacity: -1};
   }
-  !((hsrg as any)[(has as any)](colour.toLowerCase().substring(0, 2)) || colour.charAt() == "#") && (colour = toHex(colour));
+  
+  if (!((hsrg as any)[(has as any)](colour.toLowerCase().substring(0, 2)) || colour.charAt(0) === "#")) {
+    const hexColor = toHex(colour);
+    colour = hexColor || '';
+  }
+  
   if (!colour) {
     return {r: -1, g: -1, b: -1, opacity: -1, error: 1};
   }
-  var red: any,
-      green: any,
-      blue: any,
-      opacity: any,
-      t: any,
-      values: any,
-      rgb = colour.match(colourRegExp);
+  
+  let red: number = 0;
+  let green: number = 0;
+  let blue: number = 0;
+  let opacity: number = 1;
+  let t: string;
+  let values: string[];
+  const rgb = colour.match(colourRegExp);
+  
   if (rgb) {
     if (rgb[2]) {
       blue = parseInt(rgb[2].substring(5), 16);
@@ -298,47 +375,60 @@ const getRGB = function (colour: any) {
     if (rgb[4]) {
       values = rgb[4].split(commaSpaces);
       red = parseFloat(values[0]);
-      values[0].slice(-1) == "%" && (red *= 2.55);
+      values[0].slice(-1) === "%" && (red *= 2.55);
       green = parseFloat(values[1]);
-      values[1].slice(-1) == "%" && (green *= 2.55);
+      values[1].slice(-1) === "%" && (green *= 2.55);
       blue = parseFloat(values[2]);
-      values[2].slice(-1) == "%" && (blue *= 2.55);
-      rgb[1].toLowerCase().slice(0, 4) == "rgba" && (opacity = parseFloat(values[3]));
-      values[3] && values[3].slice(-1) == "%" && (opacity /= 100);
+      values[2].slice(-1) === "%" && (blue *= 2.55);
+      if (rgb[1].toLowerCase().slice(0, 4) === "rgba") {
+        opacity = parseFloat(values[3]);
+      }
+      if (values[3] && values[3].slice(-1) === "%") {
+        opacity /= 100;
+      }
     }
     if (rgb[5]) {
       values = rgb[5].split(commaSpaces);
       red = parseFloat(values[0]);
-      values[0].slice(-1) == "%" && (red /= 100);
+      values[0].slice(-1) === "%" && (red /= 100);
       green = parseFloat(values[1]);
-      values[1].slice(-1) == "%" && (green /= 100);
+      values[1].slice(-1) === "%" && (green /= 100);
       blue = parseFloat(values[2]);
-      values[2].slice(-1) == "%" && (blue /= 100);
-      (values[0].slice(-3) == "deg" || values[0].slice(-1) == "\xb0") && (red /= 360);
-      rgb[1].toLowerCase().slice(0, 4) == "hsba" && (opacity = parseFloat(values[3]));
-      values[3] && values[3].slice(-1) == "%" && (opacity /= 100);
+      values[2].slice(-1) === "%" && (blue /= 100);
+      (values[0].slice(-3) === "deg" || values[0].slice(-1) === "\xb0") && (red /= 360);
+      if (rgb[1].toLowerCase().slice(0, 4) === "hsba") {
+        opacity = parseFloat(values[3]);
+      }
+      if (values[3] && values[3].slice(-1) === "%") {
+        opacity /= 100;
+      }
       return hsb2rgb(red, green, blue, opacity);
     }
     if (rgb[6]) {
       values = rgb[6].split(commaSpaces);
       red = parseFloat(values[0]);
-      values[0].slice(-1) == "%" && (red /= 100);
+      values[0].slice(-1) === "%" && (red /= 100);
       green = parseFloat(values[1]);
-      values[1].slice(-1) == "%" && (green /= 100);
+      values[1].slice(-1) === "%" && (green /= 100);
       blue = parseFloat(values[2]);
-      values[2].slice(-1) == "%" && (blue /= 100);
-      (values[0].slice(-3) == "deg" || values[0].slice(-1) == "\xb0") && (red /= 360);
-      rgb[1].toLowerCase().slice(0, 4) == "hsla" && (opacity = parseFloat(values[3]));
-      values[3] && values[3].slice(-1) == "%" && (opacity /= 100);
+      values[2].slice(-1) === "%" && (blue /= 100);
+      (values[0].slice(-3) === "deg" || values[0].slice(-1) === "\xb0") && (red /= 360);
+      if (rgb[1].toLowerCase().slice(0, 4) === "hsla") {
+        opacity = parseFloat(values[3]);
+      }
+      if (values[3] && values[3].slice(-1) === "%") {
+        opacity /= 100;
+      }
       return hsl2rgb(red, green, blue, opacity);
     }
+    
     red = Math.min(Math.round(red), 255);
     green = Math.min(Math.round(green), 255);
     blue = Math.min(Math.round(blue), 255);
     opacity = Math.min(Math.max(opacity, 0), 1);
-    rgb = {r: red, g: green, b: blue};
-    rgb.opacity = isFinite(opacity) ? opacity : 1;
-    return rgb;
+    
+    const result: RGBColorWithError = {r: red, g: green, b: blue, opacity: isFinite(opacity) ? opacity : 1};
+    return result;
   }
   return {r: -1, g: -1, b: -1, opacity: -1, error: 1};
 };

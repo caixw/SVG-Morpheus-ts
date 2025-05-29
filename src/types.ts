@@ -42,12 +42,16 @@ export interface Transform {
   rotate?: [number, number, number];
 }
 
+// Curve data - array of curve segments, each segment is an array starting with command and coordinates
+export type CurveSegment = (string | number)[];
+export type CurveData = CurveSegment[];
+
 // Icon item structure
 export interface IconItem {
   path: string;
   attrs: StyleAttributes;
   style: StyleAttributes;
-  curve?: number[][];
+  curve?: CurveData;
   attrsNorm?: NormalizedStyle;
   styleNorm?: NormalizedStyle;
   trans?: Transform;
@@ -71,11 +75,26 @@ export interface MorphNode {
 export interface BoundingBox {
   x: number;
   y: number;
-  width: number;
-  height: number;
+  w: number;
+  h: number;
   cx: number;
   cy: number;
 }
 
 // Callback function type
-export type CallbackFunction = () => void; 
+export type CallbackFunction = () => void;
+
+// Options for the `to` method
+export interface ToMethodOptions {
+  duration?: number;
+  easing?: string;
+  rotation?: 'clock' | 'counterclock' | 'none' | 'random';
+}
+
+// Animation frame request ID
+export type AnimationFrameId = number;
+
+// Easing functions map
+export interface EasingMap {
+  [key: string]: EasingFunction;
+} 

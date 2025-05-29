@@ -142,94 +142,92 @@ export function pathToAbsolute(pathArray: any): any {
 
 // Convert path to curves (cubic bezier) - from snapsvglite.js
 export function path2curve(path: any, path2?: any): any {
-  var p = pathToAbsolute(path),
-      p2 = path2 && pathToAbsolute(path2),
-      attrs = {x: 0, y: 0, bx: 0, by: 0, X: 0, Y: 0, qx: null, qy: null},
-      attrs2 = {x: 0, y: 0, bx: 0, by: 0, X: 0, Y: 0, qx: null, qy: null},
-      processPath = function (path: any, d: any, pcom: any) {
-        var nx: any, ny: any;
-        if (!path) {
-          return ["C", d.x, d.y, d.x, d.y, d.x, d.y];
+  const p = pathToAbsolute(path);
+  const p2 = path2 && pathToAbsolute(path2);
+  const attrs = {x: 0, y: 0, bx: 0, by: 0, X: 0, Y: 0, qx: null, qy: null};
+  const attrs2 = {x: 0, y: 0, bx: 0, by: 0, X: 0, Y: 0, qx: null, qy: null};
+  const processPath = function (path: any, d: any, pcom: any) {
+    let nx: any, ny: any;
+    if (!path) {
+      return ["C", d.x, d.y, d.x, d.y, d.x, d.y];
+    }
+    !(path[0] in {T: 1, Q: 1}) && (d.qx = d.qy = null);
+    switch (path[0]) {
+      case "M":
+        d.X = path[1];
+        d.Y = path[2];
+        break;
+      case "A":
+        path = ["C"].concat((a2c as any).apply(0, [d.x, d.y].concat(path.slice(1))));
+        break;
+      case "S":
+        if (pcom == "C" || pcom == "S") { // In "S" case we have to take into account, if the previous command is C/S.
+          nx = d.x * 2 - d.bx;          // And reflect the previous
+          ny = d.y * 2 - d.by;          // command's control point relative to the current point.
         }
-        !(path[0] in {T: 1, Q: 1}) && (d.qx = d.qy = null);
-        switch (path[0]) {
-          case "M":
-            d.X = path[1];
-            d.Y = path[2];
-            break;
-          case "A":
-            path = ["C"].concat((a2c as any).apply(0, [d.x, d.y].concat(path.slice(1))));
-            break;
-          case "S":
-            if (pcom == "C" || pcom == "S") { // In "S" case we have to take into account, if the previous command is C/S.
-              nx = d.x * 2 - d.bx;          // And reflect the previous
-              ny = d.y * 2 - d.by;          // command's control point relative to the current point.
-            }
-            else {                            // or some else or nothing
-              nx = d.x;
-              ny = d.y;
-            }
-            path = ["C", nx, ny].concat(path.slice(1));
-            break;
-          case "T":
-            if (pcom == "Q" || pcom == "T") { // In "T" case we have to take into account, if the previous command is Q/T.
-              d.qx = d.x * 2 - d.qx;        // And make a reflection similar
-              d.qy = d.y * 2 - d.qy;        // to case "S".
-            }
-            else {                            // or something else or nothing
-              d.qx = d.x;
-              d.qy = d.y;
-            }
-            path = ["C"].concat(q2c(d.x, d.y, d.qx, d.qy, path[1], path[2]));
-            break;
-          case "Q":
-            d.qx = path[1];
-            d.qy = path[2];
-            path = ["C"].concat(q2c(d.x, d.y, path[1], path[2], path[3], path[4]));
-            break;
-          case "L":
-            path = ["C"].concat(l2c(d.x, d.y, path[1], path[2]));
-            break;
-          case "H":
-            path = ["C"].concat(l2c(d.x, d.y, path[1], d.y));
-            break;
-          case "V":
-            path = ["C"].concat(l2c(d.x, d.y, d.x, path[1]));
-            break;
-          case "Z":
-            path = ["C"].concat(l2c(d.x, d.y, d.X, d.Y));
-            break;
+        else {                            // or some else or nothing
+          nx = d.x;
+          ny = d.y;
         }
-        return path;
-      },
-      fixArc = function (pp: any, i: any) {
-        if (pp[i].length > 7) {
-          pp[i].shift();
-          var pi = pp[i];
-          while (pi.length) {
-            pcoms1[i] = "A"; // if created multiple C:s, their original seg is saved
-            p2 && (pcoms2[i] = "A"); // the same as above
-            pp.splice(i++, 0, ["C"].concat(pi.splice(0, 6)));
-          }
-          pp.splice(i, 1);
-          ii = Math.max(p.length, p2 && p2.length || 0);
+        path = ["C", nx, ny].concat(path.slice(1));
+        break;
+      case "T":
+        if (pcom == "Q" || pcom == "T") { // In "T" case we have to take into account, if the previous command is Q/T.
+          d.qx = d.x * 2 - d.qx;        // And make a reflection similar
+          d.qy = d.y * 2 - d.qy;        // to case "S".
         }
-      },
-      fixM = function (path1: any, path2: any, a1: any, a2: any, i: any) {
-        if (path1 && path2 && path1[i][0] == "M" && path2[i][0] != "M") {
-          path2.splice(i, 0, ["M", a2.x, a2.y]);
-          a1.bx = 0;
-          a1.by = 0;
-          a1.x = path1[i][1];
-          a1.y = path1[i][2];
-          ii = Math.max(p.length, p2 && p2.length || 0);
+        else {                            // or something else or nothing
+          d.qx = d.x;
+          d.qy = d.y;
         }
-      },
-      pcoms1: any = [], // path commands of original path p
-      pcoms2: any = [], // path commands of original path p2
-      pfirst = "", // temporary holder for original path command
-      pcom = ""; // holder for previous path command of original path
-  for (var i = 0, ii = Math.max(p.length, p2 && p2.length || 0); i < ii; i++) {
+        path = ["C"].concat(q2c(d.x, d.y, d.qx, d.qy, path[1], path[2]));
+        break;
+      case "Q":
+        d.qx = path[1];
+        d.qy = path[2];
+        path = ["C"].concat(q2c(d.x, d.y, path[1], path[2], path[3], path[4]));
+        break;
+      case "L":
+        path = ["C"].concat(l2c(d.x, d.y, path[1], path[2]));
+        break;
+      case "H":
+        path = ["C"].concat(l2c(d.x, d.y, path[1], d.y));
+        break;
+      case "V":
+        path = ["C"].concat(l2c(d.x, d.y, d.x, path[1]));
+        break;
+      case "Z":
+        path = ["C"].concat(l2c(d.x, d.y, d.X, d.Y));
+        break;
+    }
+    return path;
+  };
+  const fixArc = function (pp: any, i: any) {
+    if (pp[i].length > 7) {
+      pp[i].shift();
+      const pi = pp[i];
+      while (pi.length) {
+        pcoms1[i] = "A"; // if created multiple C:s, their original seg is saved
+        p2 && (pcoms2[i] = "A"); // the same as above
+        pp.splice(i++, 0, ["C"].concat(pi.splice(0, 6)));
+      }
+      pp.splice(i, 1);
+    }
+  };
+  const fixM = function (path1: any, path2: any, a1: any, a2: any, i: any) {
+    if (path1 && path2 && path1[i][0] == "M" && path2[i][0] != "M") {
+      path2.splice(i, 0, ["M", a2.x, a2.y]);
+      a1.bx = 0;
+      a1.by = 0;
+      a1.x = path1[i][1];
+      a1.y = path1[i][2];
+    }
+  };
+  const pcoms1: any = []; // path commands of original path p
+  const pcoms2: any = []; // path commands of original path p2
+  let pfirst = ""; // temporary holder for original path command
+  let pcom = ""; // holder for previous path command of original path
+  for (let i = 0, ii = Math.max(p.length, p2 && p2.length || 0); i < ii; i++) {
     p[i] && (pfirst = p[i][0]); // save current path command
 
     if (pfirst != "C") { // C is not saved yet, because it may be result of conversion
@@ -260,10 +258,10 @@ export function path2curve(path: any, path2?: any): any {
     }
     fixM(p, p2, attrs, attrs2, i);
     fixM(p2, p, attrs2, attrs, i);
-    var seg = p[i],
-        seg2 = p2 && p2[i],
-        seglen = seg.length,
-        seg2len = p2 && seg2.length;
+    const seg = p[i];
+    const seg2 = p2 && p2[i];
+    const seglen = seg.length;
+    const seg2len = p2 && seg2.length;
     attrs.x = seg[seglen - 2];
     attrs.y = seg[seglen - 1];
     attrs.bx = parseFloat(seg[seglen - 4]) || attrs.x;
@@ -391,45 +389,68 @@ export function path2string(path: any): any {
 
 // Calculate bounding box of a curve path
 export function curvePathBBox(path: any): any {
-  var x = 0,
-      y = 0,
-      X: any = [],
-      Y: any = [],
-      p: any;
-  for (var i = 0, ii = path.length; i < ii; i++) {
+  // 如果路径为空或无效，返回默认边界框
+  if (!path || !Array.isArray(path) || path.length === 0) {
+    return box(0, 0, 0, 0);
+  }
+
+  let x = 0;
+  let y = 0;
+  const X: number[] = [];
+  const Y: number[] = [];
+  let p: any;
+  
+  for (let i = 0, ii = path.length; i < ii; i++) {
     p = path[i];
     if (p[0] == "M") {
-      x = p[1];
-      y = p[2];
+      x = isFinite(p[1]) ? p[1] : 0;
+      y = isFinite(p[2]) ? p[2] : 0;
       X.push(x);
       Y.push(y);
     } else {
-      var dim = curveDim(x, y, p[1], p[2], p[3], p[4], p[5], p[6]);
-      X = X.concat(dim.min.x, dim.max.x);
-      Y = Y.concat(dim.min.y, dim.max.y);
-      x = p[5];
-      y = p[6];
+      const x0 = x, y0 = y;
+      const x1 = isFinite(p[1]) ? p[1] : 0;
+      const y1 = isFinite(p[2]) ? p[2] : 0;
+      const x2 = isFinite(p[3]) ? p[3] : 0;
+      const y2 = isFinite(p[4]) ? p[4] : 0;
+      const x3 = isFinite(p[5]) ? p[5] : 0;
+      const y3 = isFinite(p[6]) ? p[6] : 0;
+      
+      const dim = curveDim(x0, y0, x1, y1, x2, y2, x3, y3);
+      if (isFinite(dim.min.x) && isFinite(dim.max.x) && isFinite(dim.min.y) && isFinite(dim.max.y)) {
+        X.push(dim.min.x, dim.max.x);
+        Y.push(dim.min.y, dim.max.y);
+      }
+      x = x3;
+      y = y3;
     }
   }
-  var xmin = Math.min.apply(0, X),
-      ymin = Math.min.apply(0, Y),
-      xmax = Math.max.apply(0, X),
-      ymax = Math.max.apply(0, Y),
-      bb = box(xmin, ymin, xmax - xmin, ymax - ymin);
-
-  return bb;
+  
+  // 确保有有效的边界值
+  if (X.length === 0 || Y.length === 0) {
+    return box(0, 0, 0, 0);
+  }
+  
+  const xmin = Math.min(...X);
+  const ymin = Math.min(...Y);
+  const xmax = Math.max(...X);
+  const ymax = Math.max(...Y);
+  
+  // 验证计算结果
+  if (!isFinite(xmin) || !isFinite(ymin) || !isFinite(xmax) || !isFinite(ymax)) {
+    return box(0, 0, 0, 0);
+  }
+  
+  return box(xmin, ymin, xmax - xmin, ymax - ymin);
 }
 
-const box = function(x: any, y: any, width: any, height: any) {
-  if (x == null) {
-    x = y = width = height = 0;
-  }
-  if (y == null) {
-    y = x.y;
-    width = x.width;
-    height = x.height;
-    x = x.x;
-  }
+const box = function(x: number, y: number, width: number, height: number) {
+  // 确保所有值都是有效数字
+  x = isFinite(x) ? x : 0;
+  y = isFinite(y) ? y : 0;
+  width = isFinite(width) ? width : 0;
+  height = isFinite(height) ? height : 0;
+  
   return {
     x: x,
     y: y,
