@@ -227,9 +227,24 @@ export function curveCalc(curveFrom: CurveData, curveTo: CurveData, progress: nu
   const curve: CurveData = [];
   for (let i = 0, len1 = curveFrom.length; i < len1; i++) {
     curve.push([curveFrom[i][0]]);
+    
+    // 检查 curveTo[i] 是否存在
+    if (!curveTo[i]) {
+      // 如果 curveTo[i] 不存在，使用 curveFrom[i] 的值
+      for (let j = 1, len2 = curveFrom[i].length; j < len2; j++) {
+        curve[i].push(curveFrom[i][j] as number);
+      }
+      continue;
+    }
+    
     for (let j = 1, len2 = curveFrom[i].length; j < len2; j++) {
       const fromVal = curveFrom[i][j] as number;
-      const toVal = curveTo[i][j] as number;
+      
+      // 检查 curveTo[i][j] 是否存在
+      const toVal = (curveTo[i] && curveTo[i][j] !== undefined) ? 
+        curveTo[i][j] as number : 
+        fromVal; // 如果不存在，使用 fromVal 作为默认值
+        
       curve[i].push(fromVal + (toVal - fromVal) * progress);
     }
   }
