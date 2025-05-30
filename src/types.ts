@@ -62,10 +62,10 @@ export interface RGBColor {
 
 // Normalized style values | 标准化样式值
 export interface NormalizedStyle {
-  /** Fill color | 填充颜色 */
-  fill?: RGBColor;
-  /** Stroke color | 描边颜色 */
-  stroke?: RGBColor;
+  /** Fill color or gradient reference | 填充颜色或渐变引用 */
+  fill?: RGBColor | string;
+  /** Stroke color or gradient reference | 描边颜色或渐变引用 */
+  stroke?: RGBColor | string;
   /** Overall opacity | 整体透明度 */
   opacity?: number;
   /** Fill opacity | 填充透明度 */
@@ -107,12 +107,38 @@ export interface IconItem {
   transStr?: string;
 }
 
+// ViewBox information | ViewBox 信息
+export interface ViewBoxInfo {
+  /** ViewBox values: [x, y, width, height] | ViewBox 值 */
+  values: [number, number, number, number];
+  /** Original viewBox string | 原始 viewBox 字符串 */
+  original: string;
+}
+
+// SVG definitions information | SVG 定义信息  
+export interface DefsInfo {
+  /** Gradient definitions | 渐变定义 */
+  gradients: Record<string, string>;
+  /** Pattern definitions | 图案定义 */
+  patterns: Record<string, string>;
+  /** Other definitions | 其他定义 */
+  others: Record<string, string>;
+  /** Raw defs element | 原始 defs 元素 */
+  raw?: string;
+}
+
 // Icon structure | 图标结构
 export interface Icon {
   /** Icon identifier | 图标标识符 */
   id: string;
   /** Array of icon items | 图标项数组 */
   items: IconItem[];
+  /** ViewBox information | ViewBox 信息 */
+  viewBox?: ViewBoxInfo;
+  /** SVG definitions | SVG 定义 */
+  defs?: DefsInfo;
+  /** Original SVG root attributes | 原始 SVG 根属性 */
+  rootAttrs?: Record<string, string>;
 }
 
 // Morph node structure | 变形节点结构

@@ -34,13 +34,24 @@ export function styleNormCalc(styleNormFrom: NormalizedStyle, styleNormTo: Norma
       case 'fill':
       case 'stroke':
         if (styleNormFrom[i] && styleNormTo[i]) {
-          const fromColor = styleNormFrom[i] as RGBColor;
-          const toColor = styleNormTo[i] as RGBColor;
-          styleNorm[i] = clone(fromColor);
-          (styleNorm[i] as RGBColor).r = fromColor.r + (toColor.r - fromColor.r) * progress;
-          (styleNorm[i] as RGBColor).g = fromColor.g + (toColor.g - fromColor.g) * progress;
-          (styleNorm[i] as RGBColor).b = fromColor.b + (toColor.b - fromColor.b) * progress;
-          (styleNorm[i] as RGBColor).opacity = fromColor.opacity + (toColor.opacity - fromColor.opacity) * progress;
+          const fromValue = styleNormFrom[i];
+          const toValue = styleNormTo[i];
+          
+          // 检测是否为渐变引用（字符串值）
+          if (typeof fromValue === 'string' || typeof toValue === 'string') {
+            // 对于渐变引用，根据进度选择源值或目标值
+            // 在动画中期（progress < 0.5）使用源值，后期使用目标值
+            (styleNorm[i] as any) = progress < 0.5 ? fromValue : toValue;
+          } else {
+            // 对于RGB颜色值，进行正常插值
+            const fromColor = fromValue as RGBColor;
+            const toColor = toValue as RGBColor;
+            styleNorm[i] = clone(fromColor);
+            (styleNorm[i] as RGBColor).r = fromColor.r + (toColor.r - fromColor.r) * progress;
+            (styleNorm[i] as RGBColor).g = fromColor.g + (toColor.g - fromColor.g) * progress;
+            (styleNorm[i] as RGBColor).b = fromColor.b + (toColor.b - fromColor.b) * progress;
+            (styleNorm[i] as RGBColor).opacity = fromColor.opacity + (toColor.opacity - fromColor.opacity) * progress;
+          }
         }
         break;
       case 'opacity':
@@ -65,7 +76,14 @@ export function styleNormToString(styleNorm: NormalizedStyle): StyleAttributes {
       case 'fill':
       case 'stroke':
         if (styleNorm[i]) {
-          style[i] = rgbToString(styleNorm[i] as RGBColor);
+          const value = styleNorm[i];
+          if (typeof value === 'string') {
+            // 对于渐变引用，直接使用字符串值
+            style[i] = value;
+          } else {
+            // 对于RGB对象，转换为颜色字符串
+            style[i] = rgbToString(value as RGBColor);
+          }
         }
         break;
       case 'opacity':
@@ -84,16 +102,30 @@ export function styleNormToString(styleNorm: NormalizedStyle): StyleAttributes {
 export function styleToNorm(styleFrom: StyleAttributes, styleTo: StyleAttributes): [NormalizedStyle, NormalizedStyle] {
   const styleNorm: [NormalizedStyle, NormalizedStyle] = [{}, {}];
   
+  // 检测是否为渐变引用
+  const isGradientReference = (value: string): boolean => {
+    return typeof value === 'string' && value.trim().startsWith('url(#');
+  };
+  
   for (const key in styleFrom) {
     const i = key as keyof StyleAttributes;
     switch(i) {
       case 'fill':
       case 'stroke':
         if (styleFrom[i]) {
-          styleNorm[0][i] = getRGB(styleFrom[i]);
-          if (styleTo[i] === undefined) {
-            styleNorm[1][i] = getRGB(styleFrom[i]);
-            (styleNorm[1][i] as RGBColor).opacity = 0;
+          if (isGradientReference(styleFrom[i]!)) {
+            // 对于渐变引用，保持原始值，不进行RGB转换
+            (styleNorm[0][i] as any) = styleFrom[i];
+            if (styleTo[i] === undefined) {
+              (styleNorm[1][i] as any) = styleFrom[i];
+            }
+          } else {
+            // 对于普通颜色值，进行RGB转换
+            styleNorm[0][i] = getRGB(styleFrom[i]!);
+            if (styleTo[i] === undefined) {
+              styleNorm[1][i] = getRGB(styleFrom[i]!);
+              (styleNorm[1][i] as RGBColor).opacity = 0;
+            }
           }
         }
         break;
@@ -117,10 +149,19 @@ export function styleToNorm(styleFrom: StyleAttributes, styleTo: StyleAttributes
       case 'fill':
       case 'stroke':
         if (styleTo[i]) {
-          styleNorm[1][i] = getRGB(styleTo[i]);
-          if (styleFrom[i] === undefined) {
-            styleNorm[0][i] = getRGB(styleTo[i]);
-            (styleNorm[0][i] as RGBColor).opacity = 0;
+          if (isGradientReference(styleTo[i]!)) {
+            // 对于渐变引用，保持原始值，不进行RGB转换
+            (styleNorm[1][i] as any) = styleTo[i];
+            if (styleFrom[i] === undefined) {
+              (styleNorm[0][i] as any) = styleTo[i];
+            }
+          } else {
+            // 对于普通颜色值，进行RGB转换
+            styleNorm[1][i] = getRGB(styleTo[i]!);
+            if (styleFrom[i] === undefined) {
+              styleNorm[0][i] = getRGB(styleTo[i]!);
+              (styleNorm[0][i] as RGBColor).opacity = 0;
+            }
           }
         }
         break;
@@ -467,11 +508,24 @@ async function createBundledSvgString(
       }
     }
     
+    // 提取原始SVG的ViewBox信息
+    const originalViewBox = extractViewBoxInfo(svgContent);
+    const originalDefs = extractDefsInfo(svgContent);
+    
     // 提取 SVG 内容（去除外层 svg 标签）
     const innerContent = extractSvgInnerContent(svgContent);
     
-    // 用 g 标签包裹，设置 id
-    const groupContent = `<g id="${id}">${innerContent}</g>`;
+    // 构建g标签的属性，保留ViewBox和其他重要信息
+    let groupAttributes = `id="${id}"`;
+    if (originalViewBox) {
+      groupAttributes += ` data-original-viewbox="${originalViewBox.original}"`;
+    }
+    if (Object.keys(originalDefs.gradients).length > 0 || Object.keys(originalDefs.patterns).length > 0) {
+      groupAttributes += ` data-has-defs="true"`;
+    }
+    
+    // 用 g 标签包裹，设置 id 和保留的属性
+    const groupContent = `<g ${groupAttributes}>${innerContent}</g>`;
     svgGroups.push(groupContent);
   }
   
@@ -600,4 +654,122 @@ function extractSvgInnerContent(svgContent: string): string {
   
   // 如果都不匹配，返回原内容（可能已经是内部内容）
   return cleanContent;
+}
+
+/**
+ * 提取SVG的ViewBox信息
+ * @param svgContent SVG字符串
+ * @returns ViewBox信息
+ */
+export function extractViewBoxInfo(svgContent: string) {
+  const svgMatch = svgContent.match(/<svg[^>]*>/i);
+  if (!svgMatch) return null;
+  
+  const svgTag = svgMatch[0];
+  const viewBoxMatch = svgTag.match(/viewBox\s*=\s*["']([^"']+)["']/i);
+  
+  if (!viewBoxMatch) return null;
+  
+  const viewBoxStr = viewBoxMatch[1];
+  const values = viewBoxStr.trim().split(/\s+/).map(Number);
+  
+  if (values.length !== 4) return null;
+  
+  return {
+    values: [values[0], values[1], values[2], values[3]] as [number, number, number, number],
+    original: viewBoxStr
+  };
+}
+
+/**
+ * 提取SVG的defs信息
+ * @param svgContent SVG字符串
+ * @returns defs信息
+ */
+export function extractDefsInfo(svgContent: string) {
+  const defsInfo = {
+    gradients: {} as Record<string, string>,
+    patterns: {} as Record<string, string>,
+    others: {} as Record<string, string>,
+    raw: undefined as string | undefined
+  };
+  
+  // 提取整个defs块
+  const defsMatch = svgContent.match(/<defs[^>]*>([\s\S]*?)<\/defs>/i);
+  if (!defsMatch) return defsInfo;
+  
+  defsInfo.raw = defsMatch[0];
+  const defsContent = defsMatch[1];
+  
+  // 提取线性渐变
+  const linearGradients = defsContent.match(/<linearGradient[^>]*>[\s\S]*?<\/linearGradient>/gi);
+  if (linearGradients) {
+    linearGradients.forEach(gradient => {
+      const idMatch = gradient.match(/id\s*=\s*["']([^"']+)["']/i);
+      if (idMatch) {
+        defsInfo.gradients[idMatch[1]] = gradient;
+      }
+    });
+  }
+  
+  // 提取径向渐变
+  const radialGradients = defsContent.match(/<radialGradient[^>]*>[\s\S]*?<\/radialGradient>/gi);
+  if (radialGradients) {
+    radialGradients.forEach(gradient => {
+      const idMatch = gradient.match(/id\s*=\s*["']([^"']+)["']/i);
+      if (idMatch) {
+        defsInfo.gradients[idMatch[1]] = gradient;
+      }
+    });
+  }
+  
+  // 提取图案
+  const patterns = defsContent.match(/<pattern[^>]*>[\s\S]*?<\/pattern>/gi);
+  if (patterns) {
+    patterns.forEach(pattern => {
+      const idMatch = pattern.match(/id\s*=\s*["']([^"']+)["']/i);
+      if (idMatch) {
+        defsInfo.patterns[idMatch[1]] = pattern;
+      }
+    });
+  }
+  
+  // 提取其他定义（滤镜、遮罩等）
+  const others = defsContent.match(/<(?!linearGradient|radialGradient|pattern)[^>]+>[\s\S]*?<\/[^>]+>/gi);
+  if (others) {
+    others.forEach(other => {
+      const idMatch = other.match(/id\s*=\s*["']([^"']+)["']/i);
+      if (idMatch) {
+        defsInfo.others[idMatch[1]] = other;
+      }
+    });
+  }
+  
+  return defsInfo;
+}
+
+/**
+ * 提取SVG根元素的属性
+ * @param svgContent SVG字符串
+ * @returns 属性对象
+ */
+export function extractSvgRootAttributes(svgContent: string) {
+  const svgMatch = svgContent.match(/<svg([^>]*)>/i);
+  if (!svgMatch) return {};
+  
+  const attributes: Record<string, string> = {};
+  const attrStr = svgMatch[1];
+  
+  // 简单的属性解析（可以用更复杂的解析器）
+  const attrMatches = attrStr.match(/(\w+)\s*=\s*["']([^"']*)["']/g);
+  if (attrMatches) {
+    attrMatches.forEach(attr => {
+      const [, name, value] = attr.match(/(\w+)\s*=\s*["']([^"']*)["']/) || [];
+      if (name && value) {
+        attributes[name] = value;
+      }
+    });
+  }
+  
+  return attributes;
 } 

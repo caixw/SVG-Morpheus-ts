@@ -585,6 +585,7 @@
         'icons.star': 'Star',
         'icons.heart': 'Heart',
         'icons.diamond': 'Diamond',
+        'icons.vite': 'Vite Icon',
         'project.basedOn': 'Based on SVG-Morpheus',
         'project.source': 'View Original Project',
         'code.example1': `<span class="comment">// 1. 准备静态 iconset.svg 文件</span>
@@ -681,6 +682,7 @@
         'icons.star': '星形',
         'icons.heart': '心形',
         'icons.diamond': '菱形',
+        'icons.vite': 'Vite 图标',
         'project.basedOn': '基于 SVG-Morpheus',
         'project.source': '查看原始项目',
         'code.example1': `<span class="comment">// 1. 准备静态 iconset.svg 文件</span>
@@ -804,7 +806,8 @@
           'triangle': t('icons.triangle'),
           'star': t('icons.star'),
           'heart': t('icons.heart'),
-          'diamond': t('icons.diamond')
+          'diamond': t('icons.diamond'),
+          'vite': t('icons.vite')
         };
         
         for (const [key, value] of Object.entries(dynamicIcons)) {
@@ -947,7 +950,8 @@
           </svg>`,
           'diamond': `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <polygon points="12,2 22,12 12,22 2,12" fill="currentColor"/>
-          </svg>`
+          </svg>`,
+          'vite': '/vite.svg'
         };
 
         try {
@@ -1030,7 +1034,8 @@
                 'triangle': t('icons.triangle'),
                 'star': t('icons.star'),
                 'heart': t('icons.heart'),
-                'diamond': t('icons.diamond')
+                'diamond': t('icons.diamond'),
+                'vite': t('icons.vite')
               };
 
               populateSelectsDynamic(selIconDynamic, selEasingDynamic, selDurationDynamic, selRotationDynamic, dynamicIcons);

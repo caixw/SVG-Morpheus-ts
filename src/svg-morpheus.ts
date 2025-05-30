@@ -7,11 +7,20 @@ import {
   curveCalc, 
   clone,
   reqAnimFrame,
-  cancelAnimFrame
+  cancelAnimFrame,
+  extractViewBoxInfo,
+  extractDefsInfo,
+  extractSvgRootAttributes
 } from './helpers';
 
 import { easings } from './easings';
 import { path2curve, path2string, curvePathBBox } from './svg-path';
+import { 
+  calculateTransformMatrix,
+  transformPath,
+  transformGradientDefs,
+  updateDefsReferences
+} from './coordinate-transform';
 import { 
   Icon, 
   IconItem, 
@@ -21,7 +30,9 @@ import {
   CallbackFunction, 
   AnimationFrameId, 
   BoundingBox,
-  StyleAttributes
+  StyleAttributes,
+  ViewBoxInfo,
+  DefsInfo
 } from './types';
 
 export class SVGMorpheus {
@@ -155,6 +166,12 @@ export class SVGMorpheus {
 
     if (!!this._svgDoc) {
       let lastIconId = '';
+      
+      // 提取SVG文档级别的ViewBox和defs信息
+      const svgOuterHTML = this._svgDoc.outerHTML;
+      const documentViewBox = extractViewBoxInfo(svgOuterHTML);
+      const documentDefs = extractDefsInfo(svgOuterHTML);
+      const documentRootAttrs = extractSvgRootAttributes(svgOuterHTML);
 
       // Read Icons Data
       // Icons = 1st tier G nodes having ID
@@ -165,6 +182,40 @@ export class SVGMorpheus {
           const id = iconElement.getAttribute('id');
           if (!!id) {
             const items: IconItem[] = [];
+            
+            // 初始化图标的坐标系统信息（继承文档级别）
+            let iconViewBox: ViewBoxInfo | undefined = documentViewBox || undefined;
+            let iconDefs: DefsInfo = documentDefs;
+            let iconRootAttrs: Record<string, string> = documentRootAttrs;
+            
+            // 检查图标g元素是否保存了原始ViewBox信息
+            const originalViewBox = iconElement.getAttribute('data-original-viewbox');
+            if (originalViewBox) {
+              // 解析保存的ViewBox信息
+              const values = originalViewBox.trim().split(/\s+/).map(Number);
+              if (values.length === 4) {
+                iconViewBox = {
+                  values: [values[0], values[1], values[2], values[3]],
+                  original: originalViewBox
+                };
+              }
+            }
+            
+            // 检查是否有defs信息需要提取（从原始SVG内容中）
+            const iconHTML = iconElement.outerHTML;
+            const iconSpecificDefs = extractDefsInfo(iconHTML);
+            
+            // 合并defs信息（图标特定的defs优先）
+            iconDefs = {
+              gradients: { ...documentDefs.gradients, ...iconSpecificDefs.gradients },
+              patterns: { ...documentDefs.patterns, ...iconSpecificDefs.patterns },
+              others: { ...documentDefs.others, ...iconSpecificDefs.others },
+              raw: iconSpecificDefs.raw || documentDefs.raw
+            };
+            
+            // 合并根属性
+            iconRootAttrs = { ...documentRootAttrs, ...extractSvgRootAttributes(iconHTML) };
+
             for (let j = 0, len2 = iconElement.childNodes.length; j < len2; j++) {
               const nodeItem = iconElement.childNodes[j] as SVGElement;
               const item: IconItem = {
@@ -277,7 +328,10 @@ export class SVGMorpheus {
             if (items.length > 0) {
               const icon: Icon = {
                 id: id,
-                items: items
+                items: items,
+                viewBox: iconViewBox,
+                defs: iconDefs,
+                rootAttrs: iconRootAttrs
               };
               this._icons[id] = icon;
             }
@@ -310,6 +364,83 @@ export class SVGMorpheus {
       let i: number, len: number;
       this._fromIconItems = clone(this._curIconItems);
       this._toIconItems = clone(this._icons[toIconId].items);
+
+      // **坐标系统标准化处理** 
+      const fromIcon = this._icons[this._curIconId];
+      const toIcon = this._icons[toIconId];
+      
+      // 使用目标图标的ViewBox作为最终坐标系统
+      const targetViewBox = toIcon.viewBox || fromIcon?.viewBox || { values: [0, 0, 24, 24], original: '0 0 24 24' };
+      
+      // 立即更新SVG根元素的ViewBox为目标ViewBox
+      if (this._svgDoc) {
+        this._svgDoc.setAttribute('viewBox', targetViewBox.original);
+      }
+      
+      // 处理fromIcon的坐标转换 - 转换到目标坐标系统
+      if (fromIcon && fromIcon.viewBox && toIcon.viewBox) {
+        const fromTransformMatrix = calculateTransformMatrix(fromIcon.viewBox, targetViewBox);
+        const fromIdPrefix = `from_${this._curIconId}_`;
+        const fromOldToNewIdMap: Record<string, string> = {};
+        
+        // 先建立fromIcon的defs ID映射
+        if (fromIcon.defs) {
+          Object.keys(fromIcon.defs.gradients).forEach(oldId => {
+            fromOldToNewIdMap[oldId] = fromIdPrefix + oldId;
+          });
+          Object.keys(fromIcon.defs.patterns).forEach(oldId => {
+            fromOldToNewIdMap[oldId] = fromIdPrefix + oldId;
+          });
+          Object.keys(fromIcon.defs.others).forEach(oldId => {
+            fromOldToNewIdMap[oldId] = fromIdPrefix + oldId;
+          });
+        }
+        
+        // 转换fromIcon的路径和引用到目标坐标系统
+        this._fromIconItems = this._fromIconItems.map(item => {
+          const transformedPath = transformPath(item.path, fromTransformMatrix);
+          const updatedAttrsRefs = updateDefsReferences(transformedPath, item.attrs, fromOldToNewIdMap);
+          const updatedStyleRefs = updateDefsReferences(transformedPath, item.style, fromOldToNewIdMap);
+          
+          return {
+            ...item,
+            path: transformedPath,
+            attrs: updatedAttrsRefs.attrs,
+            style: updatedStyleRefs.attrs
+          };
+        });
+      }
+      
+      // toIcon已经在目标坐标系统中，只需要处理defs ID冲突
+      if (toIcon.defs) {
+        const toIdPrefix = `to_${toIconId}_`;
+        const toOldToNewIdMap: Record<string, string> = {};
+        
+        // 先建立toIcon的defs ID映射
+        Object.keys(toIcon.defs.gradients).forEach(oldId => {
+          toOldToNewIdMap[oldId] = toIdPrefix + oldId;
+        });
+        Object.keys(toIcon.defs.patterns).forEach(oldId => {
+          toOldToNewIdMap[oldId] = toIdPrefix + oldId;
+        });
+        Object.keys(toIcon.defs.others).forEach(oldId => {
+          toOldToNewIdMap[oldId] = toIdPrefix + oldId;
+        });
+        
+        // 再更新toIcon的defs引用以避免ID冲突
+        this._toIconItems = this._toIconItems.map(item => {
+          const updatedAttrsRefs = updateDefsReferences(item.path, item.attrs, toOldToNewIdMap);
+          const updatedStyleRefs = updateDefsReferences(item.path, item.style, toOldToNewIdMap);
+          return {
+            ...item,
+            attrs: updatedAttrsRefs.attrs,
+            style: updatedStyleRefs.attrs
+          };
+        });
+        
+        // 动态插入转换后的defs到SVG文档中
+        this._injectTransformedDefs(fromIcon, toIcon);
+      }
 
       for (i = 0, len = this._morphNodes.length; i < len; i++) {
         const morphNode = this._morphNodes[i];
@@ -488,8 +619,25 @@ export class SVGMorpheus {
   private _animationEnd(): void {
     for (let i = this._morphNodes.length - 1; i >= 0; i--) {
       const morphNode = this._morphNodes[i];
-      if (!!this._icons[this._toIconId].items[i]) {
-        morphNode.node.setAttribute("d", this._icons[this._toIconId].items[i].path);
+      if (!!this._toIconItems[i]) {
+        // 使用更新后的_toIconItems而不是原始的this._icons[this._toIconId].items
+        morphNode.node.setAttribute("d", this._toIconItems[i].path);
+        
+        // 设置最终的attributes（包含更新后的defs引用）
+        const attrs = this._toIconItems[i].attrs as StyleAttributes;
+        for (const attrName in attrs) {
+          morphNode.node.setAttribute(attrName, (attrs as any)[attrName]);
+        }
+        
+        // 设置最终的styles
+        const styles = this._toIconItems[i].style as StyleAttributes;
+        for (const styleName in styles) {
+          (morphNode.node.style as any)[styleName] = (styles as any)[styleName];
+        }
+        
+        // 设置最终的transform
+        const finalTransform = this._toIconItems[i].transStr || "";
+        morphNode.node.setAttribute("transform", finalTransform);
       } else {
         if (morphNode.node.parentNode) {
           morphNode.node.parentNode.removeChild(morphNode.node);
@@ -568,6 +716,90 @@ export class SVGMorpheus {
    */
   public registerEasing(name: string, fn: (progress: number) => number): void {
     easings[name] = fn;
+  }
+
+  /**
+   * 动态插入转换后的defs到SVG文档中
+   */
+  private _injectTransformedDefs(fromIcon: Icon | undefined, toIcon: Icon): void {
+    if (!this._svgDoc) return;
+    
+    // 查找或创建defs元素
+    let defsElement = this._svgDoc.querySelector('defs');
+    if (!defsElement) {
+      defsElement = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+      this._svgDoc.insertBefore(defsElement, this._svgDoc.firstChild);
+    }
+    
+    // 插入fromIcon的转换后defs（已经转换到目标坐标系统）
+    if (fromIcon && fromIcon.defs && fromIcon.viewBox) {
+      const fromIdPrefix = `from_${this._curIconId}_`;
+      const transformedFromDefs = transformGradientDefs(fromIcon.defs, fromIdPrefix);
+      
+      this._insertDefsContent(defsElement, transformedFromDefs);
+    }
+    
+    // 插入toIcon的defs（已经在目标坐标系统中）
+    if (toIcon.defs) {
+      const toIdPrefix = `to_${toIcon.id}_`;
+      const transformedToDefs = transformGradientDefs(toIcon.defs, toIdPrefix);
+      
+      this._insertDefsContent(defsElement, transformedToDefs);
+    }
+  }
+  
+  /**
+   * 插入defs内容到defs元素中
+   */
+  private _insertDefsContent(defsElement: SVGDefsElement, defsInfo: DefsInfo): void {
+    const parser = new DOMParser();
+    
+    // 插入渐变
+    Object.values(defsInfo.gradients).forEach(gradientStr => {
+      try {
+        // 使用DOMParser解析SVG字符串，避免HTML解析器的问题
+        const svgDoc = parser.parseFromString(`<svg xmlns="http://www.w3.org/2000/svg">${gradientStr}</svg>`, 'image/svg+xml');
+        const gradientElement = svgDoc.documentElement.firstElementChild;
+        
+        if (gradientElement) {
+          // 导入节点到当前文档中
+          const importedElement = document.importNode(gradientElement, true);
+          defsElement.appendChild(importedElement);
+        }
+      } catch (error) {
+        console.warn('Failed to parse gradient:', gradientStr, error);
+      }
+    });
+    
+    // 插入图案
+    Object.values(defsInfo.patterns).forEach(patternStr => {
+      try {
+        const svgDoc = parser.parseFromString(`<svg xmlns="http://www.w3.org/2000/svg">${patternStr}</svg>`, 'image/svg+xml');
+        const patternElement = svgDoc.documentElement.firstElementChild;
+        
+        if (patternElement) {
+          const importedElement = document.importNode(patternElement, true);
+          defsElement.appendChild(importedElement);
+        }
+      } catch (error) {
+        console.warn('Failed to parse pattern:', patternStr, error);
+      }
+    });
+    
+    // 插入其他定义
+    Object.values(defsInfo.others).forEach(otherStr => {
+      try {
+        const svgDoc = parser.parseFromString(`<svg xmlns="http://www.w3.org/2000/svg">${otherStr}</svg>`, 'image/svg+xml');
+        const otherElement = svgDoc.documentElement.firstElementChild;
+        
+        if (otherElement) {
+          const importedElement = document.importNode(otherElement, true);
+          defsElement.appendChild(importedElement);
+        }
+      } catch (error) {
+        console.warn('Failed to parse other def:', otherStr, error);
+      }
+    });
   }
 }
 
