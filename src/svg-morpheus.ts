@@ -46,6 +46,25 @@ export class SVGMorpheus {
   private _svgDoc: SVGSVGElement | null = null;
   private _fnTick: (timePassed: number) => void;
 
+  /**
+   * SVGMorpheus Constructor | SVGMorpheus 构造器
+   * Creates a new SVGMorpheus instance for morphing SVG icons | 创建一个新的 SVGMorpheus 实例用于变形 SVG 图标
+   * 
+   * @param element Target SVG element or CSS selector | 目标 SVG 元素或 CSS 选择器
+   *                - string: CSS selector to find the SVG element | 字符串：用于查找 SVG 元素的 CSS 选择器
+   *                - HTMLElement: Direct reference to HTML element containing SVG | HTML 元素：直接引用包含 SVG 的 HTML 元素
+   *                - SVGSVGElement: Direct reference to SVG element | SVG 元素：直接引用 SVG 元素
+   * 
+   * @param options Configuration options for default behavior | 默认行为的配置选项
+   *                - iconId: Initial icon to display | 初始显示的图标
+   *                - duration: Default animation duration (ms) | 默认动画持续时间（毫秒）
+   *                - easing: Default easing function name | 默认缓动函数名称
+   *                - rotation: Default rotation direction | 默认旋转方向
+   * 
+   * @param callback Default callback function executed after animations complete | 动画完成后执行的默认回调函数
+   *                 Called when any morphing animation finishes | 当任何变形动画完成时被调用
+   *                 Can be overridden by individual to() method calls | 可以被单独的 to() 方法调用覆盖
+   */
   constructor(
     element: string | HTMLElement | SVGSVGElement,
     options?: SVGMorpheusOptions,
@@ -485,9 +504,25 @@ export class SVGMorpheus {
     this._callback();
   }
 
-  // Public methods
+  // Public methods | 公共方法
 
-  // Morph To Icon
+  /**
+   * Morph to target icon | 变形到目标图标
+   * Triggers morphing animation from current icon to specified target icon | 触发从当前图标到指定目标图标的变形动画
+   * 
+   * @param iconId Target icon ID to morph to | 要变形到的目标图标ID
+   *               Must match an ID of a <g> element in the SVG | 必须匹配 SVG 中某个 <g> 元素的ID
+   * 
+   * @param options Animation options for this specific morph | 此次特定变形的动画选项
+   *                Overrides constructor defaults for this animation only | 仅为此次动画覆盖构造器默认值
+   *                - duration: Animation duration (ms) | 动画持续时间（毫秒）
+   *                - easing: Easing function name | 缓动函数名称
+   *                - rotation: Rotation direction | 旋转方向
+   * 
+   * @param callback Callback function for this specific morph | 此次特定变形的回调函数
+   *                 Overrides constructor default callback for this animation only | 仅为此次动画覆盖构造器默认回调
+   *                 Called when this specific morphing animation completes | 当此次特定变形动画完成时被调用
+   */
   public to(iconId: string, options?: ToMethodOptions, callback?: CallbackFunction): void {
     if (iconId !== this._toIconId) {
       if (!!options && typeof options !== 'object') {
@@ -513,7 +548,24 @@ export class SVGMorpheus {
     }
   }
 
-  // Register custom Easing function
+  /**
+   * Register custom easing function | 注册自定义缓动函数
+   * Adds a custom easing function that can be used in animations | 添加可在动画中使用的自定义缓动函数
+   * 
+   * @param name Unique name for the easing function | 缓动函数的唯一名称
+   *             This name will be used to reference the function in options | 此名称将用于在选项中引用该函数
+   *             
+   * @param fn Custom easing function | 自定义缓动函数
+   *           Takes progress (0-1) and returns eased progress (typically 0-1) | 接受进度值(0-1)并返回缓动后的进度值(通常为0-1)
+   *           @param progress Animation progress from 0 to 1 | 从0到1的动画进度
+   *           @returns Eased progress value | 缓动后的进度值
+   * 
+   * @example
+   * // Register a custom bounce easing | 注册自定义弹跳缓动
+   * morpheus.registerEasing('my-bounce', (t) => {
+   *   return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+   * });
+   */
   public registerEasing(name: string, fn: (progress: number) => number): void {
     easings[name] = fn;
   }
