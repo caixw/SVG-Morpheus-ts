@@ -21,7 +21,6 @@ export default defineConfig({
     },
     rollupOptions: {
       input: {
-        home: resolve(__dirname, 'demos/home.html'),
         index: resolve(__dirname, 'demos/index.html'),
       },
       external: [],
@@ -46,6 +45,6 @@ export default defineConfig({
     },
   },
   server: {
-    port: 9001,
+    port: 9111,
   },
 }); 

@@ -37,6 +37,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "dev:demo": "vite --config vite.demo.config.ts",
     "build:demo": "vite build --config vite.demo.config.ts",
     "preview": "vite preview",
     "lint": "eslint src/**/*.ts",

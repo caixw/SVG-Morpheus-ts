@@ -113,6 +113,13 @@ function updateTexts() {
     }
   });
   
+  // 重新高亮所有代码块
+  if (typeof hljs !== 'undefined') {
+    document.querySelectorAll('pre code').forEach((block) => {
+      hljs.highlightElement(block);
+    });
+  }
+  
   // 更新动态示例的下拉框选项
   updateDynamicOptions();
 }
@@ -170,6 +177,11 @@ function initLanguage() {
     });
   }
   updateTexts();
+  
+  // 初始化 highlight.js
+  if (typeof hljs !== 'undefined') {
+    hljs.highlightAll();
+  }
 }
 
 // 使函数在全局可用

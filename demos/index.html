@@ -4,7 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SVG Morpheus TypeScript Demo - Object</title>
-  <link rel="stylesheet" href="demo.css"/>
+  <link rel="stylesheet" href="demo.css" />
+  <!-- highlight.js CSS -->
+  <link rel="stylesheet" 
+        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
 </head>
 <body>
   <div id="heading">
@@ -12,10 +15,15 @@
       <button class="lang-btn active" onclick="switchLanguage('en')">English</button>
       <button class="lang-btn" onclick="switchLanguage('zh')">中文</button>
     </div>
-    <a href="https://github.com/alexk111/SVG-Morpheus" target="_blank" class="project-source" data-i18n-title="project.source">
+    
+    <a href="https://github.com/alexk111/SVG-Morpheus" 
+       target="_blank" 
+       class="project-source" 
+       data-i18n-title="project.source">
       <span class="icon">⚡</span>
       <span data-i18n="project.basedOn">Based on SVG-Morpheus</span>
     </a>
+    
     <h1 data-i18n="title">SVG Morpheus TypeScript</h1>
     <h2 data-i18n="subtitle">Demo: SVG placed via &lt;Object&gt;</h2>
     <p data-i18n="description">Modern TypeScript + Vite + pnpm refactored version</p>
@@ -25,7 +33,10 @@
   <div class="demo-section">
     <h3 data-i18n="example1.title">Example 1: Using Static iconset.svg File</h3>
     <div class="description">
-      <span data-i18n="example1.description">📁 Traditional approach: Using pre-built iconset.svg files<br>Suitable for scenarios with fixed icons that don't require dynamic loading</span>
+      <span data-i18n="example1.description">
+        📁 Traditional approach: Using pre-built iconset.svg files<br>
+        Suitable for scenarios with fixed icons that don't require dynamic loading
+      </span>
     </div>
     
     <div class="demo-content">
@@ -58,33 +69,35 @@
         <div class="code-section">
           <h4>
             <span data-i18n="example1.codeTitle">💻 Example Code</span>
-            <button class="copy-btn" onclick="copyCode(this)" data-i18n="button.copy">Copy Code</button>
+            <button class="copy-btn" onclick="copyCode(this)" data-i18n="button.copy">
+              Copy Code
+            </button>
           </h4>
-          <pre><code data-i18n-code="code.example1"><span class="comment">// 1. 准备静态 iconset.svg 文件</span>
-<span class="comment">// iconset.svg 包含所有图标的 &lt;g&gt; 元素</span>
+          <pre><code class="language-javascript" data-i18n-code="code.example1">// 1. 准备静态 iconset.svg 文件
+// iconset.svg 包含所有图标的 <g> 元素
 
-<span class="comment">// 2. HTML 结构</span>
-&lt;<span class="keyword">object</span> <span class="property">data</span>=<span class="string">"iconset.svg"</span> 
-        <span class="property">type</span>=<span class="string">"image/svg+xml"</span> 
-        <span class="property">id</span>=<span class="string">"icon"</span>&gt;&lt;/<span class="keyword">object</span>&gt;
+// 2. HTML 结构
+<object data="iconset.svg" 
+        type="image/svg+xml" 
+        id="icon"></object>
 
-<span class="comment">// 3. JavaScript 初始化</span>
-<span class="keyword">import</span> { <span class="function">SVGMorpheus</span> } <span class="keyword">from</span> <span class="string">'svg-morpheus-ts'</span>;
+// 3. JavaScript 初始化
+import { SVGMorpheus } from 'svg-morpheus-ts';
 
-<span class="keyword">const</span> <span class="variable">morpheus</span> = <span class="keyword">new</span> <span class="function">SVGMorpheus</span>(<span class="string">'#icon'</span>, {
-  <span class="property">duration</span>: <span class="property">600</span>,
-  <span class="property">easing</span>: <span class="string">'quad-in-out'</span>,
-  <span class="property">rotation</span>: <span class="string">'clock'</span>
+const morpheus = new SVGMorpheus('#icon', {
+  duration: 600,
+  easing: 'quad-in-out',
+  rotation: 'clock'
 });
 
-<span class="comment">// 4. 切换到指定图标</span>
-<span class="variable">morpheus</span>.<span class="function">to</span>(<span class="string">'icon-name'</span>);
+// 4. 切换到指定图标
+morpheus.to('icon-name');
 
-<span class="comment">// 5. 带回调的动画</span>
-<span class="variable">morpheus</span>.<span class="function">to</span>(<span class="string">'another-icon'</span>, {
-  <span class="property">duration</span>: <span class="property">1000</span>
+// 5. 带回调的动画
+morpheus.to('another-icon', {
+  duration: 1000
 }, () => {
-  <span class="function">console</span>.<span class="function">log</span>(<span class="string">'动画完成!'</span>);
+  console.log('动画完成!');
 });</code></pre>
         </div>
       </div>
@@ -95,19 +108,25 @@
   <div class="demo-section">
     <h3 data-i18n="example2.title">Example 2: Using bundleSvgs for Dynamic SVG Generation</h3>
     <div class="description">
-      <span data-i18n="example2.description">🚀 Modern approach: Runtime dynamic SVG icon merging with loading support<br>Suitable for modern applications requiring dynamic icon addition and diverse icon sources<br>✨ <strong>New Feature</strong>: Support for custom SVG attributes (viewBox, class, data-* etc.)</span>
+      <span data-i18n="example2.description">
+        🚀 Modern approach: Runtime dynamic SVG icon merging with loading support<br>
+        Suitable for modern applications requiring dynamic icon addition and diverse icon sources<br>
+        ✨ <strong>New Feature</strong>: Support for custom SVG attributes (viewBox, class, data-* etc.)
+      </span>
     </div>
     
     <div class="demo-content">
       <div class="demo-left">
-        <div id="loadingIndicator" style="text-align: center; padding: 20px; color: #666; display: block;">
-          <div style="display: inline-block; width: 20px; height: 20px; border: 3px solid #f3f3f3; border-top: 3px solid #4CAF50; border-radius: 50%; animation: spin 1s linear infinite; margin-right: 10px;"></div>
+        <div id="loadingIndicator">
+          <div class="loading-spinner"></div>
           <span data-i18n="loading.text">Generating dynamic SVG...</span>
         </div>
         
-        <object id="iconDynamic" type="image/svg+xml" style="display: none;"></object>
+        <object id="iconDynamic" 
+                type="image/svg+xml" 
+                class="initially-hidden"></object>
         
-        <div class="options-container" id="dynamicOptionsContainer" style="display: none;">
+        <div class="options-container initially-hidden" id="dynamicOptionsContainer">
           <div id="optionsDynamic">
             <div class="option">
               <label for="selIconDynamic" data-i18n="label.icon">Icon:</label>
@@ -133,46 +152,50 @@
         <div class="code-section">
           <h4>
             <span data-i18n="example2.codeTitle">💻 Advanced Usage</span>
-            <button class="copy-btn" onclick="copyCode(this)" data-i18n="button.copy">Copy Code</button>
+            <button class="copy-btn" onclick="copyCode(this)" data-i18n="button.copy">
+              Copy Code
+            </button>
           </h4>
-          <pre><code data-i18n-code="code.example2"><span class="comment">// 1. 导入所需函数</span>
-<span class="keyword">import</span> { 
-  <span class="function">SVGMorpheus</span>, 
-  <span class="function">bundleSvgs</span> 
-} <span class="keyword">from</span> <span class="string">'svg-morpheus-ts'</span>;
+          <pre><code class="language-javascript" data-i18n-code="code.example2">// 1. 导入所需函数
+import { 
+  SVGMorpheus, 
+  bundleSvgs 
+} from 'svg-morpheus-ts';
 
-<span class="comment">// 2. 定义 SVG 图标映射</span>
-<span class="keyword">const</span> <span class="variable">svgMap</span> = {
-  <span class="string">'circle'</span>: <span class="string">\`&lt;svg viewBox="0 0 24 24"&gt;
-    &lt;circle cx="12" cy="12" r="8"/&gt;
-  &lt;/svg&gt;\`</span>,
-  <span class="string">'square'</span>: <span class="string">\`&lt;svg viewBox="0 0 24 24"&gt;
-    &lt;rect x="4" y="4" width="16" height="16"/&gt;
-  &lt;/svg&gt;\`</span>,
-  <span class="string">'vite'</span>: <span class="string">'/vite.svg'</span>, <span class="comment">// 文件路径</span>
+// 2. 定义 SVG 图标映射
+const svgMap = {
+  'circle': `<svg viewBox="0 0 24 24">
+    <circle cx="12" cy="12" r="8"/>
+  </svg>`,
+  'square': `<svg viewBox="0 0 24 24">
+    <rect x="4" y="4" width="16" height="16"/>
+  </svg>`,
+  'vite': '/vite.svg', // 文件路径
 };
 
-<span class="comment">// 3. 自定义 SVG 属性 (可选)</span>
-<span class="keyword">const</span> <span class="variable">customAttributes</span> = {
-  <span class="property">viewBox</span>: <span class="string">'0 0 24 24'</span>,
-  <span class="property">class</span>: <span class="string">'dynamic-iconset'</span>,
-  <span class="string">'data-version'</span>: <span class="string">'1.0'</span>
+// 3. 自定义 SVG 属性 (可选)
+const customAttributes = {
+  viewBox: '0 0 24 24',
+  class: 'dynamic-iconset',
+  'data-version': '1.0'
 };
 
-<span class="comment">// 4. 生成合并的 SVG Blob URL (一步完成)</span>
-<span class="keyword">const</span> <span class="variable">bundledSvgUrl</span> = <span class="keyword">await</span> <span class="function">bundleSvgs</span>(<span class="variable">svgMap</span>, <span class="variable">customAttributes</span>);
+// 4. 生成合并的 SVG Blob URL (一步完成)
+const bundledSvgUrl = await bundleSvgs(svgMap, customAttributes);
 
-<span class="comment">// 5. 设置到 object 元素</span>
-<span class="variable">objectElement</span>.<span class="property">data</span> = <span class="variable">bundledSvgUrl</span>;
+// 5. 设置到 object 元素
+objectElement.data = bundledSvgUrl;
 
-<span class="comment">// 6. 初始化 SVGMorpheus</span>
-<span class="keyword">const</span> <span class="variable">morpheus</span> = <span class="keyword">new</span> <span class="function">SVGMorpheus</span>(<span class="string">'#iconDynamic'</span>);
-<span class="variable">morpheus</span>.<span class="function">to</span>(<span class="string">'circle'</span>);</code></pre>
+// 6. 初始化 SVGMorpheus
+const morpheus = new SVGMorpheus('#iconDynamic');
+morpheus.to('circle');</code></pre>
         </div>
       </div>
     </div>
   </div>
 
+  <!-- highlight.js JavaScript -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
   <!-- 导入模块化JavaScript -->
   <script type="module" src="./demo.js"></script>
 </body>

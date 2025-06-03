@@ -61,11 +61,8 @@ jobs:
         # 使用 Vite 构建 demo
         pnpm build:demo
         
-        # 重命名文件以符合 GitHub Pages 要求
-        # 将原来的 index.html（主 demo）重命名为 demo.html
-        mv dist-demo/index.html dist-demo/demo.html
-        # 将 home.html 重命名为 index.html（GitHub Pages 的默认首页）
-        mv dist-demo/home.html dist-demo/index.html
+        # 直接将 demo 页面作为 GitHub Pages 的首页
+        # 保持 index.html 为主要的 demo 页面
         
         # 验证文件结构
         echo "构建输出文件:"

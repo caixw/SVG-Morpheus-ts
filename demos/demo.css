@@ -1,17 +1,20 @@
 /* SVG Morpheus TypeScript Demo Styles */
 
-/* 基础样式 - 覆盖原有的简单样式 */
+/* ============================== */
+/* 基础样式                       */
+/* ============================== */
+
 body {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   min-height: 100vh;
   padding: 0;
   margin: 0;
   text-align: center;
-  color: #FFF;
+  color: #fff;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
 }
 
-/* 标题区域 - 覆盖原有样式 */
+/* 标题区域 */
 #heading {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   padding: 30px 20px 50px;
@@ -28,6 +31,10 @@ h2 {
   font-size: 24px;
   font-weight: normal;
 }
+
+/* ============================== */
+/* 导航和控制组件                 */
+/* ============================== */
 
 /* 语言切换器 */
 .language-switcher {
@@ -92,7 +99,10 @@ h2 {
   font-size: 11px;
 }
 
-/* Demo 区域样式 */
+/* ============================== */
+/* Demo 区域样式                  */
+/* ============================== */
+
 .demo-section {
   margin: 40px auto;
   padding: 30px;
@@ -126,7 +136,7 @@ h2 {
   margin-top: 0;
   margin-bottom: 15px;
   color: #1a1a1a;
-  border-bottom: 3px solid #4CAF50;
+  border-bottom: 3px solid #4caf50;
   padding-bottom: 12px;
   font-size: 24px;
   font-weight: 600;
@@ -141,10 +151,14 @@ h2 {
   padding: 15px;
   background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
   border-radius: 8px;
-  border-left: 4px solid #4CAF50;
+  border-left: 4px solid #4caf50;
 }
 
-/* SVG 容器样式 - 覆盖原有的#icon样式 */
+/* ============================== */
+/* SVG 容器和选项                 */
+/* ============================== */
+
+/* SVG 容器样式 */
 #icon,
 .demo-section object {
   display: block;
@@ -167,7 +181,6 @@ h2 {
   margin-top: 20px;
 }
 
-/* 覆盖原有的#options样式 */
 #options,
 .demo-section #options,
 .demo-section #optionsDynamic {
@@ -176,7 +189,6 @@ h2 {
   text-align: center;
 }
 
-/* 覆盖原有的.option样式 */
 .option,
 .demo-section .option {
   width: 100%;
@@ -188,7 +200,6 @@ h2 {
   overflow: visible;
 }
 
-/* 覆盖原有的label样式 */
 label,
 .demo-section .option label {
   text-align: left;
@@ -200,7 +211,6 @@ label,
   margin-right: 15px;
 }
 
-/* 覆盖原有的select样式 */
 select,
 .demo-section .option select {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -218,11 +228,14 @@ select,
 
 .demo-section .option select:focus {
   outline: none;
-  border-color: #4CAF50;
+  border-color: #4caf50;
   box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
 }
 
-/* 代码区域样式 */
+/* ============================== */
+/* 代码区域样式                   */
+/* ============================== */
+
 .code-section {
   background: #f8f9fa;
   border-radius: 8px;
@@ -264,9 +277,6 @@ select,
 }
 
 .code-section pre {
-  background: #263238;
-  color: #eeffff;
-  padding: 15px;
   border-radius: 6px;
   overflow-x: auto;
   font-family: 'Fira Code', 'Monaco', 'Consolas', monospace;
@@ -276,6 +286,7 @@ select,
   white-space: pre-wrap;
   max-height: 500px;
   overflow-y: auto;
+  /* 让 highlight.js 处理背景色和文字颜色 */
 }
 
 /* 代码滚动条样式 */
@@ -298,32 +309,49 @@ select,
   background: #607d8b;
 }
 
-/* 代码语法高亮 */
-.code-section pre .comment {
-  color: #546e7a;
+/* ============================== */
+/* 加载和状态样式                 */
+/* ============================== */
+
+/* 加载指示器 */
+#loadingIndicator {
+  text-align: center;
+  padding: 20px;
+  color: #666;
+  font-size: 16px;
+  font-weight: 500;
 }
 
-.code-section pre .keyword {
-  color: #c792ea;
+/* 加载动画旋转圆圈 */
+.loading-spinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #4caf50;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-right: 10px;
 }
 
-.code-section pre .string {
-  color: #c3e88d;
+/* 初始隐藏状态 */
+.initially-hidden {
+  display: none;
 }
 
-.code-section pre .function {
-  color: #82aaff;
+/* 动态图标集样式 */
+.dynamic-iconset {
+  transition: opacity 0.3s ease;
 }
 
-.code-section pre .variable {
-  color: #eeffff;
+.dynamic-iconset:hover {
+  opacity: 0.8;
 }
 
-.code-section pre .property {
-  color: #f78c6c;
-}
+/* ============================== */
+/* 动画效果                       */
+/* ============================== */
 
-/* 动画效果 */
 @keyframes fadeInUp {
   from {
     opacity: 0;
@@ -335,27 +363,19 @@ select,
   }
 }
 
-/* 加载动画 */
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% { 
+    transform: rotate(0deg); 
+  }
+  100% { 
+    transform: rotate(360deg); 
+  }
 }
 
-#loadingIndicator {
-  font-size: 16px;
-  font-weight: 500;
-}
+/* ============================== */
+/* 响应式设计                     */
+/* ============================== */
 
-/* 演示自定义 SVG 属性的样式 */
-.dynamic-iconset {
-  transition: opacity 0.3s ease;
-}
-
-.dynamic-iconset:hover {
-  opacity: 0.8;
-}
-
-/* 响应式设计 */
 @media (max-width: 768px) {
   .demo-section {
     margin: 20px 10px;
