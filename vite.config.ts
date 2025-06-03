@@ -7,8 +7,6 @@ import { readFileSync } from 'fs';
 const packageJson = JSON.parse(readFileSync(resolve(__dirname, 'package.json'), 'utf-8'));
 const version = packageJson.version;
 
-// 检查是否为demo模式
-const isDemoMode = process.env.NODE_ENV === 'demo' || process.argv.includes('--mode') && process.argv.includes('demo');
 
 export default defineConfig(({ mode }) => {
   const isDemo = mode === 'demo';
