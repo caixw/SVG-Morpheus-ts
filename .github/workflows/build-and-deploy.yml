@@ -61,8 +61,15 @@ jobs:
         # 使用 Vite 构建 demo
         pnpm build:demo
         
-        # 直接将 demo 页面作为 GitHub Pages 的首页
-        # 保持 index.html 为主要的 demo 页面
+        # 处理 GitHub Pages 路径问题
+        # 替换 HTML 中的 iconset.svg 路径（object 标签）
+        sed -i 's|data="iconset\.svg"|data="/SVG-Morpheus-ts/iconset.svg"|g' dist-demo/index.html
+        
+        # 替换 JavaScript 中的 vite.svg 路径（bundleSvgs 中使用）
+        sed -i "s|'vite\.svg'|'/SVG-Morpheus-ts/vite.svg'|g" dist-demo/*.js
+        
+        # 替换代码示例中的 iconset.svg 路径（用于显示正确的示例代码）
+        sed -i 's|<object data="iconset\.svg"|<object data="/SVG-Morpheus-ts/iconset.svg"|g' dist-demo/index.html
         
         # 验证文件结构
         echo "构建输出文件:"
