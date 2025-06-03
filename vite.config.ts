@@ -7,15 +7,28 @@ import { readFileSync } from 'fs';
 const packageJson = JSON.parse(readFileSync(resolve(__dirname, 'package.json'), 'utf-8'));
 const version = packageJson.version;
 
-
 export default defineConfig(({ mode }) => {
+  // 根据环境设置base路径
+  const isGitHubPages = process.env.GITHUB_PAGES === 'true'
+  const base = isGitHubPages ? '/SVG-Morpheus-ts/' : '/'
+  
+  // 备选方案：也可以使用 import.meta.env
+  // 在 .env 文件中设置：VITE_SVG_BASE_PATH=/SVG-Morpheus-ts/
+  // 然后在JS中使用：import.meta.env.VITE_SVG_BASE_PATH
+  
   const isDemo = mode === 'demo';
   
   return {
     // 根据模式设置不同的root
     root: isDemo ? 'demos' : '.',
-    base: './',
+    base,
     publicDir: isDemo ? '../public' : 'public',
+    
+    // 定义全局常量，在开发和构建环境都可用
+    define: {
+      __SVG_BASE_PATH__: JSON.stringify(base),
+      __IS_GITHUB_PAGES__: JSON.stringify(isGitHubPages)
+    },
     
     plugins: [
       // 只在库模式下使用dts插件
@@ -34,9 +47,7 @@ export default defineConfig(({ mode }) => {
         },
       },
       rollupOptions: {
-        input: {
-          index: resolve(__dirname, 'demos/index.html'),
-        },
+        input: './demos/index.html',
         output: {
           format: 'es',
           entryFileNames: '[name]-[hash].js',
@@ -48,12 +59,12 @@ export default defineConfig(({ mode }) => {
  * Build Date: ${new Date().toISOString()}
  * Repository: https://github.com/adoin/SVG-Morpheus-ts
  */`,
-        }
+        },
       },
     } : {
       // 库构建配置
       lib: {
-        entry: 'src/index.ts',
+        entry: './src/index.ts',
         name: 'SVGMorpheus',
         formats: ['es', 'cjs', 'umd'],
         fileName: (format) => {

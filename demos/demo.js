@@ -1,12 +1,33 @@
 /*!
  * SVG Morpheus TypeScript Demo
- * Version: v1.1.0
+ * Based on SVG-Morpheus by Alex Kaul
+ * Modern TypeScript + Vite + pnpm refactored version
  * Repository: https://github.com/adoin/SVG-Morpheus-ts
  * License: MIT
  * Build Date: ${new Date().toISOString()}
  */
 
-import { SVGMorpheus, bundleSvgs } from 'svg-morpheus-ts';
+import { SVGMorpheus, bundleSvgs } from '../dist/index.js';
+
+// 全局变量由 Vite 构建时注入
+// __SVG_BASE_PATH__: string - SVG文件的基础路径
+// __IS_GITHUB_PAGES__: boolean - 是否为GitHub Pages环境
+
+// 动态路径处理函数
+function getSvgPath(filename) {
+  // 优先使用构建时注入的变量
+  if (typeof __SVG_BASE_PATH__ !== 'undefined') {
+    console.log('使用构建时路径:', __SVG_BASE_PATH__ + filename);
+    return __SVG_BASE_PATH__ + filename;
+  }
+  
+  // Fallback: 运行时检测环境
+  const isGitHubPages = window.location.hostname.includes('github.io');
+  const basePath = isGitHubPages ? '/SVG-Morpheus-ts/' : '/';
+  console.log('使用运行时检测路径:', basePath + filename);
+  
+  return basePath + filename;
+}
 
 // 国际化数据
 const i18nData = {
@@ -194,6 +215,12 @@ async function init() {
   // 初始化语言设置
   initLanguage();
   
+  // 动态设置静态示例的 SVG 路径
+  const staticIconObject = document.getElementById('icon');
+  if (staticIconObject) {
+    staticIconObject.data = getSvgPath('iconset.svg');
+  }
+  
   // 共享配置
   const icons = {
     '3d_rotation':'3D Rotation',
@@ -293,7 +320,7 @@ async function init() {
       'diamond': `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
         <polygon points="12,2 22,12 12,22 2,12" fill="currentColor"/>
       </svg>`,
-      'vite': '/vite.svg'
+      'vite': getSvgPath('vite.svg')
     };
 
     try {
