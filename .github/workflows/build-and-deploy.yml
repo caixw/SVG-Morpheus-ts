@@ -58,7 +58,7 @@ jobs:
         # 先构建库
         pnpm build
         
-        # 使用 Vite 构建 demo
+        # 使用统一配置构建 demo
         pnpm build:demo
         
         # 处理 GitHub Pages 路径问题
