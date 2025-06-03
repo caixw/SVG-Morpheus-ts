@@ -293,7 +293,7 @@ async function init() {
       'diamond': `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
         <polygon points="12,2 22,12 12,22 2,12" fill="currentColor"/>
       </svg>`,
-      'vite': '/vite.svg'
+      'vite': 'vite.svg'
     };
 
     try {
