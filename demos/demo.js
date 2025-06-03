@@ -12,8 +12,8 @@ import { SVGMorpheus, bundleSvgs } from 'svg-morpheus-ts';
 const i18nData = {
   'en': {
     'title': 'SVG Morpheus TypeScript',
-    'subtitle': 'Demo: SVG placed via &lt;Object&gt;',
-    'description': 'Modern TypeScript + Vite + pnpm refactored version',
+    'subtitle': 'Interactive SVG Morphing: Static & Dynamic Bundling Demo',
+    'description': 'Enhanced TypeScript version with bundleSvgs() for dynamic SVG merging',
     'example1.title': 'Example 1: Using Static iconset.svg File',
     'example1.description': '📁 Traditional approach: Using pre-built iconset.svg files<br>Suitable for scenarios with fixed icons that don\'t require dynamic loading',
     'example1.codeTitle': '💻 Example Code',
@@ -44,8 +44,8 @@ const i18nData = {
   },
   'zh': {
     'title': 'SVG Morpheus TypeScript',
-    'subtitle': '演示：通过 &lt;Object&gt; 标签放置的 SVG',
-    'description': '现代 TypeScript + Vite + pnpm 重构版本',
+    'subtitle': '交互式 SVG 变形：静态与动态合并演示',
+    'description': '增强版 TypeScript 实现，内置 bundleSvgs() 动态 SVG 合并功能',
     'example1.title': '示例 1：使用静态 iconset.svg 文件',
     'example1.description': '📁 传统方式：使用预构建的 iconset.svg 文件<br>适用于图标固定、无需动态加载的场景',
     'example1.codeTitle': '💻 示例代码',
@@ -293,7 +293,7 @@ async function init() {
       'diamond': `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
         <polygon points="12,2 22,12 12,22 2,12" fill="currentColor"/>
       </svg>`,
-      'vite': 'vite.svg'
+      'vite': '/vite.svg'
     };
 
     try {
