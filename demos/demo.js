@@ -90,7 +90,65 @@ const i18nData = {
     'icons.diamond': 'Diamond',
     'icons.vite': 'Vite',
     'icons.diving': 'Diving',
-    'icons.bag': 'Bag'
+    'icons.bag': 'Bag',
+    'code.example1': `// 1. Prepare static iconset.svg file
+// iconset.svg contains all icon <g> elements
+
+// 2. HTML structure
+<object data="/iconset.svg" 
+        type="image/svg+xml" 
+        id="icon"></object>
+
+// 3. JavaScript initialization
+import { SVGMorpheus } from 'svg-morpheus-ts';
+
+const morpheus = new SVGMorpheus('#icon', {
+  duration: 600,
+  easing: 'quad-in-out',
+  rotation: 'clock'
+});
+
+// 4. Switch to specified icon
+morpheus.to('icon-name');
+
+// 5. Animation with callback
+morpheus.to('another-icon', {
+  duration: 1000
+}, () => {
+  console.log('Animation complete!');
+});`,
+    'code.example2': `// 1. Import required functions
+import { 
+  SVGMorpheus, 
+  bundleSvgs 
+} from 'svg-morpheus-ts';
+
+// 2. Define SVG icon mapping (including new icons!)
+const svgMap = {
+  'circle': '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/></svg>',
+  'square': '<svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16"/></svg>',
+  'triangle': '<svg viewBox="0 0 24 24"><polygon points="12,3 21,20 3,20"/></svg>',
+  'vite': '/vite.svg',        // File path
+  'diving': '/diving.svg',    // 🆕 New diving icon
+  'bag': '/bag.svg'           // 🆕 New bag icon
+};
+
+// 3. Custom SVG attributes (optional)
+const customAttributes = {
+  viewBox: '0 0 24 24',
+  class: 'dynamic-iconset',
+  'data-version': '1.0'
+};
+
+// 4. Generate bundled SVG Blob URL (one step)
+const bundledSvgUrl = await bundleSvgs(svgMap, customAttributes);
+
+// 5. Set to object element
+objectElement.data = bundledSvgUrl;
+
+// 6. Initialize SVGMorpheus
+const morpheus = new SVGMorpheus('#iconDynamic');
+morpheus.to('diving'); // Try the new diving icon!`
   },
   'zh': {
     'title': 'SVG Morpheus TypeScript',
@@ -124,7 +182,65 @@ const i18nData = {
     'icons.diamond': '菱形',
     'icons.vite': 'Vite',
     'icons.diving': '潜水',
-    'icons.bag': '背包'
+    'icons.bag': '背包',
+    'code.example1': `// 1. 准备静态 iconset.svg 文件
+// iconset.svg 包含所有图标的 <g> 元素
+
+// 2. HTML 结构
+<object data="/iconset.svg" 
+        type="image/svg+xml" 
+        id="icon"></object>
+
+// 3. JavaScript 初始化
+import { SVGMorpheus } from 'svg-morpheus-ts';
+
+const morpheus = new SVGMorpheus('#icon', {
+  duration: 600,
+  easing: 'quad-in-out',
+  rotation: 'clock'
+});
+
+// 4. 切换到指定图标
+morpheus.to('icon-name');
+
+// 5. 带回调的动画
+morpheus.to('another-icon', {
+  duration: 1000
+}, () => {
+  console.log('动画完成!');
+});`,
+    'code.example2': `// 1. 导入所需函数
+import { 
+  SVGMorpheus, 
+  bundleSvgs 
+} from 'svg-morpheus-ts';
+
+// 2. 定义 SVG 图标映射（包含新图标！）
+const svgMap = {
+  'circle': '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/></svg>',
+  'square': '<svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16"/></svg>',
+  'triangle': '<svg viewBox="0 0 24 24"><polygon points="12,3 21,20 3,20"/></svg>',
+  'vite': '/vite.svg',        // 文件路径
+  'diving': '/diving.svg',    // 新增潜水图标
+  'bag': '/bag.svg'           // 新增背包图标
+};
+
+// 3. 自定义 SVG 属性（可选）
+const customAttributes = {
+  viewBox: '0 0 24 24',
+  class: 'dynamic-iconset',
+  'data-version': '1.0'
+};
+
+// 4. 生成合并的 SVG Blob URL（一步完成）
+const bundledSvgUrl = await bundleSvgs(svgMap, customAttributes);
+
+// 5. 设置到 object 元素
+objectElement.data = bundledSvgUrl;
+
+// 6. 初始化 SVGMorpheus
+const morpheus = new SVGMorpheus('#iconDynamic');
+morpheus.to('diving'); // 试试新的潜水图标！`
   }
 };
 
@@ -163,15 +279,29 @@ function updateTexts() {
   document.querySelectorAll('[data-i18n-code]').forEach(element => {
     const key = element.getAttribute('data-i18n-code');
     if (texts[key]) {
-      element.innerHTML = texts[key];
+      element.textContent = texts[key];
     }
   });
   
-  // 重新高亮所有代码块
+  // 更新代码块 - 使用特殊处理避免highlight.js清理HTML标签
+  document.querySelectorAll('[data-i18n-code]').forEach(element => {
+    const key = element.getAttribute('data-i18n-code');
+    if (texts[key]) {
+      // 先设置文本内容
+      element.textContent = texts[key];
+      // 移除之前的高亮类，让highlight.js重新处理
+      element.removeAttribute('data-highlighted');
+      element.className = element.className.replace(/hljs[^\s]*/g, '').trim();
+    }
+  });
+  
+  // 延迟执行highlight.js，确保DOM更新完成
   if (typeof hljs !== 'undefined') {
-    document.querySelectorAll('pre code').forEach((block) => {
-      hljs.highlightElement(block);
-    });
+    setTimeout(() => {
+      document.querySelectorAll('[data-i18n-code]').forEach((block) => {
+        hljs.highlightElement(block);
+      });
+    }, 0);
   }
   
   // 更新动态示例的下拉框选项
