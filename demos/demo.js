@@ -88,7 +88,9 @@ const i18nData = {
     'icons.star': 'Star',
     'icons.heart': 'Heart',
     'icons.diamond': 'Diamond',
-    'icons.vite': 'Vite'
+    'icons.vite': 'Vite',
+    'icons.diving': 'Diving',
+    'icons.bag': 'Bag'
   },
   'zh': {
     'title': 'SVG Morpheus TypeScript',
@@ -120,7 +122,9 @@ const i18nData = {
     'icons.star': '星形',
     'icons.heart': '心形',
     'icons.diamond': '菱形',
-    'icons.vite': 'Vite'
+    'icons.vite': 'Vite',
+    'icons.diving': '潜水',
+    'icons.bag': '背包'
   }
 };
 
@@ -191,7 +195,9 @@ function updateDynamicOptions() {
       'star': t('icons.star'),
       'heart': t('icons.heart'),
       'diamond': t('icons.diamond'),
-      'vite': t('icons.vite')
+      'vite': t('icons.vite'),
+      'diving': t('icons.diving'),
+      'bag': t('icons.bag')
     };
     
     for (const [key, value] of Object.entries(dynamicIcons)) {
@@ -357,7 +363,9 @@ async function init() {
       'diamond': `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
         <polygon points="12,2 22,12 12,22 2,12" fill="currentColor"/>
       </svg>`,
-      'vite': getSvgPath('vite.svg')
+      'vite': getSvgPath('vite.svg'),
+      'diving': getSvgPath('diving.svg'),
+      'bag': getSvgPath('bag.svg')
     };
 
     try {
@@ -440,7 +448,9 @@ async function init() {
             'star': t('icons.star'),
             'heart': t('icons.heart'),
             'diamond': t('icons.diamond'),
-            'vite': t('icons.vite')
+            'vite': t('icons.vite'),
+            'diving': t('icons.diving'),
+            'bag': t('icons.bag')
           };
 
           populateSelectsDynamic(selIconDynamic, selEasingDynamic, selDurationDynamic, selRotationDynamic, dynamicIcons);
