@@ -767,11 +767,11 @@ export class SVGMorpheus {
     if (fromIcon && fromIcon.defs && fromIcon.viewBox) {
       const fromIdPrefix = `from_${this._curIconId}_`;
       
-      // **新增：计算转换矩阵用于渐变坐标转换**
+      // 计算转换矩阵用于渐变坐标转换
       const targetViewBox = toIcon.viewBox || { values: [0, 0, 24, 24], original: '0 0 24 24' };
       const fromTransformMatrix = calculateTransformMatrix(fromIcon.viewBox, targetViewBox);
       
-      // **传入转换矩阵**
+      // 传入转换矩阵
       const transformedFromDefs = transformGradientDefs(fromIcon.defs, fromIdPrefix, fromTransformMatrix);
       
       this._insertDefsContent(defsElement, transformedFromDefs);
@@ -839,39 +839,6 @@ export class SVGMorpheus {
         console.warn('Failed to parse other def:', otherStr, error);
       }
     });
-  }
-
-  private _createOffsetPath(path: string, offset: number): string {
-    // 创建路径的位置偏移副本，避免完全相同的路径
-    // offset: 偏移层级，用于计算小幅位置调整
-    
-    if (!path || offset === 0) {
-      return path;
-    }
-    
-    // 计算微小的偏移量（基于ViewBox尺寸）
-    const offsetX = (offset % 3 - 1) * 0.5; // -0.5, 0, 0.5
-    const offsetY = (Math.floor(offset / 3) % 3 - 1) * 0.5; // -0.5, 0, 0.5
-    
-    // 如果偏移量为0，返回原路径
-    if (offsetX === 0 && offsetY === 0) {
-      return path;
-    }
-    
-    try {
-      // 使用坐标转换来创建偏移
-      const matrix = {
-        scaleX: 1,
-        scaleY: 1,
-        translateX: offsetX,
-        translateY: offsetY
-      };
-      
-      return transformPath(path, matrix);
-    } catch (error) {
-      console.warn('Path offset failed:', error);
-      return path; // 返回原路径作为fallback
-    }
   }
 }
 

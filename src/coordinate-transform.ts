@@ -249,7 +249,7 @@ export function transformGradientDefs(
     transformed = transformed.replace(new RegExp(`id="${id}"`, 'g'), `id="${newId}"`);
     transformed = transformed.replace(new RegExp(`id='${id}'`, 'g'), `id='${newId}'`);
     
-    // **新增：如果有转换矩阵，转换渐变坐标**
+    // 如果有转换矩阵，转换渐变坐标
     if (transformMatrix) {
       transformed = transformGradientCoordinates(transformed, transformMatrix);
     }
@@ -266,7 +266,7 @@ export function transformGradientDefs(
     transformed = transformed.replace(new RegExp(`id="${id}"`, 'g'), `id="${newId}"`);
     transformed = transformed.replace(new RegExp(`id='${id}'`, 'g'), `id='${newId}'`);
     
-    // **新增：如果有转换矩阵，转换图案坐标**
+    // 如果有转换矩阵，转换图案坐标
     if (transformMatrix) {
       transformed = transformPatternCoordinates(transformed, transformMatrix);
     }
