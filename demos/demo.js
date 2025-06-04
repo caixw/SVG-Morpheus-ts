@@ -330,7 +330,6 @@ async function init() {
       
       // 自定义 SVG 属性
       const customSvgAttributes = {
-        viewBox: '0 0 24 24',
         width: '100%',
         height: '100%',
         class: 'dynamic-iconset',
