@@ -449,6 +449,11 @@ export class SVGMorpheus {
       }
 
       const maxNum = Math.max(this._fromIconItems.length, this._toIconItems.length);
+      
+      // 记录原始路径数量用于补齐逻辑
+      const originalFromLength = this._fromIconItems.length;
+      const originalToLength = this._toIconItems.length;
+      
       let toBB: BoundingBox;
       for (i = 0; i < maxNum; i++) {
         // Add items to fromIcon/toIcon if needed
@@ -476,15 +481,34 @@ export class SVGMorpheus {
         }
         if (!this._toIconItems[i]) {
           if (!!this._fromIconItems[i]) {
-            toBB = curvePathBBox(path2curve(this._fromIconItems[i].path));
-            this._toIconItems.push({
-              path: 'M' + toBB.cx + ',' + toBB.cy + 'l0,0',
-              attrs: {},
-              style: {},
-              trans: {
-                'rotate': [0, toBB.cx, toBB.cy]
-              }
-            });
+            // 让多余的源路径收缩到目标中心点
+            if (originalToLength > 0) {
+              // 计算第一个目标路径的中心点
+              const firstTargetBBox = curvePathBBox(path2curve(this._toIconItems[0].path));
+              const centerX = firstTargetBBox.cx;
+              const centerY = firstTargetBBox.cy;
+              
+              // 创建收缩到中心点的路径（消失效果）
+              this._toIconItems.push({
+                path: `M${centerX},${centerY}l0,0`,
+                attrs: { ...this._toIconItems[0].attrs },
+                style: { ...this._toIconItems[0].style },
+                trans: {
+                  'rotate': [0, centerX, centerY]
+                }
+              });
+            } else {
+              // fallback：如果没有原始路径，创建点路径
+              toBB = curvePathBBox(path2curve(this._fromIconItems[i].path));
+              this._toIconItems.push({
+                path: 'M' + toBB.cx + ',' + toBB.cy + 'l0,0',
+                attrs: {},
+                style: {},
+                trans: {
+                  'rotate': [0, toBB.cx, toBB.cy]
+                }
+              });
+            }
           } else {
             this._toIconItems.push({
               path: 'M0,0l0,0',
@@ -518,6 +542,34 @@ export class SVGMorpheus {
         fromIconItem.curve = curves[0];
         toIconItem.curve = curves[1];
 
+        // 平衡贝塞尔曲线段数量
+        const fromCurveLength = fromIconItem.curve?.length || 0;
+        const toCurveLength = toIconItem.curve?.length || 0;
+        const maxCurveLength = Math.max(fromCurveLength, toCurveLength);
+        
+        // 平衡贝塞尔曲线段数量
+        if (fromCurveLength < maxCurveLength && fromIconItem.curve) {
+          const lastSegment = fromIconItem.curve[fromCurveLength - 1];
+          if (lastSegment && lastSegment.length >= 7) {
+            // 复制最后一段来补齐
+            const endPoint = [lastSegment[0], lastSegment[5], lastSegment[6], lastSegment[5], lastSegment[6], lastSegment[5], lastSegment[6]];
+            for (let k = fromCurveLength; k < maxCurveLength; k++) {
+              fromIconItem.curve.push([...endPoint]);
+            }
+          }
+        }
+        
+        if (toCurveLength < maxCurveLength && toIconItem.curve) {
+          const lastSegment = toIconItem.curve[toCurveLength - 1];
+          if (lastSegment && lastSegment.length >= 7) {
+            // 复制最后一段来补齐
+            const endPoint = [lastSegment[0], lastSegment[5], lastSegment[6], lastSegment[5], lastSegment[6], lastSegment[5], lastSegment[6]];
+            for (let k = toCurveLength; k < maxCurveLength; k++) {
+              toIconItem.curve.push([...endPoint]);
+            }
+          }
+        }
+
         // Normalize from/to attrs
         const attrsNorm = styleToNorm(this._fromIconItems[i].attrs, this._toIconItems[i].attrs);
         fromIconItem.attrsNorm = attrsNorm[0];
@@ -534,14 +586,60 @@ export class SVGMorpheus {
 
         // Calculate from/to transform
         toBB = curvePathBBox(toIconItem.curve!);
+        
+        // 计算统一的旋转中心（所有路径几何中心的平均值）
+        let totalCx = 0, totalCy = 0;
+        let validCenterCount = 0;
+        
+        // 收集所有路径的几何中心
+        for (let j = 0; j < this._toIconItems.length; j++) {
+          if (this._toIconItems[j].curve) {
+            const bbox = curvePathBBox(this._toIconItems[j].curve!);
+            
+            // 检查几何中心是否有效
+            if (bbox && typeof bbox.cx === 'number' && typeof bbox.cy === 'number' &&
+                !isNaN(bbox.cx) && !isNaN(bbox.cy)) {
+              totalCx += bbox.cx;
+              totalCy += bbox.cy;
+              validCenterCount++;
+            }
+          }
+        }
+        
+        // 计算旋转中心
+        let svgCenter;
+        if (validCenterCount === 0) {
+          // 使用ViewBox中心作为后备方案
+          svgCenter = { x: 12, y: 12 };
+        } else {
+          // 使用几何中心的平均值
+          svgCenter = {
+            x: totalCx / validCenterCount,
+            y: totalCy / validCenterCount
+          };
+        }
+        
         toIconItem.trans = {
-          'rotate': [0, toBB.cx, toBB.cy]
+          'rotate': [0, svgCenter.x, svgCenter.y]
         };
+        
+        // 为fromIcon设置统一旋转中心并重置角度
+        if (!fromIconItem.trans) {
+          fromIconItem.trans = {
+            'rotate': [0, svgCenter.x, svgCenter.y]
+          };
+        } else if (fromIconItem.trans.rotate) {
+          fromIconItem.trans.rotate[0] = 0; // 重置角度避免累积
+          fromIconItem.trans.rotate[1] = svgCenter.x;
+          fromIconItem.trans.rotate[2] = svgCenter.y;
+        }
+        
         let rotation = this._rotation;
         let degAdd: number;
         if (rotation === 'random') {
           rotation = Math.random() < 0.5 ? 'counterclock' : 'clock';
         }
+        
         switch (rotation) {
           case 'none':
             if (fromIconItem.trans?.rotate && toIconItem.trans?.rotate) {
@@ -734,14 +832,21 @@ export class SVGMorpheus {
     // 插入fromIcon的转换后defs（已经转换到目标坐标系统）
     if (fromIcon && fromIcon.defs && fromIcon.viewBox) {
       const fromIdPrefix = `from_${this._curIconId}_`;
-      const transformedFromDefs = transformGradientDefs(fromIcon.defs, fromIdPrefix);
+      
+      // **新增：计算转换矩阵用于渐变坐标转换**
+      const targetViewBox = toIcon.viewBox || { values: [0, 0, 24, 24], original: '0 0 24 24' };
+      const fromTransformMatrix = calculateTransformMatrix(fromIcon.viewBox, targetViewBox);
+      
+      // **传入转换矩阵**
+      const transformedFromDefs = transformGradientDefs(fromIcon.defs, fromIdPrefix, fromTransformMatrix);
       
       this._insertDefsContent(defsElement, transformedFromDefs);
     }
     
-    // 插入toIcon的defs（已经在目标坐标系统中）
+    // 插入toIcon的defs（已经在目标坐标系统中，无需坐标转换）
     if (toIcon.defs) {
       const toIdPrefix = `to_${toIcon.id}_`;
+      // toIcon不需要坐标转换，只需要ID重命名
       const transformedToDefs = transformGradientDefs(toIcon.defs, toIdPrefix);
       
       this._insertDefsContent(defsElement, transformedToDefs);
@@ -800,6 +905,39 @@ export class SVGMorpheus {
         console.warn('Failed to parse other def:', otherStr, error);
       }
     });
+  }
+
+  private _createOffsetPath(path: string, offset: number): string {
+    // 创建路径的位置偏移副本，避免完全相同的路径
+    // offset: 偏移层级，用于计算小幅位置调整
+    
+    if (!path || offset === 0) {
+      return path;
+    }
+    
+    // 计算微小的偏移量（基于ViewBox尺寸）
+    const offsetX = (offset % 3 - 1) * 0.5; // -0.5, 0, 0.5
+    const offsetY = (Math.floor(offset / 3) % 3 - 1) * 0.5; // -0.5, 0, 0.5
+    
+    // 如果偏移量为0，返回原路径
+    if (offsetX === 0 && offsetY === 0) {
+      return path;
+    }
+    
+    try {
+      // 使用坐标转换来创建偏移
+      const matrix = {
+        scaleX: 1,
+        scaleY: 1,
+        translateX: offsetX,
+        translateY: offsetY
+      };
+      
+      return transformPath(path, matrix);
+    } catch (error) {
+      console.warn('Path offset failed:', error);
+      return path; // 返回原路径作为fallback
+    }
   }
 }
 

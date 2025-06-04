@@ -17,12 +17,13 @@ export default defineConfig(({ mode }) => {
   // 然后在JS中使用：import.meta.env.VITE_SVG_BASE_PATH
   
   const isDemo = mode === 'demo';
+  const isDev = mode === 'development' || !mode || mode === 'dev';
   
   return {
     // 根据模式设置不同的root
-    root: isDemo ? 'demos' : '.',
+    root: (isDemo || isDev) ? 'demos' : '.',
     base,
-    publicDir: isDemo ? '../public' : 'public',
+    publicDir: (isDemo || isDev) ? '../public' : 'public',
     
     // 定义全局常量，在开发和构建环境都可用
     define: {
@@ -32,7 +33,7 @@ export default defineConfig(({ mode }) => {
     
     plugins: [
       // 只在库模式下使用dts插件
-      ...(isDemo ? [] : [dts({ insertTypesEntry: true })]),
+      ...(isDemo || isDev ? [] : [dts({ insertTypesEntry: true })]),
     ],
     
     build: isDemo ? {
@@ -91,7 +92,7 @@ export default defineConfig(({ mode }) => {
     
     server: {
       port: isDemo ? 9111 : 9001,
-      open: isDemo ? '/' : '/demos/index.html',
+      open: isDev ? '/' : (isDemo ? '/' : '/demos/index.html'),
     },
     
     resolve: {

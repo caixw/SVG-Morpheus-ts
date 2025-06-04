@@ -7,7 +7,34 @@
  * Build Date: ${new Date().toISOString()}
  */
 
-import { SVGMorpheus, bundleSvgs } from '../dist/index.js';
+// 动态导入SVGMorpheus模块
+async function loadSVGMorpheus() {
+  // 根据环境选择导入路径
+  const isDemoMode = import.meta.env.MODE === 'demo';
+  console.log('当前模式:', import.meta.env.MODE, '是否为演示模式:', isDemoMode);
+
+  if (isDemoMode) {
+    // 演示模式：使用构建后的文件
+    try {
+      const module = await import('../dist/index.js');
+      console.log('已加载构建后的模块');
+      return module;
+    } catch (error) {
+      console.error('加载构建后的模块失败，回退到源文件:', error);
+      const module = await import('../src/index.ts');
+      console.log('已回退到源 TypeScript 模块');
+      return module;
+    }
+  } else {
+    // 开发模式：直接使用源文件
+    const module = await import('../src/index.ts');
+    console.log('已加载源 TypeScript 模块');
+    return module;
+  }
+}
+
+// 全局变量声明
+let SVGMorpheus, bundleSvgs;
 
 // 全局变量由 Vite 构建时注入
 // __SVG_BASE_PATH__: string - SVG文件的基础路径
@@ -212,6 +239,16 @@ window.switchLanguage = switchLanguage;
 
 // 主初始化函数
 async function init() {
+  // 首先加载SVGMorpheus模块
+  try {
+    const module = await loadSVGMorpheus();
+    SVGMorpheus = module.SVGMorpheus;
+    bundleSvgs = module.bundleSvgs;
+  } catch (error) {
+    console.error('加载SVGMorpheus模块失败:', error);
+    return;
+  }
+
   // 初始化语言设置
   initLanguage();
   

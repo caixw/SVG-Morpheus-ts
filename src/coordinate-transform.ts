@@ -231,7 +231,8 @@ export function calculateOptimalViewBox(fromViewBox: ViewBoxInfo | undefined, to
  */
 export function transformGradientDefs(
   defs: DefsInfo, 
-  idPrefix: string = ''
+  idPrefix: string = '',
+  transformMatrix?: TransformMatrix
 ): DefsInfo {
   const transformedDefs: DefsInfo = {
     gradients: {},
@@ -242,30 +243,161 @@ export function transformGradientDefs(
   // 转换渐变定义
   for (const [id, gradientStr] of Object.entries(defs.gradients)) {
     const newId = idPrefix + id;
-    // 这里可以进一步实现渐变坐标的转换
-    // 目前先简单重命名ID避免冲突
-    let transformed = gradientStr.replace(new RegExp(`id="${id}"`, 'g'), `id="${newId}"`);
+    let transformed = gradientStr;
+    
+    // 重命名ID避免冲突
+    transformed = transformed.replace(new RegExp(`id="${id}"`, 'g'), `id="${newId}"`);
     transformed = transformed.replace(new RegExp(`id='${id}'`, 'g'), `id='${newId}'`);
+    
+    // **新增：如果有转换矩阵，转换渐变坐标**
+    if (transformMatrix) {
+      transformed = transformGradientCoordinates(transformed, transformMatrix);
+    }
+    
     transformedDefs.gradients[newId] = transformed;
   }
   
   // 转换图案定义
   for (const [id, patternStr] of Object.entries(defs.patterns)) {
     const newId = idPrefix + id;
-    let transformed = patternStr.replace(new RegExp(`id="${id}"`, 'g'), `id="${newId}"`);
+    let transformed = patternStr;
+    
+    // 重命名ID避免冲突
+    transformed = transformed.replace(new RegExp(`id="${id}"`, 'g'), `id="${newId}"`);
     transformed = transformed.replace(new RegExp(`id='${id}'`, 'g'), `id='${newId}'`);
+    
+    // **新增：如果有转换矩阵，转换图案坐标**
+    if (transformMatrix) {
+      transformed = transformPatternCoordinates(transformed, transformMatrix);
+    }
+    
     transformedDefs.patterns[newId] = transformed;
   }
   
   // 转换其他定义
   for (const [id, otherStr] of Object.entries(defs.others)) {
     const newId = idPrefix + id;
-    let transformed = otherStr.replace(new RegExp(`id="${id}"`, 'g'), `id="${newId}"`);
+    let transformed = otherStr;
+    
+    // 重命名ID避免冲突
+    transformed = transformed.replace(new RegExp(`id="${id}"`, 'g'), `id="${newId}"`);
     transformed = transformed.replace(new RegExp(`id='${id}'`, 'g'), `id='${newId}'`);
+    
     transformedDefs.others[newId] = transformed;
   }
   
   return transformedDefs;
+}
+
+/**
+ * 转换渐变坐标
+ */
+function transformGradientCoordinates(gradientStr: string, matrix: TransformMatrix): string {
+  let transformed = gradientStr;
+  
+  // 处理 linearGradient 的坐标
+  if (gradientStr.includes('linearGradient')) {
+    // 匹配 x1, y1, x2, y2 属性（支持百分比和绝对值）
+    transformed = transformed.replace(
+      /\b(x1|y1|x2|y2)=["']([^"']+)["']/g,
+      (_match, attr, value) => {
+        const transformedValue = transformGradientValue(attr, value, matrix);
+        return `${attr}="${transformedValue}"`;
+      }
+    );
+  }
+  
+  // 处理 radialGradient 的坐标
+  if (gradientStr.includes('radialGradient')) {
+    // 匹配 cx, cy, r, fx, fy 属性
+    transformed = transformed.replace(
+      /\b(cx|cy|fx|fy|r)=["']([^"']+)["']/g,
+      (_match, attr, value) => {
+        const transformedValue = transformGradientValue(attr, value, matrix);
+        return `${attr}="${transformedValue}"`;
+      }
+    );
+  }
+  
+  return transformed;
+}
+
+/**
+ * 转换图案坐标
+ */
+function transformPatternCoordinates(patternStr: string, matrix: TransformMatrix): string {
+  let transformed = patternStr;
+  
+  // 处理 pattern 的坐标属性
+  transformed = transformed.replace(
+    /\b(x|y|width|height)=["']([^"']+)["']/g,
+    (_match, attr, value) => {
+      const transformedValue = transformGradientValue(attr, value, matrix);
+      return `${attr}="${transformedValue}"`;
+    }
+  );
+  
+  return transformed;
+}
+
+/**
+ * 转换单个渐变坐标值
+ */
+function transformGradientValue(attr: string, value: string, matrix: TransformMatrix): string {
+  // 处理百分比值（保持百分比格式，因为百分比是相对的）
+  if (value.endsWith('%')) {
+    return value; // 百分比坐标不需要转换，它们是相对于元素大小的
+  }
+  
+  // 处理绝对坐标值
+  const numValue = parseFloat(value);
+  if (isNaN(numValue)) {
+    return value; // 非数字值保持不变
+  }
+  
+  // 根据属性类型进行坐标转换
+  let transformedValue: number;
+  
+  switch (attr) {
+    case 'x1':
+    case 'x2':
+    case 'cx':
+    case 'fx':
+    case 'x':
+      // X坐标转换
+      transformedValue = numValue * matrix.scaleX + matrix.translateX;
+      break;
+      
+    case 'y1':
+    case 'y2':
+    case 'cy':
+    case 'fy':
+    case 'y':
+      // Y坐标转换
+      transformedValue = numValue * matrix.scaleY + matrix.translateY;
+      break;
+      
+    case 'r':
+      // 半径转换（使用平均缩放比例）
+      transformedValue = numValue * Math.sqrt(matrix.scaleX * matrix.scaleY);
+      break;
+      
+    case 'width':
+      // 宽度转换
+      transformedValue = numValue * matrix.scaleX;
+      break;
+      
+    case 'height':
+      // 高度转换
+      transformedValue = numValue * matrix.scaleY;
+      break;
+      
+    default:
+      transformedValue = numValue;
+  }
+  
+  // 保留合理的小数位数
+  return transformedValue.toFixed(3);
 }
 
 /**
