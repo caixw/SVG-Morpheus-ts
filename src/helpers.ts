@@ -526,9 +526,35 @@ async function createBundledSvgString(
     // 提取原始SVG的ViewBox信息
     const originalViewBox = extractViewBoxInfo(svgContent);
     const originalDefs = extractDefsInfo(svgContent);
+    // 新增：提取SVG根属性（包括fill）
+    const rootAttributes = extractSvgRootAttributes(svgContent);
+    const svgRootFill = rootAttributes['fill'];
     
     // 提取 SVG 内容（去除外层 svg 标签）
-    const innerContent = extractSvgInnerContent(svgContent);
+    let innerContent = extractSvgInnerContent(svgContent);
+
+    // 新增：如果svg标签有fill，处理所有可填充元素
+    if (svgRootFill) {
+      // 需要处理的标签列表
+      const fillTags = [
+        'path', 'polygon', 'rect', 'circle', 'ellipse', 'line', 'polyline'
+      ];
+      fillTags.forEach(tag => {
+        const tagReg = new RegExp(`<${tag}(\\s[^>]*)?>`, 'gi');
+        innerContent = innerContent.replace(tagReg, (match) => {
+          // 如果已有fill属性，保持原样
+          if (/fill\s*=\s*['"][^'"]*['"]/i.test(match)) {
+            return match;
+          }
+          // 没有fill属性，补上fill
+          if (match.endsWith('/>')) {
+            return match.replace(new RegExp(`<${tag}(\\s*)`), `<${tag}$1 fill=\"${svgRootFill}\" `);
+          } else {
+            return match.replace(new RegExp(`<${tag}(\\s*)`), `<${tag}$1 fill=\"${svgRootFill}\" `);
+          }
+        });
+      });
+    }
     
     // 构建g标签的属性，保留ViewBox和其他重要信息
     let groupAttributes = `id="${id}"`;

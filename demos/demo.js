@@ -487,11 +487,11 @@ async function init() {
       'star': `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
         <path d="M12,2 L15,8 L22,9 L17,14 L18,21 L12,18 L6,21 L7,14 L2,9 L9,8 Z" fill="currentColor"/>
       </svg>`,
-      'heart': `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-        <path d="M20.84,4.61a5.5,5.5 0,0,0 -7.78,0L12,5.67 10.94,4.61a5.5,5.5 0,0,0 -7.78,7.78L12,21.23l8.84,-8.84A5.5,5.5 0,0,0 20.84,4.61Z" fill="currentColor"/>
+      'heart': `<svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+        <path d="M20.84,4.61a5.5,5.5 0,0,0 -7.78,0L12,5.67 10.94,4.61a5.5,5.5 0,0,0 -7.78,7.78L12,21.23l8.84,-8.84A5.5,5.5 0,0,0 20.84,4.61Z"/>
       </svg>`,
-      'diamond': `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-        <polygon points="12,2 22,12 12,22 2,12" fill="currentColor"/>
+      'diamond': `<svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="12,2 22,12 12,22 2,12"/>
       </svg>`,
       'vite': getSvgPath('vite.svg'),
       'diving': getSvgPath('diving.svg'),
