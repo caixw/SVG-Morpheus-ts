@@ -101,7 +101,7 @@ export function styleNormToString(styleNorm: NormalizedStyle): StyleAttributes {
   return style;
 }
 
-export function styleToNorm(styleFrom: StyleAttributes, styleTo: StyleAttributes): [NormalizedStyle, NormalizedStyle] {
+export function styleToNorm(styleFrom: StyleAttributes, styleTo: StyleAttributes, doc: SVGSVGElement | null): [NormalizedStyle, NormalizedStyle] {
   const styleNorm: [NormalizedStyle, NormalizedStyle] = [{}, {}];
   
   // 检测是否为渐变引用
@@ -123,9 +123,9 @@ export function styleToNorm(styleFrom: StyleAttributes, styleTo: StyleAttributes
             }
           } else {
             // 对于普通颜色值，进行RGB转换
-            styleNorm[0][i] = getRGB(styleFrom[i]!);
+            styleNorm[0][i] = getRGB(doc, styleFrom[i]!);
             if (styleTo[i] === undefined) {
-              styleNorm[1][i] = getRGB(styleFrom[i]!);
+              styleNorm[1][i] = getRGB(doc, styleFrom[i]!);
               (styleNorm[1][i] as RGBColor).opacity = 0;
             }
           }
@@ -159,9 +159,9 @@ export function styleToNorm(styleFrom: StyleAttributes, styleTo: StyleAttributes
             }
           } else {
             // 对于普通颜色值，进行RGB转换
-            styleNorm[1][i] = getRGB(styleTo[i]!);
+            styleNorm[1][i] = getRGB(doc, styleTo[i]!);
             if (styleFrom[i] === undefined) {
-              styleNorm[0][i] = getRGB(styleTo[i]!);
+              styleNorm[0][i] = getRGB(doc, styleTo[i]!);
               (styleNorm[0][i] as RGBColor).opacity = 0;
             }
           }
@@ -292,12 +292,17 @@ interface RGBColorWithError extends RGBColor {
 }
 
 // Parses color string as RGB object
-const getRGB = function (colour: string): RGBColorWithError {
-  if (colour === 'currentColor') {
-    const i = window.document.getElementsByTagName('head')[0] || window.document.getElementsByTagName('svg')[0];
-    i.style.color = colour;
-    colour = window.document.defaultView?.getComputedStyle(i).getPropertyValue('color')!;
+const getRGB = function (doc: SVGSVGElement | null, colour: string): RGBColorWithError {
+  if (colour.toUpperCase() === 'CURRENTCOLOR') {
+    const i = doc || window.document.getElementsByTagName('head')[0] || window.document.getElementsByTagName('svg')[0];
+    if (i.style.color) {
+      colour = i.style.color;
+    } else {
+      i.style.color = colour;
+      colour = window.getComputedStyle(i).getPropertyValue('color')!;
+    }
   }
+
   const c = new Color(colour).to('srgb');
   return {
     r: Math.round(c.r * 255),

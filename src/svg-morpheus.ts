@@ -519,14 +519,14 @@ export class SVGMorpheus {
         toIconItem.curve = curves[1];
 
         // Normalize from/to attrs
-        const attrsNorm = styleToNorm(this._fromIconItems[i].attrs, this._toIconItems[i].attrs);
+        const attrsNorm = styleToNorm(this._fromIconItems[i].attrs, this._toIconItems[i].attrs, this._svgDoc);
         fromIconItem.attrsNorm = attrsNorm[0];
         toIconItem.attrsNorm = attrsNorm[1];
         fromIconItem.attrs = styleNormToString(fromIconItem.attrsNorm);
         toIconItem.attrs = styleNormToString(toIconItem.attrsNorm);
 
         // Normalize from/to style
-        const styleNorm = styleToNorm(this._fromIconItems[i].style, this._toIconItems[i].style);
+        const styleNorm = styleToNorm(this._fromIconItems[i].style, this._toIconItems[i].style, this._svgDoc);
         fromIconItem.styleNorm = styleNorm[0];
         toIconItem.styleNorm = styleNorm[1];
         fromIconItem.style = styleNormToString(fromIconItem.styleNorm);
