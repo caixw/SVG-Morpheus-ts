@@ -1,3 +1,5 @@
+import Color from 'colorjs.io';
+
 // 定义包含浏览器前缀方法的接口
 interface ExtendedWindow extends Window {
   mozRequestAnimationFrame?: typeof requestAnimationFrame;
@@ -278,113 +280,11 @@ export function clone<T>(obj: T): T {
 }
 
 // Helper functions for color conversion - from snapsvglite.js
-const spaces = "\x09\x0a\x0b\x0c\x0d\x20\xa0\u1680\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u202f\u205f\u3000\u2028\u2029";
-const hsrg = {hs: 1, rg: 1};
-const has = "hasOwnProperty";
-const colourRegExp = /^\s*((#[a-f\d]{6})|(#[a-f\d]{3})|rgba?\(\s*([\d\.]+%?\s*,\s*[\d\.]+%?\s*,\s*[\d\.]+%?(?:\s*,\s*[\d\.]+%?)?)\s*\)|hsba?\(\s*([\d\.]+(?:deg|\xb0|%)?\s*,\s*[\d\.]+%?\s*,\s*[\d\.]+(?:%?\s*,\s*[\d\.]+)?%?)\s*\)|hsla?\(\s*([\d\.]+(?:deg|\xb0|%)?\s*,\s*[\d\.]+%?\s*,\s*[\d\.]+(?:%?\s*,\s*[\d\.]+)?%?)\s*\))\s*$/i;
-const commaSpaces = new RegExp("[" + spaces + "]*,[" + spaces + "]*");
 
 // Converts RGB values to a hex representation of the color
 const rgbToString = function (rgb: RGBColor): string {
   const round = Math.round;
   return "rgba(" + [round(rgb.r), round(rgb.g), round(rgb.b), +rgb.opacity.toFixed(2)] + ")";
-};
-
-const toHex = function (color: string): string | null {
-  const i = window.document.getElementsByTagName("head")[0] || window.document.getElementsByTagName("svg")[0];
-  const red = "rgb(255, 0, 0)";
-  const toHexFunc = function (color: string): string | null {
-    if (color.toLowerCase() === "red") {
-      return red;
-    }
-    i.style.color = red;
-    i.style.color = color;
-    const out = window.document.defaultView?.getComputedStyle(i, "").getPropertyValue("color");
-    return out === red ? null : (out || null);
-  };
-  return toHexFunc(color);
-};
-
-const packageRGB = function (r: number, g: number, b: number, o: number): RGBColor {
-  const red = Math.round(r * 255);
-  const green = Math.round(g * 255);
-  const blue = Math.round(b * 255);
-  return {
-    r: red,
-    g: green,
-    b: blue,
-    opacity: isFinite(o) ? o : 1
-  };
-};
-
-interface HSBColor {
-  h: number;
-  s: number;
-  b: number;
-  o?: number;
-}
-
-interface HSLColor {
-  h: number;
-  s: number;
-  l: number;
-  o?: number;
-}
-
-// Converts HSB values to an RGB object
-const hsb2rgb = function (h: number | HSBColor, s?: number, v?: number, o?: number): RGBColor {
-  if (typeof h === 'object' && "h" in h && "s" in h && "b" in h) {
-    v = h.b;
-    s = h.s;
-    o = h.o;
-    h = h.h;
-  }
-  
-  const hue = (h as number) * 360;
-  let R: number, G: number, B: number, X: number, C: number;
-  const normalizedHue = (hue % 360) / 60;
-  C = (v as number) * (s as number);
-  X = C * (1 - Math.abs(normalizedHue % 2 - 1));
-  R = G = B = (v as number) - C;
-
-  const hueIndex = ~~normalizedHue;
-  R += [C, X, 0, 0, X, C][hueIndex];
-  G += [X, C, C, X, 0, 0][hueIndex];
-  B += [0, 0, X, C, C, X][hueIndex];
-  return packageRGB(R, G, B, o as number);
-};
-
-// Converts HSL values to an RGB object
-const hsl2rgb = function (h: number | HSLColor, s?: number, l?: number, o?: number): RGBColor {
-  if (typeof h === 'object' && "h" in h && "s" in h && "l" in h) {
-    l = h.l;
-    s = h.s;
-    o = h.o;
-    h = h.h;
-  }
-  
-  let hue = h as number;
-  let saturation = s as number;
-  let lightness = l as number;
-  
-  if (hue > 1 || saturation > 1 || lightness > 1) {
-    hue /= 360;
-    saturation /= 100;
-    lightness /= 100;
-  }
-  
-  hue *= 360;
-  let R: number, G: number, B: number, X: number, C: number;
-  const normalizedHue = (hue % 360) / 60;
-  C = 2 * saturation * (lightness < 0.5 ? lightness : 1 - lightness);
-  X = C * (1 - Math.abs(normalizedHue % 2 - 1));
-  R = G = B = lightness - C / 2;
-
-  const hueIndex = ~~normalizedHue;
-  R += [C, X, 0, 0, X, C][hueIndex];
-  G += [X, C, C, X, 0, 0][hueIndex];
-  B += [0, 0, X, C, C, X][hueIndex];
-  return packageRGB(R, G, B, o as number);
 };
 
 interface RGBColorWithError extends RGBColor {
@@ -393,100 +293,18 @@ interface RGBColorWithError extends RGBColor {
 
 // Parses color string as RGB object
 const getRGB = function (colour: string): RGBColorWithError {
-  if (!colour || !!((colour = String(colour)).indexOf("-") + 1)) {
-    return {r: -1, g: -1, b: -1, opacity: -1, error: 1};
+  if (colour === 'currentColor') {
+    const i = window.document.getElementsByTagName('head')[0] || window.document.getElementsByTagName('svg')[0];
+    i.style.color = colour;
+    colour = window.document.defaultView?.getComputedStyle(i).getPropertyValue('color')!;
   }
-  if (colour === "none") {
-    return {r: -1, g: -1, b: -1, opacity: -1};
-  }
-  
-  if (!((hsrg as any)[(has as any)](colour.toLowerCase().substring(0, 2)) || colour.charAt(0) === "#")) {
-    const hexColor = toHex(colour);
-    colour = hexColor || '';
-  }
-  
-  if (!colour) {
-    return {r: -1, g: -1, b: -1, opacity: -1, error: 1};
-  }
-  
-  let red: number = 0;
-  let green: number = 0;
-  let blue: number = 0;
-  let opacity: number = 1;
-  let t: string;
-  let values: string[];
-  const rgb = colour.match(colourRegExp);
-  
-  if (rgb) {
-    if (rgb[2]) {
-      blue = parseInt(rgb[2].substring(5), 16);
-      green = parseInt(rgb[2].substring(3, 5), 16);
-      red = parseInt(rgb[2].substring(1, 3), 16);
-    }
-    if (rgb[3]) {
-      blue = parseInt((t = rgb[3].charAt(3)) + t, 16);
-      green = parseInt((t = rgb[3].charAt(2)) + t, 16);
-      red = parseInt((t = rgb[3].charAt(1)) + t, 16);
-    }
-    if (rgb[4]) {
-      values = rgb[4].split(commaSpaces);
-      red = parseFloat(values[0]);
-      values[0].slice(-1) === "%" && (red *= 2.55);
-      green = parseFloat(values[1]);
-      values[1].slice(-1) === "%" && (green *= 2.55);
-      blue = parseFloat(values[2]);
-      values[2].slice(-1) === "%" && (blue *= 2.55);
-      if (rgb[1].toLowerCase().slice(0, 4) === "rgba") {
-        opacity = parseFloat(values[3]);
-      }
-      if (values[3] && values[3].slice(-1) === "%") {
-        opacity /= 100;
-      }
-    }
-    if (rgb[5]) {
-      values = rgb[5].split(commaSpaces);
-      red = parseFloat(values[0]);
-      values[0].slice(-1) === "%" && (red /= 100);
-      green = parseFloat(values[1]);
-      values[1].slice(-1) === "%" && (green /= 100);
-      blue = parseFloat(values[2]);
-      values[2].slice(-1) === "%" && (blue /= 100);
-      (values[0].slice(-3) === "deg" || values[0].slice(-1) === "\xb0") && (red /= 360);
-      if (rgb[1].toLowerCase().slice(0, 4) === "hsba") {
-        opacity = parseFloat(values[3]);
-      }
-      if (values[3] && values[3].slice(-1) === "%") {
-        opacity /= 100;
-      }
-      return hsb2rgb(red, green, blue, opacity);
-    }
-    if (rgb[6]) {
-      values = rgb[6].split(commaSpaces);
-      red = parseFloat(values[0]);
-      values[0].slice(-1) === "%" && (red /= 100);
-      green = parseFloat(values[1]);
-      values[1].slice(-1) === "%" && (green /= 100);
-      blue = parseFloat(values[2]);
-      values[2].slice(-1) === "%" && (blue /= 100);
-      (values[0].slice(-3) === "deg" || values[0].slice(-1) === "\xb0") && (red /= 360);
-      if (rgb[1].toLowerCase().slice(0, 4) === "hsla") {
-        opacity = parseFloat(values[3]);
-      }
-      if (values[3] && values[3].slice(-1) === "%") {
-        opacity /= 100;
-      }
-      return hsl2rgb(red, green, blue, opacity);
-    }
-    
-    red = Math.min(Math.round(red), 255);
-    green = Math.min(Math.round(green), 255);
-    blue = Math.min(Math.round(blue), 255);
-    opacity = Math.min(Math.max(opacity, 0), 1);
-    
-    const result: RGBColorWithError = {r: red, g: green, b: blue, opacity: isFinite(opacity) ? opacity : 1};
-    return result;
-  }
-  return {r: -1, g: -1, b: -1, opacity: -1, error: 1};
+  const c = new Color(colour).to('srgb');
+  return {
+    r: Math.round(c.r * 255),
+    g: Math.round(c.g * 255),
+    b: Math.round(c.b * 255),
+    opacity: c.alpha,
+  };
 };
 
 /**
