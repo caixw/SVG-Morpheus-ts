@@ -1,3 +1,5 @@
+import Color from 'colorjs.io';
+
 // Animation easing functions | 动画缓动函数类型
 export type EasingFunction = (t: number) => number;
 
@@ -41,31 +43,19 @@ export interface SVGMorpheusOptions {
 // Style attributes for SVG elements | SVG 元素样式属性
 export interface StyleAttributes {
   fill?: string;
-  'fill-opacity'?: string;
-  opacity?: string;
   stroke?: string;
+  opacity?: string;
+  'fill-opacity'?: string;
   'stroke-opacity'?: string;
   'stroke-width'?: string;
-}
-
-// Normalized color object | 标准化颜色对象
-export interface RGBColor {
-  /** Red channel (0-255) | 红色通道 (0-255) */
-  r: number;
-  /** Green channel (0-255) | 绿色通道 (0-255) */
-  g: number;
-  /** Blue channel (0-255) | 蓝色通道 (0-255) */
-  b: number;
-  /** Opacity (0-1) | 透明度 (0-1) */
-  opacity: number;
 }
 
 // Normalized style values | 标准化样式值
 export interface NormalizedStyle {
   /** Fill color or gradient reference | 填充颜色或渐变引用 */
-  fill?: RGBColor | string;
+  fill?: Color | string;
   /** Stroke color or gradient reference | 描边颜色或渐变引用 */
-  stroke?: RGBColor | string;
+  stroke?: Color | string;
   /** Overall opacity | 整体透明度 */
   opacity?: number;
   /** Fill opacity | 填充透明度 */

@@ -24,7 +24,7 @@ export const cancelAnimFrame = extendedWindow.cancelAnimationFrame ||
   extendedWindow.webkitCancelAnimationFrame || 
   extendedWindow.oCancelAnimationFrame;
 
-import { NormalizedStyle, RGBColor, StyleAttributes, Transform, CurveData } from './types';
+import { NormalizedStyle, StyleAttributes, Transform, CurveData } from './types';
 
 // Calculate style
 export function styleNormCalc(styleNormFrom: NormalizedStyle, styleNormTo: NormalizedStyle, progress: number): NormalizedStyle {
@@ -43,16 +43,14 @@ export function styleNormCalc(styleNormFrom: NormalizedStyle, styleNormTo: Norma
           if (typeof fromValue === 'string' || typeof toValue === 'string') {
             // 对于渐变引用，根据进度选择源值或目标值
             // 在动画中期（progress < 0.5）使用源值，后期使用目标值
-            (styleNorm[i] as any) = progress < 0.5 ? fromValue : toValue;
+            styleNorm[i] = progress < .5 ? fromValue : toValue;
           } else {
             // 对于RGB颜色值，进行正常插值
-            const fromColor = fromValue as RGBColor;
-            const toColor = toValue as RGBColor;
-            styleNorm[i] = clone(fromColor);
-            (styleNorm[i] as RGBColor).r = fromColor.r + (toColor.r - fromColor.r) * progress;
-            (styleNorm[i] as RGBColor).g = fromColor.g + (toColor.g - fromColor.g) * progress;
-            (styleNorm[i] as RGBColor).b = fromColor.b + (toColor.b - fromColor.b) * progress;
-            (styleNorm[i] as RGBColor).opacity = fromColor.opacity + (toColor.opacity - fromColor.opacity) * progress;
+            styleNorm[i] = fromValue.clone();
+            styleNorm[i].r = fromValue.r + (toValue.r - fromValue.r) * progress;
+            styleNorm[i].g = fromValue.g + (toValue.g - fromValue.g) * progress;
+            styleNorm[i].b = fromValue.b + (toValue.b - fromValue.b) * progress;
+            styleNorm[i].alpha = fromValue.alpha + (toValue.alpha - fromValue.alpha) * progress;
           }
         }
         break;
@@ -61,7 +59,7 @@ export function styleNormCalc(styleNormFrom: NormalizedStyle, styleNormTo: Norma
       case 'stroke-opacity':
       case 'stroke-width':
         if (typeof styleNormFrom[i] === 'number' && typeof styleNormTo[i] === 'number') {
-          (styleNorm[i] as number) = styleNormFrom[i] as number + ((styleNormTo[i] as number) - (styleNormFrom[i] as number)) * progress;
+          styleNorm[i] = styleNormFrom[i] + (styleNormTo[i] - styleNormFrom[i]) * progress;
         }
         break;
     }
@@ -84,7 +82,7 @@ export function styleNormToString(styleNorm: NormalizedStyle): StyleAttributes {
             style[i] = value;
           } else {
             // 对于RGB对象，转换为颜色字符串
-            style[i] = rgbToString(value as RGBColor);
+            style[i] = value.toString();
           }
         }
         break;
@@ -93,7 +91,7 @@ export function styleNormToString(styleNorm: NormalizedStyle): StyleAttributes {
       case 'stroke-opacity':
       case 'stroke-width':
         if (typeof styleNorm[i] === 'number') {
-          (style[i] as any) = styleNorm[i];
+          style[i] = styleNorm[i].toFixed();
         }
         break;
     }
@@ -117,16 +115,16 @@ export function styleToNorm(styleFrom: StyleAttributes, styleTo: StyleAttributes
         if (styleFrom[i]) {
           if (isGradientReference(styleFrom[i]!)) {
             // 对于渐变引用，保持原始值，不进行RGB转换
-            (styleNorm[0][i] as any) = styleFrom[i];
+            styleNorm[0][i] = styleFrom[i];
             if (styleTo[i] === undefined) {
-              (styleNorm[1][i] as any) = styleFrom[i];
+              styleNorm[1][i] = styleFrom[i];
             }
           } else {
             // 对于普通颜色值，进行RGB转换
             styleNorm[0][i] = getRGB(doc, styleFrom[i]!);
             if (styleTo[i] === undefined) {
               styleNorm[1][i] = getRGB(doc, styleFrom[i]!);
-              (styleNorm[1][i] as RGBColor).opacity = 0;
+              styleNorm[1][i].alpha = 0;
             }
           }
         }
@@ -138,7 +136,7 @@ export function styleToNorm(styleFrom: StyleAttributes, styleTo: StyleAttributes
         if (styleFrom[i]) {
           (styleNorm[0][i] as any) = styleFrom[i];
           if (styleTo[i] === undefined) {
-            (styleNorm[1][i] as any) = 1;
+            styleNorm[1][i] = 1;
           }
         }
         break;
@@ -153,16 +151,16 @@ export function styleToNorm(styleFrom: StyleAttributes, styleTo: StyleAttributes
         if (styleTo[i]) {
           if (isGradientReference(styleTo[i]!)) {
             // 对于渐变引用，保持原始值，不进行RGB转换
-            (styleNorm[1][i] as any) = styleTo[i];
+            styleNorm[1][i] = styleTo[i];
             if (styleFrom[i] === undefined) {
-              (styleNorm[0][i] as any) = styleTo[i];
+              styleNorm[0][i] = styleTo[i];
             }
           } else {
             // 对于普通颜色值，进行RGB转换
             styleNorm[1][i] = getRGB(doc, styleTo[i]!);
             if (styleFrom[i] === undefined) {
               styleNorm[0][i] = getRGB(doc, styleTo[i]!);
-              (styleNorm[0][i] as RGBColor).opacity = 0;
+              styleNorm[0][i].alpha = 0;
             }
           }
         }
@@ -174,7 +172,7 @@ export function styleToNorm(styleFrom: StyleAttributes, styleTo: StyleAttributes
         if (styleTo[i]) {
           (styleNorm[1][i] as any) = styleTo[i];
           if (styleFrom[i] === undefined) {
-            (styleNorm[0][i] as any) = 1;
+            styleNorm[0][i] = 1;
           }
         }
         break;
@@ -254,28 +252,28 @@ export function curveCalc(curveFrom: CurveData, curveTo: CurveData, progress: nu
 }
 
 export function clone<T>(obj: T): T {
-  // TODO: 用 structuredClone 替换？需要调整浏览器支持情况！
-
-  let copy: any;
-
   // Handle Array
   if (obj instanceof Array) {
-    copy = [];
+    const copy = [];
     for (let i = 0, len = obj.length; i < len; i++) {
       copy[i] = clone(obj[i]);
     }
-    return copy;
+    return copy as T;
+  }
+
+  if (obj instanceof Color) {
+    return obj.clone();
   }
 
   // Handle Object
   if (obj instanceof Object) {
-    copy = {};
+    const copy = {};
     for (const attr in obj) {
       if (obj.hasOwnProperty(attr)) {
         (copy as any)[attr] = clone((obj as any)[attr]);
       }
     }
-    return copy;
+    return copy as T;
   }
 
   return obj;
@@ -283,18 +281,12 @@ export function clone<T>(obj: T): T {
 
 // Helper functions for color conversion - from snapsvglite.js
 
-// Converts RGB values to a hex representation of the color
-const rgbToString = function (rgb: RGBColor): string {
-  const round = Math.round;
-  return "rgba(" + [round(rgb.r), round(rgb.g), round(rgb.b), +rgb.opacity.toFixed(2)] + ")";
-};
-
 // Parses color string as RGB object
-const getRGB = function (doc: SVGSVGElement | null, colour: string): RGBColor {
-  if (colour.toUpperCase() === 'CURRENTCOLOR') {
+const getRGB = function (doc: SVGSVGElement | null, colour: string): Color {
+  if (colour.toUpperCase() === 'CURRENTCOLOR') { // 如果是 currentColor，则尝试从 SVG 对象上获取真实的颜色值
     const i = doc || window.document.getElementsByTagName('head')[0] || window.document.getElementsByTagName('svg')[0];
     if (i.style.color) {
-      if (i.style.color.toUpperCase() === 'CURRENTCOLOR') {
+      if (i.style.color.toUpperCase() === 'CURRENTCOLOR') { // SVG 上的 color 也是 currentColor
         colour = window.getComputedStyle(i).getPropertyValue('color')!;
       } else {
         colour = i.style.color;
@@ -305,13 +297,7 @@ const getRGB = function (doc: SVGSVGElement | null, colour: string): RGBColor {
     }
   }
 
-  const c = new Color(colour).to('srgb');
-  return {
-    r: Math.round(c.r * 255),
-    g: Math.round(c.g * 255),
-    b: Math.round(c.b * 255),
-    opacity: c.alpha,
-  };
+  return new Color(colour).to('srgb');
 };
 
 /**

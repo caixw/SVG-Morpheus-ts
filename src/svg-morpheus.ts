@@ -300,13 +300,13 @@ export class SVGMorpheus {
                       case 'stroke':
                       case 'stroke-opacity':
                       case 'stroke-width':
-                        (item.attrs as any)[name] = attrib.value;
+                        item.attrs[name] = attrib.value;
                     }
                   }
                 }
 
                 // Traverse all inline styles and get supported values
-                const elementStyle = (nodeItem as any).style;
+                const elementStyle = nodeItem.style;
                 for (let l = 0, len4 = elementStyle.length; l < len4; l++) {
                   const styleName = elementStyle[l];
                   switch (styleName) {
@@ -316,7 +316,7 @@ export class SVGMorpheus {
                     case 'stroke':
                     case 'stroke-opacity':
                     case 'stroke-width':
-                      (item.style as any)[styleName] = elementStyle[styleName];
+                      item.style[styleName] = elementStyle[l];
                   }
                 }
 
@@ -636,11 +636,11 @@ export class SVGMorpheus {
     for (i = 0, len = this._morphNodes.length; i < len; i++) {
       const morphNode = this._morphNodes[i];
       morphNode.node.setAttribute("d", this._curIconItems[i].path);
-      const attrs = this._curIconItems[i].attrs as StyleAttributes;
+      const attrs = this._curIconItems[i].attrs;
       for (j in attrs) {
         morphNode.node.setAttribute(j, (attrs as any)[j]);
       }
-      const style = this._curIconItems[i].style as StyleAttributes;
+      const style = this._curIconItems[i].style;
       for (k in style) {
         (morphNode.node.style as any)[k] = (style as any)[k];
       }
@@ -656,7 +656,7 @@ export class SVGMorpheus {
         morphNode.node.setAttribute("d", this._toIconItems[i].path);
         
         // 设置最终的attributes（包含更新后的defs引用）
-        const attrs = this._toIconItems[i].attrs as StyleAttributes;
+        const attrs = this._toIconItems[i].attrs;
         for (const attrName in attrs) {
           morphNode.node.setAttribute(attrName, (attrs as any)[attrName]);
         }
