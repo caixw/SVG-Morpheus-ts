@@ -254,6 +254,8 @@ export function curveCalc(curveFrom: CurveData, curveTo: CurveData, progress: nu
 }
 
 export function clone<T>(obj: T): T {
+  // TODO: 用 structuredClone 替换？需要调整浏览器支持情况！
+
   let copy: any;
 
   // Handle Array
@@ -287,16 +289,16 @@ const rgbToString = function (rgb: RGBColor): string {
   return "rgba(" + [round(rgb.r), round(rgb.g), round(rgb.b), +rgb.opacity.toFixed(2)] + ")";
 };
 
-interface RGBColorWithError extends RGBColor {
-  error?: number;
-}
-
 // Parses color string as RGB object
-const getRGB = function (doc: SVGSVGElement | null, colour: string): RGBColorWithError {
+const getRGB = function (doc: SVGSVGElement | null, colour: string): RGBColor {
   if (colour.toUpperCase() === 'CURRENTCOLOR') {
     const i = doc || window.document.getElementsByTagName('head')[0] || window.document.getElementsByTagName('svg')[0];
     if (i.style.color) {
-      colour = i.style.color;
+      if (i.style.color.toUpperCase() === 'CURRENTCOLOR') {
+        colour = window.getComputedStyle(i).getPropertyValue('color')!;
+      } else {
+        colour = i.style.color;
+      }
     } else {
       i.style.color = colour;
       colour = window.getComputedStyle(i).getPropertyValue('color')!;
