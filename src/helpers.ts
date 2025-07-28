@@ -1,29 +1,5 @@
 import Color from 'colorjs.io';
 
-// 定义包含浏览器前缀方法的接口
-interface ExtendedWindow extends Window {
-  mozRequestAnimationFrame?: typeof requestAnimationFrame;
-  webkitRequestAnimationFrame?: typeof requestAnimationFrame;
-  oRequestAnimationFrame?: typeof requestAnimationFrame;
-  mozCancelAnimationFrame?: typeof cancelAnimationFrame;
-  webkitCancelAnimationFrame?: typeof cancelAnimationFrame;
-  oCancelAnimationFrame?: typeof cancelAnimationFrame;
-}
-
-// 类型安全的 window 引用
-const extendedWindow = window as ExtendedWindow;
-
-// Request animation frame polyfills
-export const reqAnimFrame = extendedWindow.requestAnimationFrame || 
-  extendedWindow.mozRequestAnimationFrame || 
-  extendedWindow.webkitRequestAnimationFrame || 
-  extendedWindow.oRequestAnimationFrame;
-
-export const cancelAnimFrame = extendedWindow.cancelAnimationFrame || 
-  extendedWindow.mozCancelAnimationFrame || 
-  extendedWindow.webkitCancelAnimationFrame || 
-  extendedWindow.oCancelAnimationFrame;
-
 import { NormalizedStyle, StyleAttributes, Transform, CurveData } from './types';
 
 // Calculate style

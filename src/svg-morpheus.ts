@@ -6,8 +6,6 @@ import {
   trans2string, 
   curveCalc, 
   clone,
-  reqAnimFrame,
-  cancelAnimFrame,
   extractViewBoxInfo,
   extractDefsInfo,
   extractSvgRootAttributes
@@ -133,7 +131,7 @@ export class SVGMorpheus {
       const progress = Math.min((timePassed - that._startTime) / that._duration, 1);
       that._updateAnimationProgress(progress);
       if (progress < 1) {
-        that._rafid = reqAnimFrame(that._fnTick);
+        that._rafid = window.requestAnimationFrame(that._fnTick);
       } else {
         if (that._toIconId !== '') {
           that._animationEnd();
@@ -715,7 +713,7 @@ export class SVGMorpheus {
       }
 
       if (this._rafid) {
-        cancelAnimFrame(this._rafid);
+        window.cancelAnimationFrame(this._rafid);
       }
 
       this._duration = options.duration || this._defDuration;
@@ -724,7 +722,7 @@ export class SVGMorpheus {
       this._callback = callback || this._defCallback;
 
       this._setupAnimation(iconId);
-      this._rafid = reqAnimFrame(this._fnTick);
+      this._rafid = window.requestAnimationFrame(this._fnTick);
     }
   }
 

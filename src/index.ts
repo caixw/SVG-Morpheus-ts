@@ -9,7 +9,6 @@ export type {
   EasingFunction,
   SVGMorpheusOptions,
   StyleAttributes,
-  RGBColor,
   NormalizedStyle,
   Transform,
   IconItem,
