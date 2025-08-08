@@ -1,42 +1,21 @@
 import {
-    clone,
-    curveCalc,
-    extractDefsInfo,
-    extractSvgRootAttributes,
-    extractViewBoxInfo,
-    styleNormCalc,
-    styleNormToString,
-    styleToNorm,
-    trans2string,
-    transCalc
-} from './helpers';
-
-import {
-    calculateTransformMatrix,
-    transformGradientDefs,
-    transformPath,
-    updateDefsReferences
+    calculateTransformMatrix, transformGradientDefs, transformPath, updateDefsReferences
 } from './coordinate-transform';
 import { easings } from './easings';
+import {
+    clone, curveCalc, extractDefsInfo, extractSvgRootAttributes, extractViewBoxInfo,
+    styleNormCalc, styleNormToString, styleToNorm, trans2string, transCalc
+} from './helpers';
 import { curvePathBBox, path2curve, path2string } from './svg-path';
 import {
-    AnimationFrameId,
-    BoundingBox,
-    CallbackFunction,
-    DefsInfo,
-    Icon,
-    IconItem,
-    MorphNode,
-    StyleAttributes,
-    SVGMorpheusOptions,
-    ToMethodOptions,
-    ViewBoxInfo
+    AnimationFrameId, BoundingBox, CallbackFunction, DefsInfo, EasingFunction, Icon,
+    IconItem, MorphNode, StyleAttributes, SVGMorpheusOptions, ToMethodOptions, ViewBoxInfo
 } from './types';
 
 export class SVGMorpheus {
     private _icons: Record<string, Icon> = {};
     private _curIconId: string = '';
-    private _toIconId: string = '';
+    private _toIconId: string = ''; // 当前正在跳转的图标 ID，执行完成之后会清空。
     private _curIconItems: IconItem[] = [];
     private _fromIconItems: IconItem[] = [];
     private _toIconItems: IconItem[] = [];
@@ -160,7 +139,7 @@ export class SVGMorpheus {
         if (!!this._svgDoc) {
             let lastIconId = '';
 
-            // 提取SVG文档级别的ViewBox和defs信息
+            // 提取 SVG 文档级别的 ViewBox 和 defs 信息
             const svgOuterHTML = this._svgDoc.outerHTML;
             const documentViewBox = extractViewBoxInfo(svgOuterHTML);
             const documentDefs = extractDefsInfo(svgOuterHTML);
@@ -360,10 +339,10 @@ export class SVGMorpheus {
             const fromIcon = this._icons[this._curIconId];
             const toIcon = this._icons[toIconId];
 
-            // 使用目标图标的ViewBox作为最终坐标系统
+            // 使用目标图标的 ViewBox 作为最终坐标系统
             const targetViewBox = toIcon.viewBox || fromIcon?.viewBox || { values: [0, 0, 24, 24], original: '0 0 24 24' };
 
-            // 立即更新SVG根元素的ViewBox为目标ViewBox
+            // 立即更新 SVG 根元素的 ViewBox 为目标 ViewBox
             if (this._svgDoc) {
                 this._svgDoc.setAttribute('viewBox', targetViewBox.original);
             }
@@ -429,7 +408,7 @@ export class SVGMorpheus {
                     };
                 });
 
-                // 动态插入转换后的defs到SVG文档中
+                // 动态插入转换后的 defs 到 SVG 文档中
                 this._injectTransformedDefs(fromIcon, toIcon);
             }
 
@@ -682,7 +661,7 @@ export class SVGMorpheus {
      * Triggers morphing animation from current icon to specified target icon | 触发从当前图标到指定目标图标的变形动画
      *
      * @param iconId Target icon ID to morph to | 要变形到的目标图标ID
-     *     Must match an ID of a <g> element in the SVG | 必须匹配 SVG 中某个 <g> 元素的ID
+     *     Must match an ID of a <g> element in the SVG | 必须匹配 SVG 中某个 <g> 元素的 ID
      *
      * @param options Animation options for this specific morph | 此次特定变形的动画选项
      *    Overrides constructor defaults for this animation only | 仅为此次动画覆盖构造器默认值
@@ -705,9 +684,7 @@ export class SVGMorpheus {
                 throw new Error('SVGMorpheus.to() > "callback" parameter must be a function');
             }
 
-            if (this._rafid) {
-                window.cancelAnimationFrame(this._rafid);
-            }
+            if (this._rafid) { window.cancelAnimationFrame(this._rafid); }
 
             this._duration = options.duration || this._defDuration;
             this._easing = options.easing || this._defEasing;
@@ -718,6 +695,11 @@ export class SVGMorpheus {
             this._rafid = window.requestAnimationFrame(this._fnTick);
         }
     }
+
+    /**
+     * 当前正在展示的图标 ID
+     */
+    public currIconId(): string { return this._curIconId; }
 
     /**
      * Register custom easing function | 注册自定义缓动函数
@@ -737,7 +719,10 @@ export class SVGMorpheus {
      *   return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
      * });
      */
-    public registerEasing(name: string, fn: (progress: number) => number): void {
+    public registerEasing(name: string, fn: EasingFunction): void {
+        if (name in easings) {
+            throw new Error(`Easing function with name '${name}' already exists.`);
+        }
         (easings as any)[name] = fn;
     }
 

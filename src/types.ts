@@ -3,8 +3,15 @@ import Color from 'colorjs.io';
 // Animation easing functions | 动画缓动函数类型
 export type EasingFunction = (t: number) => number;
 
+
+/**
+ * 可用的旋转方式
+ */
 export const rotations = ['clock', 'counterclock', 'none', 'random'] as const;
 
+/**
+ * 动画图标的旋转方式
+ */
 export type Rotation = typeof rotations[number];
 
 // SVG Morpheus configuration options | SVG Morpheus 配置选项
