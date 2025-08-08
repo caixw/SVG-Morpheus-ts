@@ -1,118 +1,125 @@
 # SVG Morpheus TypeScript
 
-> **⚡ This project is a TypeScript refactoring based on [alexk111/SVG-Morpheus](https://github.com/alexk111/SVG-Morpheus)**  
-> Original project by [@alexk111](https://github.com/alexk111) - refactored with modern TypeScript + Vite + pnpm
+> **⚡ 本项目基于 [adoin/SVG-Morpheus](https://github.com/adoin/SVG-Morpheus) 再次重构**
 
-[中文](./README.zh.md) | **English**
+> **⚡ 本项目基于 [alexk111/SVG-Morpheus](https://github.com/alexk111/SVG-Morpheus) 进行 TypeScript 重构**
+> 原始项目作者：[@alexk111](https://github.com/alexk111) - 使用现代化 TypeScript + Vite + pnpm 重构
 
-JavaScript library enabling SVG icons to morph from one to the other. It implements Material Design's Delightful Details transitions.
+JavaScript 库，使 SVG 图标能够从一个变形到另一个。它实现了 Material Design 的精美细节过渡效果。
 
-## 🌐 Live Demo
+## 🌐 在线演示
 
-**[🎯 View Live Demo](https://adoin.github.io/SVG-Morpheus-ts/)**
+**[🎯 查看在线演示](https://caixw.github.io/SVG-Morpheus-ts/)**
 
-Try the interactive demo to see SVG morphing animations in action, featuring both static and dynamic examples with multilingual support.
+体验交互式演示，观看 SVG 变形动画效果，包含静态和动态示例，支持中英文界面。
 
-## 🚀 Modernization Highlights
+## 🚀 重构亮点
 
-This project has been refactored from Gulp to a modern TypeScript + Vite + pnpm build system:
+这个项目已经从 Gulp 重构为现代化的 TypeScript + Vite + pnpm 构建系统：
 
-- ✅ **TypeScript** - Complete type safety support
-- ✅ **ESM Modules** - Standard ES module system
-- ✅ **Vite Build** - Fast modern build tool
-- ✅ **Multi-format Output** - Supports ES, CJS, UMD formats
-- ✅ **Modern Toolchain** - ESLint, TypeScript type checking
-- ✅ **Development Experience** - HMR, fast reload
-- ✅ **pnpm** - Efficient package manager
-- ✅ **Dynamic SVG Bundling** - 🆕 Runtime SVG iconset generation
+- ✅ **TypeScript** - 完整的类型安全支持
+- ✅ **ESM 模块** - 使用标准的 ES 模块系统
+- ✅ **Vite 构建** - 快速的现代化构建工具
+- ✅ **多格式输出** - 支持 ES、CJS、UMD 格式
+- ✅ **现代工具链** - ESLint、TypeScript 类型检查
+- ✅ **开发体验** - HMR、快速重载
+- ✅ **pnpm** - 高效的包管理器
+- ✅ **动态SVG合并** - 🆕 运行时SVG图标集生成
 
-## 🎉 What's New in v1.2.0
+## 🎉 v1.3.0 新特性
 
-### 🐛 Critical Bug Fixes
+###  🔧 功能增强
 
-**Fixed Rotation Animation "Displacement" Effect**
-- ✅ **Unified Rotation Center**: All paths now rotate around a unified geometric center instead of individual path centers
-- ✅ **Fixed Angle Accumulation**: Resolved rotation angle accumulation bug that caused angles to grow indefinitely (5760° → 6120°)
-- ✅ **Smooth Morphing**: Eliminated "flying" or "displacement" effects during rotation animations
-- ✅ **Improved Path Balancing**: Enhanced handling when source and target icons have different numbers of paths
+ - 引入 colorjs.io，基本支持所有的 CSS 颜色类型；
+ - 采用 colorjs.io 中的 Color 对象代替了原来自定义的 RGBColor 和 RGBColorWithError；
 
-### 🔧 Enhanced Features
+## 🎉 v1.2.0 新特性
 
-**Gradient Coordinate Transformation**
-- ✅ **Synchronized Gradient Scaling**: Gradients now scale correctly with paths during coordinate system transformations
-- ✅ **Proper Gradient Center Calculation**: Fixed gradient positioning when morphing between different ViewBox sizes
-- ✅ **Enhanced Pattern Support**: Improved handling of SVG patterns during coordinate transformations
+### 🐛 关键错误修复
 
-**Code Quality Improvements**
-- ✅ **Cleaned Codebase**: Removed all experimental/debugging code for better maintainability
-- ✅ **Optimized Performance**: Streamlined rotation center calculation algorithms
-- ✅ **Updated Dependencies**: Updated highlight.js CDN to more reliable unpkg.com sources
+**修复旋转动画"位移"效果**
+- ✅ **统一旋转中心**：所有路径现在围绕统一的几何中心旋转，而不是各自的路径中心
+- ✅ **修复角度累积**：解决了旋转角度无限累积的错误（5760° → 6120°）
+- ✅ **平滑变形**：消除了旋转动画中的"飞行"或"位移"效果
+- ✅ **改进路径平衡**：增强了源图标和目标图标路径数量不同时的处理机制
 
-### 🎯 Technical Details
+### 🔧 功能增强
 
-**Before (v1.1.x)**:
+**渐变坐标转换**
+- ✅ **同步渐变缩放**：渐变现在能在坐标系统转换时与路径正确同步缩放
+- ✅ **正确的渐变中心计算**：修复了不同ViewBox尺寸之间变形时的渐变定位
+- ✅ **增强图案支持**：改进了坐标转换期间对SVG图案的处理
+
+**代码质量改进**
+- ✅ **清理代码库**：移除了所有实验性/调试代码，提高了可维护性
+- ✅ **优化性能**：简化了旋转中心计算算法
+- ✅ **更新依赖**：更新了highlight.js CDN为更可靠的unpkg.com源
+
+### 🎯 技术细节
+
+**修复前 (v1.1.x)**:
 ```javascript
-// Individual rotation centers caused "displacement"
-path1Center: (17.38, 0.006)  // vite path 1
-path2Center: (23.92, 3.54)   // vite path 2
-targetCenter: (12, 12)       // diamond center
-// Result: Paths "fly" to different centers
+// 各自的旋转中心导致"位移"效果
+path1Center: (17.38, 0.006)  // vite 路径 1
+path2Center: (23.92, 3.54)   // vite 路径 2
+targetCenter: (12, 12)       // diamond 中心
+// 结果：路径"飞向"不同的中心
 ```
 
-**After (v1.2.0)**:
+**修复后 (v1.2.0)**:
 ```javascript
-// Unified rotation center eliminates displacement
-unifiedCenter: (147.02, 107.00)  // Average of all path centers
-// Result: All paths rotate smoothly around same center
+// 统一旋转中心消除位移效果
+unifiedCenter: (147.02, 107.00)  // 所有路径中心的平均值
+// 结果：所有路径围绕同一中心平滑旋转
 ```
 
-**Gradient Transformation**:
+**渐变转换**:
 ```javascript
-// Now properly transforms gradient coordinates
+// 现在能正确转换渐变坐标
 linearGradient: x1="0%" y1="0%" x2="100%" y2="100%"
-// ↓ Scales with path coordinates
+// ↓ 与路径坐标同步缩放
 transformedGradient: x1="0.0%" y1="7.652%" x2="57.636%" y2="78.411%"
 ```
 
-### 🚀 Performance Impact
+### 🚀 性能影响
 
-- **50% smoother** rotation animations
-- **Eliminated visual artifacts** during complex shape transitions
-- **Better memory management** with cleaned codebase
-- **Faster loading** with updated CDN sources
+- **50%更平滑**的旋转动画
+- **消除视觉瑕疵**在复杂形状过渡中
+- **更好的内存管理**通过清理代码库
+- **更快的加载速度**通过更新CDN源
 
-## 🏗️ Installation
+## 🏗️ 安装
 
 ```bash
 npm install svg-morpheus
 ```
 
-## 📖 Usage
+## 📖 使用方法
 
-### Import Core Class
+### 导入核心类
 
 ```typescript
-// Default import
+// 默认导入
 import SVGMorpheus from 'svg-morpheus-ts';
 
-// Or named import
+// 或者命名导入
 import { SVGMorpheus } from 'svg-morpheus-ts';
 
-// Create instance
+// 创建实例
 const myMorpheus = new SVGMorpheus('#my-svg');
 ```
 
-### Import Type Definitions
+### 导入类型定义
 
 ```typescript
-import type { 
-  SVGMorpheusOptions, 
-  IconItem, 
+import type {
+  SVGMorpheusOptions,
+  IconItem,
   EasingFunction,
-  RGBColor 
+  RGBColor
 } from 'svg-morpheus-ts';
 
-// Use types
+// 使用类型
 const options: SVGMorpheusOptions = {
   duration: 1000,
   easing: 'ease-in-out',
@@ -122,25 +129,25 @@ const options: SVGMorpheusOptions = {
 const customEasing: EasingFunction = (t: number) => t * t;
 ```
 
-### Import Utility Functions
+### 导入工具函数
 
 ```typescript
-import { 
-  easings,           // Predefined easing functions
-  pathToAbsolute,    // Path conversion utilities
-  styleNormCalc,     // Style calculation utilities
-  curveCalc,         // Curve calculation utilities
-  bundleSvgs,        // 🆕 Dynamic SVG bundling, returns Blob URL
-  bundleSvgsString   // 🆕 Dynamic SVG bundling, returns SVG string
+import {
+  easings,           // 预定义的缓动函数
+  pathToAbsolute,    // 路径转换工具
+  styleNormCalc,     // 样式计算工具
+  curveCalc,         // 曲线计算工具
+  bundleSvgs,        // 🆕 动态SVG合并，返回 Blob URL
+  bundleSvgsString   // 🆕 动态SVG合并，返回 SVG 字符串
 } from 'svg-morpheus-ts';
 
-// Use predefined easing functions
+// 使用预定义的缓动函数
 console.log(easings.easeInOut);
 
-// Use path utilities
+// 使用路径工具
 const absolutePath = pathToAbsolute('m10,10 l20,20');
 
-// 🆕 Bundle multiple SVGs dynamically
+// 🆕 动态合并多个SVG
 const svgMap = {
   'icon1': '<svg>...</svg>',
   'icon2': '/path/to/icon.svg'
@@ -149,32 +156,32 @@ const bundledSvgUrl = await bundleSvgs(svgMap);
 const bundledSvgString = await bundleSvgsString(svgMap);
 ```
 
-### Complete Example
+### 完整示例
 
 ```typescript
-import SVGMorpheus, { 
-  type SVGMorpheusOptions, 
-  easings 
+import SVGMorpheus, {
+  type SVGMorpheusOptions,
+  easings
 } from 'svg-morpheus-ts';
 
-// Configuration options
+// 配置选项
 const options: SVGMorpheusOptions = {
   duration: 800,
   easing: 'easeInOut',
   rotation: 'clock'
 };
 
-// Create morpheus instance
+// 创建morpheus实例
 const morpheus = new SVGMorpheus('#my-svg', options);
 
-// Register custom easing function
+// 注册自定义缓动函数
 morpheus.registerEasing('customEase', easings.easeInQuad);
 
-// Start animation
+// 开始动画
 morpheus.to('icon2', { duration: 1200 });
 ```
 
-### ES Modules (Recommended)
+### ES 模块 (推荐)
 
 ```typescript
 import { SVGMorpheus } from 'svg-morpheus-ts';
@@ -185,7 +192,7 @@ const morpheus = new SVGMorpheus('svg', {
   rotation: 'clock'
 });
 
-// Morph to specified icon
+// 变形到指定图标
 morpheus.to('icon-name');
 ```
 
@@ -198,7 +205,7 @@ const morpheus = new SVGMorpheus('svg');
 morpheus.to('icon-name');
 ```
 
-### UMD (Browser)
+### UMD (浏览器)
 
 ```html
 <script src="svg-morpheus.umd.js"></script>
@@ -208,9 +215,9 @@ morpheus.to('icon-name');
 </script>
 ```
 
-## 🎯 TypeScript Support
+## 🎯 TypeScript 支持
 
-The project provides complete TypeScript type definitions:
+项目提供完整的 TypeScript 类型定义：
 
 ```typescript
 import { SVGMorpheus, type SVGMorpheusOptions } from 'svg-morpheus-ts';
@@ -222,94 +229,94 @@ const options: SVGMorpheusOptions = {
 };
 
 const morpheus = new SVGMorpheus('#my-svg', options, () => {
-  console.log('Animation complete');
+  console.log('动画完成');
 });
 ```
 
-## 📦 Export List
+## 📦 导出清单
 
-### Core Classes
-- `SVGMorpheus` (default export)
-- `SVGMorpheus` (named export)
+### 核心类
+- `SVGMorpheus` (默认导出)
+- `SVGMorpheus` (命名导出)
 
-### Type Definitions
-- `EasingFunction` - Easing function type
-- `SVGMorpheusOptions` - Configuration options interface
-- `StyleAttributes` - Style attributes interface
-- `RGBColor` - RGB color interface
-- `NormalizedStyle` - Normalized style interface
-- `Transform` - Transform interface
-- `IconItem` - Icon item interface
-- `Icon` - Icon interface
-- `MorphNode` - Morph node interface
-- `BoundingBox` - Bounding box interface
-- `CallbackFunction` - Callback function type
+### 类型定义
+- `EasingFunction` - 缓动函数类型
+- `SVGMorpheusOptions` - 配置选项接口
+- `StyleAttributes` - 样式属性接口
+- `RGBColor` - RGB颜色接口
+- `NormalizedStyle` - 标准化样式接口
+- `Transform` - 变换接口
+- `IconItem` - 图标项接口
+- `Icon` - 图标接口
+- `MorphNode` - 变形节点接口
+- `BoundingBox` - 边界框接口
+- `CallbackFunction` - 回调函数类型
 
-### Utility Functions
-- `easings` - Predefined easing functions object
-- `styleNormCalc` - Style normalization calculation
-- `styleNormToString` - Style object to string conversion
-- `styleToNorm` - Style to normalized format conversion
-- `transCalc` - Transform calculation
-- `trans2string` - Transform to string conversion
-- `curveCalc` - Curve calculation
-- `clone` - Deep clone utility
-- `parsePathString` - Parse path string
-- `pathToAbsolute` - Convert to absolute path
-- `path2curve` - Path to curve conversion
-- `path2string` - Path to string conversion
-- `curvePathBBox` - Calculate curve bounding box
-- `bundleSvgs` - 🆕 Dynamic SVG bundling utility
-- `bundleSvgsString` - 🆕 Dynamic SVG bundling, returns SVG string
+### 工具函数
+- `easings` - 预定义缓动函数对象
+- `styleNormCalc` - 样式标准化计算
+- `styleNormToString` - 样式对象转字符串
+- `styleToNorm` - 样式转标准化格式
+- `transCalc` - 变换计算
+- `trans2string` - 变换转字符串
+- `curveCalc` - 曲线计算
+- `clone` - 深度克隆
+- `parsePathString` - 解析路径字符串
+- `pathToAbsolute` - 转换为绝对路径
+- `path2curve` - 路径转曲线
+- `path2string` - 路径转字符串
+- `curvePathBBox` - 计算曲线边界框
+- `bundleSvgs` - 🆕 动态SVG合并工具
+- `bundleSvgsString` - 🆕 动态SVG合并，返回 SVG 字符串
 
-## 🛠️ Development
+## 🛠️ 开发
 
-### Install Dependencies
+### 安装依赖
 
 ```bash
 pnpm install
 ```
 
-### Development Mode
+### 开发模式
 
 ```bash
 pnpm dev
 ```
 
-Open `http://localhost:9000` in your browser to view the demo.
+在浏览器中打开 `http://localhost:9000` 查看演示。
 
-### Build
+### 构建
 
 ```bash
 pnpm build
 ```
 
-Build output will be generated in the `dist/` directory:
-- `index.js` - ES module
-- `index.cjs` - CommonJS module  
-- `index.umd.js` - UMD module
-- `index.d.ts` - TypeScript type definitions
+构建产物将输出到 `dist/` 目录：
+- `index.js` - ES 模块
+- `index.cjs` - CommonJS 模块
+- `index.umd.js` - UMD 模块
+- `index.d.ts` - TypeScript 类型定义
 
-### Code Quality
+### 代码检查
 
 ```bash
-pnpm lint          # Check code
-pnpm lint:fix      # Auto fix
-pnpm type-check    # TypeScript type checking
+pnpm lint          # 检查代码
+pnpm lint:fix      # 自动修复
+pnpm type-check    # TypeScript 类型检查
 ```
 
-## 📝 Configuration Options
+## 📝 配置选项
 
 ```typescript
 interface SVGMorpheusOptions {
-  iconId?: string;                                    // Initial icon ID
-  duration?: number;                                  // Animation duration (ms)
-  easing?: string;                                   // Easing function
-  rotation?: 'clock' | 'counterclock' | 'none' | 'random'; // Rotation direction
+  iconId?: string;                                    // 初始图标ID
+  duration?: number;                                  // 动画时长(ms)
+  easing?: string;                                   // 缓动函数
+  rotation?: 'clock' | 'counterclock' | 'none' | 'random'; // 旋转方向
 }
 ```
 
-## 🎨 Supported Easing Functions
+## 🎨 支持的缓动函数
 
 - `linear`
 - `quad-in`, `quad-out`, `quad-in-out`
@@ -321,95 +328,95 @@ interface SVGMorpheusOptions {
 - `circ-in`, `circ-out`, `circ-in-out`
 - `elastic-in`, `elastic-out`, `elastic-in-out`
 
-### Custom Easing Functions
+### 自定义缓动函数
 
 ```typescript
 morpheus.registerEasing('my-easing', (t: number) => {
-  return t * t * t; // Custom easing logic
+  return t * t * t; // 自定义缓动逻辑
 });
 ```
 
-## 📦 Project Structure
+## 📦 项目结构
 
 ```
-├── src/                  # TypeScript source code
-│   ├── index.ts         # Main entry file
-│   ├── types.ts         # Type definitions
-│   ├── helpers.ts       # Utility functions (includes bundleSvgs 🆕)
-│   ├── easings.ts       # Easing functions
-│   ├── svg-path.ts      # SVG path processing
-│   └── svg-morpheus.ts  # Main class
-├── dist/                # Build output
-├── demos/               # Demo files (includes bundleSvgs examples 🆕)
-├── vite.config.ts       # Vite configuration
-├── tsconfig.json        # TypeScript configuration
+├── src/                  # TypeScript 源码
+│   ├── index.ts         # 主入口文件
+│   ├── types.ts         # 类型定义
+│   ├── helpers.ts       # 工具函数 (包含 bundleSvgs 🆕)
+│   ├── easings.ts       # 缓动函数
+│   ├── svg-path.ts      # SVG 路径处理
+│   └── svg-morpheus.ts  # 主类
+├── dist/                # 构建产物
+├── demos/               # 演示文件 (包含 bundleSvgs 示例 🆕)
+├── vite.config.ts       # Vite 配置
+├── tsconfig.json        # TypeScript 配置
 ├── package.json
-└── pnpm-lock.yaml       # pnpm lock file
+└── pnpm-lock.yaml       # pnpm 锁文件
 ```
 
-## 🔄 Migration from Old Version
+## 🔄 从旧版本迁移
 
-### Major Changes
+### 主要变更
 
-1. **Module System**: From IIFE to ESM
-2. **TypeScript**: Complete type support
-3. **Build Tool**: From Gulp to Vite
-4. **Package Manager**: Use pnpm instead of npm
-5. **API**: Maintains backward compatibility
+1. **模块系统**: 从 IIFE 改为 ESM
+2. **TypeScript**: 提供完整类型支持
+3. **构建工具**: 从 Gulp 迁移到 Vite
+4. **包管理器**: 使用 pnpm 替代 npm
+5. **API**: 保持向后兼容
 
-### Migration Steps
+### 迁移步骤
 
 ```javascript
-// Old version (UMD)
+// 旧版本 (UMD)
 const morpheus = new SVGMorpheus('svg');
 
-// New version (ESM)
+// 新版本 (ESM)
 import { SVGMorpheus } from 'svg-morpheus-ts';
 const morpheus = new SVGMorpheus('svg');
 ```
 
-## ⚡ Performance Benefits
+## ⚡ 性能优势
 
-Advantages of using pnpm:
+使用 pnpm 的优势：
 
-- 🚀 **Faster installation** - Hard links and symlinks reduce disk usage
-- 📦 **Save disk space** - Global storage, avoid duplicate downloads
-- 🔒 **Strict dependency management** - Prevent phantom dependency issues
-- 🛡️ **Better security** - Stricter package resolution mechanism
+- 🚀 **更快的安装速度** - 硬链接和符号链接减少磁盘使用
+- 📦 **节省磁盘空间** - 全局存储，避免重复下载
+- 🔒 **严格的依赖管理** - 防止幽灵依赖问题
+- 🛡️ **更好的安全性** - 更严格的包解析机制
 
-## 📄 License
+## 📄 许可证
 
 MIT License
 
-## 🙏 Acknowledgments
+## 🙏 致谢
 
-Based on the original [SVG Morpheus](https://github.com/alexk111/SVG-Morpheus) project, refactored with modern technology stack.
+基于原始的 [SVG Morpheus](https://github.com/alexk111/SVG-Morpheus) 项目，使用现代化技术栈重构。
 
-## 🆕 Dynamic SVG Bundling
+## 🆕 动态SVG合并
 
-The new `bundleSvgs` functionality allows you to dynamically create iconset-style SVG files at runtime, perfect for modern applications that need flexible icon management.
+新的 `bundleSvgs` 功能允许你在运行时动态创建iconset风格的SVG文件，非常适合需要灵活图标管理的现代应用程序。
 
-### Basic Usage
+### 基础用法
 
 ```typescript
 import { bundleSvgs } from 'svg-morpheus-ts';
 
 const svgMap = {
   'home': '<svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>',
-  'user': '/icons/user.svg',  // Can also load from file
+  'user': '/icons/user.svg',      // 也可以从文件加载
   'settings': '/icons/settings.svg'
 };
 
-// Generate bundled SVG Blob URL
+// 生成合并的SVG Blob URL
 const bundledSvgUrl = await bundleSvgs(svgMap);
 console.log(bundledSvgUrl);
-// Output: blob:null/12345678-1234-1234-1234-123456789abc
+// 输出: blob:null/12345678-1234-1234-1234-123456789abc
 ```
 
-### Custom SVG Attributes
+### 自定义SVG属性
 
 ```typescript
-// Customize the root SVG element attributes
+// 自定义根SVG元素的属性
 const customAttributes = {
   viewBox: '0 0 24 24',
   width: '100%',
@@ -419,56 +426,56 @@ const customAttributes = {
 };
 
 const bundledSvgUrl = await bundleSvgs(svgMap, customAttributes);
-// The generated SVG will have custom attributes applied
+// 生成的SVG将应用自定义属性
 ```
 
-### Use with Object Element
+### 与Object元素配合使用
 
 ```typescript
-// Use bundleSvgs directly with object element
+// 直接使用bundleSvgs与object元素
 const bundledSvgUrl = await bundleSvgs(svgMap, { viewBox: '0 0 24 24' });
 
-// Use with object element
+// 用于object元素
 const objectElement = document.getElementById('my-svg-object');
 objectElement.data = bundledSvgUrl;
 
-// Initialize SVGMorpheus
+// 初始化SVGMorpheus
 const morpheus = new SVGMorpheus('#my-svg-object');
 morpheus.to('home');
 ```
 
-### Get SVG String (for fallback scenarios)
+### 获取SVG字符串（用于备用方案）
 
 ```typescript
 import { bundleSvgsString } from 'svg-morpheus-ts';
 
-// Get SVG string instead of Blob URL
+// 获取SVG字符串而不是Blob URL
 const bundledSvgString = await bundleSvgsString(svgMap, customAttributes);
 
-// Use for inline SVG
+// 用于内联SVG
 document.getElementById('svg-container').innerHTML = bundledSvgString;
 ```
 
-### Advanced Features
+### 高级特性
 
-**Smart Content Detection**: Automatically detects whether input is SVG code or file path
+**智能内容检测**: 自动检测输入是SVG代码还是文件路径
 ```typescript
 const mixedSources = {
-  'inline': '<svg>...</svg>',      // Direct SVG code
-  'external': '/icons/icon.svg',   // File path
-  'with-xml': '<?xml version="1.0"?><svg>...</svg>' // XML declaration
+  'inline': '<svg>...</svg>',      // 直接的SVG代码
+  'external': '/icons/icon.svg',   // 文件路径
+  'with-xml': '<?xml version="1.0"?><svg>...</svg>' // XML声明
 };
 ```
 
-**Error Handling**: Gracefully handles loading failures
+**错误处理**: 优雅地处理加载失败
 ```typescript
 const bundledSvg = await bundleSvgs({
   'valid': '<svg>...</svg>',
-  'invalid': '/non-existent.svg'  // Will be skipped with warning
+  'invalid': '/non-existent.svg'  // 将被跳过并显示警告
 });
 ```
 
-**TypeScript Support**: Full type definitions included
+**TypeScript支持**: 包含完整的类型定义
 ```typescript
 import type { bundleSvgs } from 'svg-morpheus-ts';
 
@@ -478,39 +485,39 @@ const svgAttributes: Record<string, string | number> = {
 };
 ```
 
-### API Reference
+### API参考
 
 #### bundleSvgs(svgMap, svgAttributes?)
 
-- **svgMap**: `Record<string, string>` - Object mapping icon IDs to SVG sources
-- **svgAttributes**: `Record<string, string | number>` (optional) - Custom attributes for root SVG element
-- **Returns**: `Promise<string>` - Generated Blob URL
+- **svgMap**: `Record<string, string>` - 将图标ID映射到SVG源的对象
+- **svgAttributes**: `Record<string, string | number>` (可选) - 根SVG元素的自定义属性
+- **返回值**: `Promise<string>` - 生成的 Blob URL
 
 #### bundleSvgsString(svgMap, svgAttributes?)
 
-- **svgMap**: `Record<string, string>` - Object mapping icon IDs to SVG sources
-- **svgAttributes**: `Record<string, string | number>` (optional) - Custom attributes for root SVG element
-- **Returns**: `Promise<string>` - Combined SVG string
+- **svgMap**: `Record<string, string>` - 将图标ID映射到SVG源的对象
+- **svgAttributes**: `Record<string, string | number>` (可选) - 根SVG元素的自定义属性
+- **返回值**: `Promise<string>` - 合并的SVG字符串
 
-## Browser Compatibility
+## 浏览器兼容性
 
-This library uses modern Web APIs. Here are the minimum browser versions required for full functionality:
+此库使用现代 Web API。以下是实现完整功能所需的最低浏览器版本：
 
-### Core Features Compatibility
+### 核心功能兼容性
 
-| Browser | Minimum Version | Notes |
-|---------|----------------|-------|
-| **Chrome** | 42+ | Full support for all features |
-| **Firefox** | 39+ | Full support for all features |
-| **Safari** | 10.1+ | Full support for all features |
-| **Edge** | 14+ | Full support for all features |
-| **Internet Explorer** | ❌ Not Supported | Missing fetch API and other modern features |
+| 浏览器 | 最低版本 | 说明 |
+|--------|---------|------|
+| **Chrome** | 42+ | 完全支持所有功能 |
+| **Firefox** | 39+ | 完全支持所有功能 |
+| **Safari** | 10.1+ | 完全支持所有功能 |
+| **Edge** | 14+ | 完全支持所有功能 |
+| **Internet Explorer** | ❌ 不支持 | 缺少 fetch API 和其他现代功能 |
 
-### Feature-specific Compatibility
+### 功能特定兼容性
 
-| API/Feature | Chrome | Firefox | Safari | Edge | IE |
-|------------|--------|---------|--------|------|-----|
-| **SVG Morphing (Core)** | 22+ | 11+ | 6+ | 12+ | 10+ |
+| API/功能 | Chrome | Firefox | Safari | Edge | IE |
+|----------|--------|---------|--------|------|-----|
+| **SVG 变形 (核心)** | 22+ | 11+ | 6+ | 12+ | 10+ |
 | **bundleSvgs (fetch API)** | 42+ | 39+ | 10.1+ | 14+ | ❌ |
 | **Blob/URL.createObjectURL** | 8+ | 4+ | 6+ | 12+ | 10+ |
 | **querySelector/querySelectorAll** | 4+ | 3.5+ | 3.1+ | 12+ | 9+ |
@@ -519,20 +526,20 @@ This library uses modern Web APIs. Here are the minimum browser versions require
 | **createElementNS** | 1+ | 1+ | 1+ | 12+ | 9+ |
 | **getComputedStyle** | 1+ | 1+ | 1+ | 12+ | 9+ |
 
-### Recommendations
+### 建议
 
-- **Modern Development**: Use Chrome 42+, Firefox 39+, Safari 10.1+, or Edge 14+
-- **Legacy Support**: For IE support, consider using polyfills for fetch API or use XMLHttpRequest
-- **Mobile Browsers**: All modern mobile browsers are supported
-- **bundleSvgs Feature**: Requires modern browsers with fetch API support
+- **现代开发**: 使用 Chrome 42+、Firefox 39+、Safari 10.1+ 或 Edge 14+
+- **旧版支持**: 对于 IE 支持，考虑使用 fetch API 的 polyfill 或使用 XMLHttpRequest
+- **移动浏览器**: 支持所有现代移动浏览器
+- **bundleSvgs 功能**: 需要支持 fetch API 的现代浏览器
 
-### Polyfills for Legacy Support
+### 旧版浏览器的 Polyfill
 
-If you need to support older browsers, consider these polyfills:
+如果需要支持旧版浏览器，请考虑这些 polyfill：
 
 ```html
-<!-- For IE 11 and older browsers -->
+<!-- 适用于 IE 11 和更旧的浏览器 -->
 <script src="https://polyfill.io/v3/polyfill.min.js?features=fetch,Promise"></script>
 ```
 
-**Note**: The core SVG morphing functionality works in older browsers (IE 10+), but the new `bundleSvgs` feature requires modern browsers with fetch API support.
+**注意**：核心 SVG 变形功能在较旧的浏览器中有效（IE 10+），但新的 `bundleSvgs` 功能需要支持 fetch API 的现代浏览器。

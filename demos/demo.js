@@ -47,12 +47,12 @@ function getSvgPath(filename) {
     console.log('使用构建时路径:', __SVG_BASE_PATH__ + filename);
     return __SVG_BASE_PATH__ + filename;
   }
-  
+
   // Fallback: 运行时检测环境
   const isGitHubPages = window.location.hostname.includes('github.io');
   const basePath = isGitHubPages ? '/SVG-Morpheus-ts/' : '/';
   console.log('使用运行时检测路径:', basePath + filename);
-  
+
   return basePath + filename;
 }
 
@@ -97,8 +97,8 @@ const i18nData = {
 // iconset.svg contains all icon <g> elements
 
 // 2. HTML structure
-<object data="/iconset.svg" 
-        type="image/svg+xml" 
+<object data="/iconset.svg"
+        type="image/svg+xml"
         id="icon"></object>
 
 // 3. JavaScript initialization
@@ -120,9 +120,9 @@ morpheus.to('another-icon', {
   console.log('Animation complete!');
 });`,
     'code.example2': `// 1. Import required functions
-import { 
-  SVGMorpheus, 
-  bundleSvgs 
+import {
+  SVGMorpheus,
+  bundleSvgs
 } from 'svg-morpheus-ts';
 
 // 2. Define SVG icon mapping (including new icons!)
@@ -191,8 +191,8 @@ morpheus.to('diving'); // Try the new diving icon!`
 // iconset.svg 包含所有图标的 <g> 元素
 
 // 2. HTML 结构
-<object data="/iconset.svg" 
-        type="image/svg+xml" 
+<object data="/iconset.svg"
+        type="image/svg+xml"
         id="icon"></object>
 
 // 3. JavaScript 初始化
@@ -214,9 +214,9 @@ morpheus.to('another-icon', {
   console.log('动画完成!');
 });`,
     'code.example2': `// 1. 导入所需函数
-import { 
-  SVGMorpheus, 
-  bundleSvgs 
+import {
+  SVGMorpheus,
+  bundleSvgs
 } from 'svg-morpheus-ts';
 
 // 2. 定义 SVG 图标映射（包含新图标！）
@@ -253,16 +253,16 @@ let currentLanguage = 'en'; // 默认英文
 // 语言切换函数
 function switchLanguage(lang) {
   currentLanguage = lang;
-  
+
   // 更新按钮状态
   document.querySelectorAll('.lang-btn').forEach(btn => {
     btn.classList.remove('active');
   });
   event.target.classList.add('active');
-  
+
   // 更新所有文本
   updateTexts();
-  
+
   // 保存语言选择
   localStorage.setItem('svgMorpheusLang', lang);
 }
@@ -270,7 +270,7 @@ function switchLanguage(lang) {
 // 更新页面文本
 function updateTexts() {
   const texts = i18nData[currentLanguage];
-  
+
   // 更新所有带有 data-i18n 属性的元素
   document.querySelectorAll('[data-i18n]').forEach(element => {
     const key = element.getAttribute('data-i18n');
@@ -278,7 +278,7 @@ function updateTexts() {
       element.innerHTML = texts[key];
     }
   });
-  
+
   // 更新代码块
   document.querySelectorAll('[data-i18n-code]').forEach(element => {
     const key = element.getAttribute('data-i18n-code');
@@ -286,7 +286,7 @@ function updateTexts() {
       element.textContent = texts[key];
     }
   });
-  
+
   // 更新代码块 - 使用特殊处理避免highlight.js清理HTML标签
   document.querySelectorAll('[data-i18n-code]').forEach(element => {
     const key = element.getAttribute('data-i18n-code');
@@ -298,7 +298,7 @@ function updateTexts() {
       element.className = element.className.replace(/hljs[^\s]*/g, '').trim();
     }
   });
-  
+
   // 延迟执行highlight.js，确保DOM更新完成
   if (typeof hljs !== 'undefined') {
     setTimeout(() => {
@@ -307,7 +307,7 @@ function updateTexts() {
       });
     }, 0);
   }
-  
+
   // 更新动态示例的下拉框选项
   updateDynamicOptions();
 }
@@ -317,10 +317,10 @@ function updateDynamicOptions() {
   const selIconDynamic = document.getElementById('selIconDynamic');
   if (selIconDynamic && selIconDynamic.options.length > 0) {
     const currentValue = selIconDynamic.value;
-    
+
     // 清空现有选项
     selIconDynamic.innerHTML = '';
-    
+
     // 重新填充选项
     const dynamicIcons = {
       'circle': t('icons.circle'),
@@ -335,11 +335,11 @@ function updateDynamicOptions() {
       'diving': t('icons.diving'),
       'bag': t('icons.bag')
     };
-    
+
     for (const [key, value] of Object.entries(dynamicIcons)) {
       selIconDynamic.options[selIconDynamic.options.length] = new Option(value, key);
     }
-    
+
     // 恢复之前选中的值
     if (currentValue) {
       selIconDynamic.value = currentValue;
@@ -369,7 +369,7 @@ function initLanguage() {
     });
   }
   updateTexts();
-  
+
   // 初始化 highlight.js
   if (typeof hljs !== 'undefined') {
     hljs.highlightAll();
@@ -393,13 +393,13 @@ async function init() {
 
   // 初始化语言设置
   initLanguage();
-  
+
   // 动态设置静态示例的 SVG 路径
   const staticIconObject = document.getElementById('icon');
   if (staticIconObject) {
     staticIconObject.data = getSvgPath('iconset.svg');
   }
-  
+
   // 共享配置
   const icons = {
     '3d_rotation':'3D Rotation',
@@ -478,7 +478,7 @@ async function init() {
 
   async function initDynamicExample() {
     console.log('开始初始化动态示例...');
-    
+
     // 动态 SVG 图标数据（使用简单的几何图形作为示例）
     const dynamicSvgMap = {
       'circle': `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -514,7 +514,7 @@ async function init() {
       console.log('准备调用 bundleSvgs...');
       console.log('bundleSvgs 函数类型:', typeof bundleSvgs);
       console.log('dynamicSvgMap 内容:', dynamicSvgMap);
-      
+
       // 自定义 SVG 属性
       const customSvgAttributes = {
         width: '100%',
@@ -522,14 +522,14 @@ async function init() {
         class: 'dynamic-iconset',
         'data-source': 'bundleSvgs-dynamic'
       };
-      
+
       console.log('customSvgAttributes:', customSvgAttributes);
       console.log('开始调用 bundleSvgs...');
-      
+
       // 使用 bundleSvgs 生成合并的 SVG Blob URL，并传入自定义属性
       const bundledSvgUrl = await bundleSvgs(dynamicSvgMap, customSvgAttributes);
       console.log('bundleSvgs 调用成功，生成的 Blob URL:', bundledSvgUrl);
-      
+
       // 设置 object 元素的 data 属性
       const iconObject = document.getElementById('iconDynamic');
       const loadingIndicator = document.getElementById('loadingIndicator');
@@ -568,13 +568,13 @@ async function init() {
         if (loadingIndicator) {
           loadingIndicator.style.display = 'none';
         }
-        
+
         // 显示SVG和选项
         iconObject.style.display = 'block';
         if (dynamicOptionsContainer) {
           dynamicOptionsContainer.style.display = 'block';
         }
-        
+
         try {
           const svgMorpheusDynamic = new SVGMorpheus('#iconDynamic');
           const selIconDynamic = document.getElementById('selIconDynamic');
@@ -672,10 +672,10 @@ async function init() {
       const valEasing = getSelValue(selEasing);
       const valDuration = getSelValue(selDuration);
       const valRotation = getSelValue(selRotation);
-      
+
       svgMorpheus.to(valIcon, {
-        duration: valDuration, 
-        easing: valEasing, 
+        duration: valDuration,
+        easing: valEasing,
         rotation: valRotation
       }, !manualChange ? launchTimer : null);
     }
@@ -708,13 +708,13 @@ async function init() {
 function copyCode(button) {
   const codeSection = button.closest('.code-section');
   const codeElement = codeSection.querySelector('pre code');
-  
+
   // 获取纯文本内容，去掉HTML标签
   let codeText = codeElement.textContent || codeElement.innerText;
-  
+
   // 清理多余的空白
   codeText = codeText.replace(/\n\s*\n/g, '\n').trim();
-  
+
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(codeText).then(() => {
       showCopySuccess(button);
@@ -734,7 +734,7 @@ function fallbackCopyTextToClipboard(text, button) {
   document.body.appendChild(textArea);
   textArea.focus();
   textArea.select();
-  
+
   try {
     document.execCommand('copy');
     showCopySuccess(button);
@@ -742,7 +742,7 @@ function fallbackCopyTextToClipboard(text, button) {
     console.error('复制失败:', err);
     showCopyError(button);
   }
-  
+
   document.body.removeChild(textArea);
 }
 
@@ -768,4 +768,4 @@ function showCopyError(button) {
 window.copyCode = copyCode;
 
 // 页面加载时初始化
-window.addEventListener('load', init); 
+window.addEventListener('load', init);
