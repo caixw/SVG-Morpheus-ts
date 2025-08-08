@@ -1,8 +1,8 @@
 // Path parsing and conversion utilities from snapsvglite.js
 
-const spaces = "\x09\x0a\x0b\x0c\x0d\x20\xa0\u1680\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u202f\u205f\u3000\u2028\u2029";
-const pathCommand = new RegExp("([a-z])[" + spaces + ",]*((-?\\d*\\.?\\d*(?:e[\\-+]?\\d+)?[" + spaces + "]*,?[" + spaces + "]*)+)", "ig");
-const pathValues = new RegExp("(-?\\d*\\.?\\d*(?:e[\\-+]?\\d+)?)[" + spaces + "]*,?[" + spaces + "]*", "ig");
+const spaces = '\x09\x0a\x0b\x0c\x0d\x20\xa0\u1680\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u202f\u205f\u3000\u2028\u2029';
+const pathCommand = new RegExp('([a-z])[' + spaces + ',]*((-?\\d*\\.?\\d*(?:e[\\-+]?\\d+)?[' + spaces + ']*,?[' + spaces + ']*)+)', 'ig');
+const pathValues = new RegExp('(-?\\d*\\.?\\d*(?:e[\\-+]?\\d+)?)[' + spaces + ']*,?[' + spaces + ']*', 'ig');
 
 // Parses given path string into an array of arrays of path segments
 export function parsePathString(pathString: any): any {
@@ -21,15 +21,15 @@ export function parsePathString(pathString: any): any {
                 if (b) params.push(+b);
                 return '';
             });
-            if (name === "m" && params.length > 2) {
+            if (name === 'm' && params.length > 2) {
                 data.push([b.charCodeAt(0)].concat(params.splice(0, 2)));
-                name = "l";
-                b = b === "m" ? "l" : "L";
+                name = 'l';
+                b = b === 'm' ? 'l' : 'L';
             }
-            if (name === "o" && params.length === 1) {
+            if (name === 'o' && params.length === 1) {
                 data.push([b.charCodeAt(0), params[0]]);
             }
-            if (name === "r") {
+            if (name === 'r') {
                 data.push([b.charCodeAt(0)].concat(params));
             } else {
                 while (params.length >= paramCounts[name]) {
@@ -50,19 +50,19 @@ export function parsePathString(pathString: any): any {
 export function pathToAbsolute(pathArray: any): any {
     const parsed = parsePathString(pathArray);
 
-    if (!parsed || !parsed.length) { return [["M", 0, 0]]; } // "M", 0, 0
+    if (!parsed || !parsed.length) { return [['M', 0, 0]]; } // "M", 0, 0
 
     const res: any = [];
     let x = 0, y = 0, mx = 0, my = 0;
     let start = 0;
 
-    if (parsed[0][0] === "M".charCodeAt(0)) { // "M"
+    if (parsed[0][0] === 'M'.charCodeAt(0)) { // "M"
         x = +parsed[0][1];
         y = +parsed[0][2];
         mx = x;
         my = y;
         start++;
-        res[0] = ["M", x, y]; // "M"
+        res[0] = ['M', x, y]; // "M"
     }
 
     for (let i = start, ii = parsed.length; i < ii; i++) {
@@ -74,31 +74,31 @@ export function pathToAbsolute(pathArray: any): any {
         if (cmd !== cmd.toUpperCase()) { // relative command (lowercase)
             r[0] = cmd.toUpperCase(); // convert to uppercase
             switch (r[0]) {
-                case "A":
-                    r[1] = pa[1];
-                    r[2] = pa[2];
-                    r[3] = pa[3];
-                    r[4] = pa[4];
-                    r[5] = pa[5];
-                    r[6] = +pa[6] + x;
-                    r[7] = +pa[7] + y;
-                    break;
-                case "V":
-                    r[1] = +pa[1] + y;
-                    break;
-                case "H":
-                    r[1] = +pa[1] + x;
-                    break;
-                case "M":
-                    mx = +pa[1] + x;
-                    my = +pa[2] + y;
+            case 'A':
+                r[1] = pa[1];
+                r[2] = pa[2];
+                r[3] = pa[3];
+                r[4] = pa[4];
+                r[5] = pa[5];
+                r[6] = +pa[6] + x;
+                r[7] = +pa[7] + y;
+                break;
+            case 'V':
+                r[1] = +pa[1] + y;
+                break;
+            case 'H':
+                r[1] = +pa[1] + x;
+                break;
+            case 'M':
+                mx = +pa[1] + x;
+                my = +pa[2] + y;
                 // Intentional fallthrough to default case
-                // eslint-disable-next-line no-fallthrough
-                default:
-                    for (let j = 1, jj = pa.length; j < jj; j++) {
-                        r[j] = +pa[j] + ((j % 2) ? x : y);
-                    }
-                    break;
+                 
+            default:
+                for (let j = 1, jj = pa.length; j < jj; j++) {
+                    r[j] = +pa[j] + ((j % 2) ? x : y);
+                }
+                break;
             }
         } else {
             r[0] = cmd;
@@ -108,25 +108,25 @@ export function pathToAbsolute(pathArray: any): any {
         }
 
         switch (r[0]) {
-            case "Z":
-                x = mx;
-                y = my;
-                break;
-            case "H":
-                x = r[1];
-                break;
-            case "V":
-                y = r[1];
-                break;
-            case "M":
-                mx = r[1];
-                my = r[2];
-                x = r[1];
-                y = r[2];
-                break;
-            default:
-                x = r[r.length - 2];
-                y = r[r.length - 1];
+        case 'Z':
+            x = mx;
+            y = my;
+            break;
+        case 'H':
+            x = r[1];
+            break;
+        case 'V':
+            y = r[1];
+            break;
+        case 'M':
+            mx = r[1];
+            my = r[2];
+            x = r[1];
+            y = r[2];
+            break;
+        default:
+            x = r[r.length - 2];
+            y = r[r.length - 1];
         }
         res.push(r);
     }
@@ -143,56 +143,56 @@ export function path2curve(path: any, path2?: any): any {
     const processPath = function (path: any, d: any, pcom: any) {
         let nx: any, ny: any;
         if (!path) {
-            return ["C", d.x, d.y, d.x, d.y, d.x, d.y];
+            return ['C', d.x, d.y, d.x, d.y, d.x, d.y];
         }
         !(path[0] in { T: 1, Q: 1 }) && (d.qx = d.qy = null);
         switch (path[0]) {
-            case "M":
-                d.X = path[1];
-                d.Y = path[2];
-                break;
-            case "A":
-                path = ["C"].concat((a2c as any).apply(0, [d.x, d.y].concat(path.slice(1))));
-                break;
-            case "S":
-                if (pcom == "C" || pcom == "S") { // In "S" case we have to take into account, if the previous command is C/S.
-                    nx = d.x * 2 - d.bx;          // And reflect the previous
-                    ny = d.y * 2 - d.by;          // command's control point relative to the current point.
-                }
-                else {                            // or some else or nothing
-                    nx = d.x;
-                    ny = d.y;
-                }
-                path = ["C", nx, ny].concat(path.slice(1));
-                break;
-            case "T":
-                if (pcom == "Q" || pcom == "T") { // In "T" case we have to take into account, if the previous command is Q/T.
-                    d.qx = d.x * 2 - d.qx;        // And make a reflection similar
-                    d.qy = d.y * 2 - d.qy;        // to case "S".
-                }
-                else {                            // or something else or nothing
-                    d.qx = d.x;
-                    d.qy = d.y;
-                }
-                path = ["C"].concat(q2c(d.x, d.y, d.qx, d.qy, path[1], path[2]));
-                break;
-            case "Q":
-                d.qx = path[1];
-                d.qy = path[2];
-                path = ["C"].concat(q2c(d.x, d.y, path[1], path[2], path[3], path[4]));
-                break;
-            case "L":
-                path = ["C"].concat(l2c(d.x, d.y, path[1], path[2]));
-                break;
-            case "H":
-                path = ["C"].concat(l2c(d.x, d.y, path[1], d.y));
-                break;
-            case "V":
-                path = ["C"].concat(l2c(d.x, d.y, d.x, path[1]));
-                break;
-            case "Z":
-                path = ["C"].concat(l2c(d.x, d.y, d.X, d.Y));
-                break;
+        case 'M':
+            d.X = path[1];
+            d.Y = path[2];
+            break;
+        case 'A':
+            path = ['C'].concat((a2c as any).apply(0, [d.x, d.y].concat(path.slice(1))));
+            break;
+        case 'S':
+            if (pcom == 'C' || pcom == 'S') { // In "S" case we have to take into account, if the previous command is C/S.
+                nx = d.x * 2 - d.bx;          // And reflect the previous
+                ny = d.y * 2 - d.by;          // command's control point relative to the current point.
+            }
+            else {                            // or some else or nothing
+                nx = d.x;
+                ny = d.y;
+            }
+            path = ['C', nx, ny].concat(path.slice(1));
+            break;
+        case 'T':
+            if (pcom == 'Q' || pcom == 'T') { // In "T" case we have to take into account, if the previous command is Q/T.
+                d.qx = d.x * 2 - d.qx;        // And make a reflection similar
+                d.qy = d.y * 2 - d.qy;        // to case "S".
+            }
+            else {                            // or something else or nothing
+                d.qx = d.x;
+                d.qy = d.y;
+            }
+            path = ['C'].concat(q2c(d.x, d.y, d.qx, d.qy, path[1], path[2]));
+            break;
+        case 'Q':
+            d.qx = path[1];
+            d.qy = path[2];
+            path = ['C'].concat(q2c(d.x, d.y, path[1], path[2], path[3], path[4]));
+            break;
+        case 'L':
+            path = ['C'].concat(l2c(d.x, d.y, path[1], path[2]));
+            break;
+        case 'H':
+            path = ['C'].concat(l2c(d.x, d.y, path[1], d.y));
+            break;
+        case 'V':
+            path = ['C'].concat(l2c(d.x, d.y, d.x, path[1]));
+            break;
+        case 'Z':
+            path = ['C'].concat(l2c(d.x, d.y, d.X, d.Y));
+            break;
         }
         return path;
     };
@@ -201,16 +201,16 @@ export function path2curve(path: any, path2?: any): any {
             pp[i].shift();
             const pi = pp[i];
             while (pi.length) {
-                pcoms1[i] = "A"; // if created multiple C:s, their original seg is saved
-                p2 && (pcoms2[i] = "A"); // the same as above
-                pp.splice(i++, 0, ["C"].concat(pi.splice(0, 6)));
+                pcoms1[i] = 'A'; // if created multiple C:s, their original seg is saved
+                p2 && (pcoms2[i] = 'A'); // the same as above
+                pp.splice(i++, 0, ['C'].concat(pi.splice(0, 6)));
             }
             pp.splice(i, 1);
         }
     };
     const fixM = function (path1: any, path2: any, a1: any, a2: any, i: any) {
-        if (path1 && path2 && path1[i][0] == "M" && path2[i][0] != "M") {
-            path2.splice(i, 0, ["M", a2.x, a2.y]);
+        if (path1 && path2 && path1[i][0] == 'M' && path2[i][0] != 'M') {
+            path2.splice(i, 0, ['M', a2.x, a2.y]);
             a1.bx = 0;
             a1.by = 0;
             a1.x = path1[i][1];
@@ -219,18 +219,18 @@ export function path2curve(path: any, path2?: any): any {
     };
     const pcoms1: any = []; // path commands of original path p
     const pcoms2: any = []; // path commands of original path p2
-    let pfirst = ""; // temporary holder for original path command
-    let pcom = ""; // holder for previous path command of original path
+    let pfirst = ''; // temporary holder for original path command
+    let pcom = ''; // holder for previous path command of original path
     for (let i = 0, ii = Math.max(p.length, p2 && p2.length || 0); i < ii; i++) {
         p[i] && (pfirst = p[i][0]); // save current path command
 
-        if (pfirst != "C") { // C is not saved yet, because it may be result of conversion
+        if (pfirst != 'C') { // C is not saved yet, because it may be result of conversion
             pcoms1[i] = pfirst; // Save current path command
             i && (pcom = pcoms1[i - 1]); // Get previous path command pcom
         }
         p[i] = processPath(p[i], attrs, pcom); // Previous path command is inputted to processPath
 
-        if (pcoms1[i] != "A" && pfirst == "C") pcoms1[i] = "C"; // A is the only command
+        if (pcoms1[i] != 'A' && pfirst == 'C') pcoms1[i] = 'C'; // A is the only command
         // which may produce multiple C:s
         // so we have to make sure that C is also C in original path
 
@@ -238,13 +238,13 @@ export function path2curve(path: any, path2?: any): any {
 
         if (p2) { // the same procedures is done to p2
             p2[i] && (pfirst = p2[i][0]);
-            if (pfirst != "C") {
+            if (pfirst != 'C') {
                 pcoms2[i] = pfirst;
                 i && (pcom = pcoms2[i - 1]);
             }
             p2[i] = processPath(p2[i], attrs2, pcom);
 
-            if (pcoms2[i] != "A" && pfirst == "C") { pcoms2[i] = "C"; }
+            if (pcoms2[i] != 'A' && pfirst == 'C') { pcoms2[i] = 'C'; }
 
             fixArc(p2, i);
         }
@@ -272,7 +272,7 @@ function l2c(x1: any, y1: any, x2: any, y2: any) {
     return [x1, y1, x2, y2, x2, y2];
 }
 
- function q2c(x1: any, y1: any, ax: any, ay: any, x2: any, y2: any) {
+function q2c(x1: any, y1: any, ax: any, ay: any, x2: any, y2: any) {
     var _13 = 1 / 3,
         _23 = 2 / 3;
     return [
@@ -285,7 +285,7 @@ function l2c(x1: any, y1: any, x2: any, y2: any) {
     ];
 }
 
- function a2c(x1: any, y1: any, rx: any, ry: any, angle: any, large_arc_flag: any, sweep_flag: any, x2: any, y2: any, recursive?: any) {
+function a2c(x1: any, y1: any, rx: any, ry: any, angle: any, large_arc_flag: any, sweep_flag: any, x2: any, y2: any, recursive?: any) {
     // for more information of where this math came from visit:
     // http://www.w3.org/TR/SVG11/implnote.html#ArcImplementationNotes
     var _120 = Math.PI * 120 / 180,
@@ -358,7 +358,7 @@ function l2c(x1: any, y1: any, x2: any, y2: any) {
     if (recursive) {
         return [m2, m3, m4].concat(res);
     } else {
-        res = [m2, m3, m4].concat(res).join().split(",");
+        res = [m2, m3, m4].concat(res).join().split(',');
         var newres = [];
         for (var i = 0, ii = res.length; i < ii; i++) {
             newres[i] = i % 2 ? rotate(res[i - 1], res[i], rad).y : rotate(res[i], res[i + 1], rad).x;
@@ -370,7 +370,7 @@ function l2c(x1: any, y1: any, x2: any, y2: any) {
 // Convert curve back to path string
 const p2s = /,?([a-z]),?/gi;
 export function path2string(path: any): any {
-    return path.join(',').replace(p2s, "$1");
+    return path.join(',').replace(p2s, '$1');
 }
 
 // Calculate bounding box of a curve path
@@ -386,7 +386,7 @@ export function curvePathBBox(path: any): any {
 
     for (let i = 0, ii = path.length; i < ii; i++) {
         p = path[i];
-        if (p[0] == "M") {
+        if (p[0] == 'M') {
             x = isFinite(p[1]) ? p[1] : 0;
             y = isFinite(p[2]) ? p[2] : 0;
             X.push(x);

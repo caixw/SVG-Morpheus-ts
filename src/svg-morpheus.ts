@@ -119,7 +119,7 @@ export class SVGMorpheus {
             this._svgDoc = (targetElement as any).getSVGDocument();
         }
         if (!this._svgDoc) {
-            targetElement.addEventListener("load", function () {
+            targetElement.addEventListener('load', function () {
                 that._svgDoc = (targetElement as any).getSVGDocument();
                 that._init();
             }, false);
@@ -198,36 +198,36 @@ export class SVGMorpheus {
 
                             // Get Item Path (Convert all shapes into Path Data)
                             switch (nodeItem.nodeName.toUpperCase()) {
-                                case 'PATH':
-                                    item.path = (nodeItem as SVGPathElement).getAttribute('d') || '';
-                                    break;
-                                case 'CIRCLE':
-                                    const circleElement = nodeItem as SVGCircleElement;
-                                    const cx = parseFloat(circleElement.getAttribute('cx') || '0');
-                                    const cy = parseFloat(circleElement.getAttribute('cy') || '0');
-                                    const r = parseFloat(circleElement.getAttribute('r') || '0');
-                                    item.path = `M${cx - r},${cy}a${r},${r} 0 1,0 ${r * 2},0a${r},${r} 0 1,0 -${r * 2},0z`;
-                                    break;
-                                case 'ELLIPSE':
-                                    const ellipseElement = nodeItem as SVGEllipseElement;
-                                    const ecx = parseFloat(ellipseElement.getAttribute('cx') || '0');
-                                    const ecy = parseFloat(ellipseElement.getAttribute('cy') || '0');
-                                    const rx = parseFloat(ellipseElement.getAttribute('rx') || '0');
-                                    const ry = parseFloat(ellipseElement.getAttribute('ry') || '0');
-                                    item.path = `M${ecx - rx},${ecy}a${rx},${ry} 0 1,0 ${rx * 2},0a${rx},${ry} 0 1,0 -${rx * 2},0z`;
-                                    break;
-                                case 'RECT':
-                                    const rectElement = nodeItem as SVGRectElement;
-                                    const x = parseFloat(rectElement.getAttribute('x') || '0');
-                                    const y = parseFloat(rectElement.getAttribute('y') || '0');
-                                    const w = parseFloat(rectElement.getAttribute('width') || '0');
-                                    const h = parseFloat(rectElement.getAttribute('height') || '0');
-                                    const rectRx = parseFloat(rectElement.getAttribute('rx') || '0');
-                                    const rectRy = parseFloat(rectElement.getAttribute('ry') || '0');
-                                    if (!rectRx && !rectRy) {
-                                        item.path = `M${x},${y}l${w},0l0,${h}l-${w},0z`;
-                                    } else {
-                                        item.path = `M${x + rectRx},${y}` +
+                            case 'PATH':
+                                item.path = (nodeItem as SVGPathElement).getAttribute('d') || '';
+                                break;
+                            case 'CIRCLE':
+                                const circleElement = nodeItem as SVGCircleElement;
+                                const cx = parseFloat(circleElement.getAttribute('cx') || '0');
+                                const cy = parseFloat(circleElement.getAttribute('cy') || '0');
+                                const r = parseFloat(circleElement.getAttribute('r') || '0');
+                                item.path = `M${cx - r},${cy}a${r},${r} 0 1,0 ${r * 2},0a${r},${r} 0 1,0 -${r * 2},0z`;
+                                break;
+                            case 'ELLIPSE':
+                                const ellipseElement = nodeItem as SVGEllipseElement;
+                                const ecx = parseFloat(ellipseElement.getAttribute('cx') || '0');
+                                const ecy = parseFloat(ellipseElement.getAttribute('cy') || '0');
+                                const rx = parseFloat(ellipseElement.getAttribute('rx') || '0');
+                                const ry = parseFloat(ellipseElement.getAttribute('ry') || '0');
+                                item.path = `M${ecx - rx},${ecy}a${rx},${ry} 0 1,0 ${rx * 2},0a${rx},${ry} 0 1,0 -${rx * 2},0z`;
+                                break;
+                            case 'RECT':
+                                const rectElement = nodeItem as SVGRectElement;
+                                const x = parseFloat(rectElement.getAttribute('x') || '0');
+                                const y = parseFloat(rectElement.getAttribute('y') || '0');
+                                const w = parseFloat(rectElement.getAttribute('width') || '0');
+                                const h = parseFloat(rectElement.getAttribute('height') || '0');
+                                const rectRx = parseFloat(rectElement.getAttribute('rx') || '0');
+                                const rectRy = parseFloat(rectElement.getAttribute('ry') || '0');
+                                if (!rectRx && !rectRy) {
+                                    item.path = `M${x},${y}l${w},0l0,${h}l-${w},0z`;
+                                } else {
+                                    item.path = `M${x + rectRx},${y}` +
                                             `l${w - rectRx * 2},0` +
                                             `a${rectRx},${rectRy} 0 0,1 ${rectRx},${rectRy}` +
                                             `l0,${h - rectRy * 2}` +
@@ -237,26 +237,26 @@ export class SVGMorpheus {
                                             `l0,${rectRy * 2 - h}` +
                                             `a${rectRx},${rectRy} 0 0,1 ${rectRx},-${rectRy}` +
                                             'z';
-                                    }
-                                    break;
-                                case 'POLYGON':
-                                    const polygonElement = nodeItem as SVGPolygonElement;
-                                    const points = polygonElement.getAttribute('points') || '';
-                                    const p = points.split(/\s+/);
-                                    let path = "";
-                                    for (let k = 0, len = p.length; k < len; k++) {
-                                        path += (k && "L" || "M") + p[k];
-                                    }
-                                    item.path = path + 'z';
-                                    break;
-                                case 'LINE':
-                                    const lineElement = nodeItem as SVGLineElement;
-                                    const x1 = parseFloat(lineElement.getAttribute('x1') || '0');
-                                    const y1 = parseFloat(lineElement.getAttribute('y1') || '0');
-                                    const x2 = parseFloat(lineElement.getAttribute('x2') || '0');
-                                    const y2 = parseFloat(lineElement.getAttribute('y2') || '0');
-                                    item.path = `M${x1},${y1}L${x2},${y2}z`;
-                                    break;
+                                }
+                                break;
+                            case 'POLYGON':
+                                const polygonElement = nodeItem as SVGPolygonElement;
+                                const points = polygonElement.getAttribute('points') || '';
+                                const p = points.split(/\s+/);
+                                let path = '';
+                                for (let k = 0, len = p.length; k < len; k++) {
+                                    path += (k && 'L' || 'M') + p[k];
+                                }
+                                item.path = path + 'z';
+                                break;
+                            case 'LINE':
+                                const lineElement = nodeItem as SVGLineElement;
+                                const x1 = parseFloat(lineElement.getAttribute('x1') || '0');
+                                const y1 = parseFloat(lineElement.getAttribute('y1') || '0');
+                                const x2 = parseFloat(lineElement.getAttribute('x2') || '0');
+                                const y2 = parseFloat(lineElement.getAttribute('y2') || '0');
+                                item.path = `M${x1},${y1}L${x2},${y2}z`;
+                                break;
                             }
 
                             if (item.path !== '') {
@@ -265,13 +265,13 @@ export class SVGMorpheus {
                                     const attrib = nodeItem.attributes[k];
                                     const name = attrib.name.toLowerCase();
                                     switch (name) {
-                                        case 'fill':
-                                        case 'fill-opacity':
-                                        case 'opacity':
-                                        case 'stroke':
-                                        case 'stroke-opacity':
-                                        case 'stroke-width':
-                                            item.attrs[name] = attrib.value;
+                                    case 'fill':
+                                    case 'fill-opacity':
+                                    case 'opacity':
+                                    case 'stroke':
+                                    case 'stroke-opacity':
+                                    case 'stroke-width':
+                                        item.attrs[name] = attrib.value;
                                     }
                                 }
 
@@ -280,13 +280,13 @@ export class SVGMorpheus {
                                 for (let l = 0, len4 = elementStyle.length; l < len4; l++) {
                                     const styleName = elementStyle[l];
                                     switch (styleName) {
-                                        case 'fill':
-                                        case 'fill-opacity':
-                                        case 'opacity':
-                                        case 'stroke':
-                                        case 'stroke-opacity':
-                                        case 'stroke-width':
-                                            item.style[styleName] = elementStyle[l];
+                                    case 'fill':
+                                    case 'fill-opacity':
+                                    case 'opacity':
+                                    case 'stroke':
+                                    case 'stroke-opacity':
+                                    case 'stroke-width':
+                                        item.style[styleName] = elementStyle[l];
                                     }
                                 }
 
@@ -545,29 +545,29 @@ export class SVGMorpheus {
                 }
 
                 switch (rotation) {
-                    case 'none':
-                        if (fromIconItem.trans?.rotate && toIconItem.trans?.rotate) {
-                            toIconItem.trans.rotate[0] = fromIconItem.trans.rotate[0];
-                        }
-                        break;
-                    case 'counterclock':
-                        if (fromIconItem.trans?.rotate && toIconItem.trans?.rotate) {
-                            toIconItem.trans.rotate[0] = fromIconItem.trans.rotate[0] - 360;
-                            degAdd = -fromIconItem.trans.rotate[0] % 360;
-                            toIconItem.trans.rotate[0] += (degAdd < 180 ? degAdd : degAdd - 360);
-                        } else if (toIconItem.trans?.rotate) {
-                            toIconItem.trans.rotate[0] = -360;
-                        }
-                        break;
-                    default: // Clockwise
-                        if (fromIconItem.trans?.rotate && toIconItem.trans?.rotate) {
-                            toIconItem.trans.rotate[0] = fromIconItem.trans.rotate[0] + 360;
-                            degAdd = fromIconItem.trans.rotate[0] % 360;
-                            toIconItem.trans.rotate[0] += (degAdd < 180 ? -degAdd : 360 - degAdd);
-                        } else if (toIconItem.trans?.rotate) {
-                            toIconItem.trans.rotate[0] = 360;
-                        }
-                        break;
+                case 'none':
+                    if (fromIconItem.trans?.rotate && toIconItem.trans?.rotate) {
+                        toIconItem.trans.rotate[0] = fromIconItem.trans.rotate[0];
+                    }
+                    break;
+                case 'counterclock':
+                    if (fromIconItem.trans?.rotate && toIconItem.trans?.rotate) {
+                        toIconItem.trans.rotate[0] = fromIconItem.trans.rotate[0] - 360;
+                        degAdd = -fromIconItem.trans.rotate[0] % 360;
+                        toIconItem.trans.rotate[0] += (degAdd < 180 ? degAdd : degAdd - 360);
+                    } else if (toIconItem.trans?.rotate) {
+                        toIconItem.trans.rotate[0] = -360;
+                    }
+                    break;
+                default: // Clockwise
+                    if (fromIconItem.trans?.rotate && toIconItem.trans?.rotate) {
+                        toIconItem.trans.rotate[0] = fromIconItem.trans.rotate[0] + 360;
+                        degAdd = fromIconItem.trans.rotate[0] % 360;
+                        toIconItem.trans.rotate[0] += (degAdd < 180 ? -degAdd : 360 - degAdd);
+                    } else if (toIconItem.trans?.rotate) {
+                        toIconItem.trans.rotate[0] = 360;
+                    }
+                    break;
                 }
             }
 
@@ -605,7 +605,7 @@ export class SVGMorpheus {
         // Update DOM
         for (i = 0, len = this._morphNodes.length; i < len; i++) {
             const morphNode = this._morphNodes[i];
-            morphNode.node.setAttribute("d", this._curIconItems[i].path);
+            morphNode.node.setAttribute('d', this._curIconItems[i].path);
             const attrs = this._curIconItems[i].attrs;
             for (j in attrs) {
                 morphNode.node.setAttribute(j, (attrs as any)[j]);
@@ -614,7 +614,7 @@ export class SVGMorpheus {
             for (k in style) {
                 (morphNode.node.style as any)[k] = (style as any)[k];
             }
-            morphNode.node.setAttribute("transform", this._curIconItems[i].transStr || '');
+            morphNode.node.setAttribute('transform', this._curIconItems[i].transStr || '');
         }
     }
 
@@ -623,7 +623,7 @@ export class SVGMorpheus {
             const morphNode = this._morphNodes[i];
             if (!!this._toIconItems[i]) {
                 // 使用更新后的 _toIconItems 而不是原始的 this._icons[this._toIconId].items
-                morphNode.node.setAttribute("d", this._toIconItems[i].path);
+                morphNode.node.setAttribute('d', this._toIconItems[i].path);
 
                 // 设置最终的 attributes（包含更新后的 defs 引用）
                 const attrs = this._toIconItems[i].attrs;
@@ -638,8 +638,8 @@ export class SVGMorpheus {
                 }
 
                 // 设置最终的 transform
-                const finalTransform = this._toIconItems[i].transStr || "";
-                morphNode.node.setAttribute("transform", finalTransform);
+                const finalTransform = this._toIconItems[i].transStr || '';
+                morphNode.node.setAttribute('transform', finalTransform);
             } else {
                 if (morphNode.node.parentNode) {
                     morphNode.node.parentNode.removeChild(morphNode.node);

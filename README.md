@@ -352,6 +352,7 @@ morpheus.registerEasing('my-easing', (t: number) => {
 │   └── svg-morpheus.ts  # 主类
 ├── dist/                # 构建产物
 ├── demos/               # 演示文件 (包含 bundleSvgs 示例 🆕)
+├── docs/                # 演示文件的编译产物
 ├── vite.config.ts       # Vite 配置
 ├── tsconfig.json        # TypeScript 配置
 ├── package.json

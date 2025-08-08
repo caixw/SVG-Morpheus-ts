@@ -62,11 +62,7 @@ export function calculateTransformMatrix(
 /**
  * 应用转换矩阵到点坐标
  */
-export function transformPoint(
-    x: number,
-    y: number,
-    matrix: TransformMatrix
-): [number, number] {
+export function transformPoint(x: number, y: number, matrix: TransformMatrix): [number, number] {
     return [
         x * matrix.scaleX + matrix.translateX,
         y * matrix.scaleY + matrix.translateY
@@ -95,83 +91,83 @@ export function transformPath(pathData: string, matrix: TransformMatrix): string
             const newSegment = [command];
 
             switch (command) {
-                case 'M': // MoveTo
-                case 'L': // LineTo
-                    if (coords.length >= 2) {
-                        const [newX, newY] = transformPoint(coords[0], coords[1], matrix);
-                        newSegment.push(newX, newY);
-                        // 处理额外的坐标对
-                        for (let i = 2; i < coords.length; i += 2) {
-                            if (i + 1 < coords.length) {
-                                const [x, y] = transformPoint(coords[i], coords[i + 1], matrix);
-                                newSegment.push(x, y);
-                            }
+            case 'M': // MoveTo
+            case 'L': // LineTo
+                if (coords.length >= 2) {
+                    const [newX, newY] = transformPoint(coords[0], coords[1], matrix);
+                    newSegment.push(newX, newY);
+                    // 处理额外的坐标对
+                    for (let i = 2; i < coords.length; i += 2) {
+                        if (i + 1 < coords.length) {
+                            const [x, y] = transformPoint(coords[i], coords[i + 1], matrix);
+                            newSegment.push(x, y);
                         }
                     }
-                    break;
+                }
+                break;
 
-                case 'C': // CurveTo
-                    if (coords.length >= 6) {
-                        for (let i = 0; i < coords.length; i += 2) {
-                            if (i + 1 < coords.length) {
-                                const [x, y] = transformPoint(coords[i], coords[i + 1], matrix);
-                                newSegment.push(x, y);
-                            }
-                        }
-                    }
-                    break;
-
-                case 'Q': // QuadraticCurveTo
-                    if (coords.length >= 4) {
-                        for (let i = 0; i < coords.length; i += 2) {
-                            if (i + 1 < coords.length) {
-                                const [x, y] = transformPoint(coords[i], coords[i + 1], matrix);
-                                newSegment.push(x, y);
-                            }
-                        }
-                    }
-                    break;
-
-                case 'A': // Arc
-                    if (coords.length >= 7) {
-                        // Arc: rx ry x-axis-rotation large-arc-flag sweep-flag x y
-                        // 只转换终点坐标，半径需要按比例缩放
-                        const rx = coords[0] * matrix.scaleX;
-                        const ry = coords[1] * matrix.scaleY;
-                        const [endX, endY] = transformPoint(coords[5], coords[6], matrix);
-                        newSegment.push(rx, ry, coords[2], coords[3], coords[4], endX, endY);
-                    }
-                    break;
-
-                case 'H': // Horizontal LineTo
-                    if (coords.length >= 1) {
-                        const [newX] = transformPoint(coords[0], 0, matrix);
-                        newSegment.push(newX);
-                    }
-                    break;
-
-                case 'V': // Vertical LineTo
-                    if (coords.length >= 1) {
-                        const [, newY] = transformPoint(0, coords[0], matrix);
-                        newSegment.push(newY);
-                    }
-                    break;
-
-                case 'Z': // ClosePath
-                case 'z':
-                    // 无需坐标转换
-                    break;
-
-                default:
-                    // 对于未知命令，尝试按坐标对转换
+            case 'C': // CurveTo
+                if (coords.length >= 6) {
                     for (let i = 0; i < coords.length; i += 2) {
                         if (i + 1 < coords.length) {
                             const [x, y] = transformPoint(coords[i], coords[i + 1], matrix);
                             newSegment.push(x, y);
-                        } else {
-                            newSegment.push(coords[i]);
                         }
                     }
+                }
+                break;
+
+            case 'Q': // QuadraticCurveTo
+                if (coords.length >= 4) {
+                    for (let i = 0; i < coords.length; i += 2) {
+                        if (i + 1 < coords.length) {
+                            const [x, y] = transformPoint(coords[i], coords[i + 1], matrix);
+                            newSegment.push(x, y);
+                        }
+                    }
+                }
+                break;
+
+            case 'A': // Arc
+                if (coords.length >= 7) {
+                    // Arc: rx ry x-axis-rotation large-arc-flag sweep-flag x y
+                    // 只转换终点坐标，半径需要按比例缩放
+                    const rx = coords[0] * matrix.scaleX;
+                    const ry = coords[1] * matrix.scaleY;
+                    const [endX, endY] = transformPoint(coords[5], coords[6], matrix);
+                    newSegment.push(rx, ry, coords[2], coords[3], coords[4], endX, endY);
+                }
+                break;
+
+            case 'H': // Horizontal LineTo
+                if (coords.length >= 1) {
+                    const [newX] = transformPoint(coords[0], 0, matrix);
+                    newSegment.push(newX);
+                }
+                break;
+
+            case 'V': // Vertical LineTo
+                if (coords.length >= 1) {
+                    const [, newY] = transformPoint(0, coords[0], matrix);
+                    newSegment.push(newY);
+                }
+                break;
+
+            case 'Z': // ClosePath
+            case 'z':
+                // 无需坐标转换
+                break;
+
+            default:
+                // 对于未知命令，尝试按坐标对转换
+                for (let i = 0; i < coords.length; i += 2) {
+                    if (i + 1 < coords.length) {
+                        const [x, y] = transformPoint(coords[i], coords[i + 1], matrix);
+                        newSegment.push(x, y);
+                    } else {
+                        newSegment.push(coords[i]);
+                    }
+                }
             }
 
             return newSegment;
@@ -188,7 +184,9 @@ export function transformPath(pathData: string, matrix: TransformMatrix): string
 /**
  * 根据起始和目标 ViewBox 计算最佳的过渡 ViewBox
  */
-export function calculateOptimalViewBox(fromViewBox: ViewBoxInfo | undefined, toViewBox: ViewBoxInfo | undefined): ViewBoxInfo {
+export function calculateOptimalViewBox(
+    fromViewBox: ViewBoxInfo | undefined, toViewBox: ViewBoxInfo | undefined
+): ViewBoxInfo {
     // 如果都没有 ViewBox，使用默认
     if (!fromViewBox && !toViewBox) {
         return {
@@ -222,9 +220,7 @@ export function calculateOptimalViewBox(fromViewBox: ViewBoxInfo | undefined, to
  * 转换渐变定义中的坐标
  */
 export function transformGradientDefs(
-    defs: DefsInfo,
-    idPrefix: string = '',
-    transformMatrix?: TransformMatrix
+    defs: DefsInfo, idPrefix: string = '', transformMatrix?: TransformMatrix
 ): DefsInfo {
     const transformedDefs: DefsInfo = {
         gradients: {},
@@ -351,41 +347,41 @@ function transformGradientValue(attr: string, value: string, matrix: TransformMa
     let transformedValue: number;
 
     switch (attr) {
-        case 'x1':
-        case 'x2':
-        case 'cx':
-        case 'fx':
-        case 'x':
-            // X坐标转换
-            transformedValue = numValue * matrix.scaleX + matrix.translateX;
-            break;
+    case 'x1':
+    case 'x2':
+    case 'cx':
+    case 'fx':
+    case 'x':
+        // X坐标转换
+        transformedValue = numValue * matrix.scaleX + matrix.translateX;
+        break;
 
-        case 'y1':
-        case 'y2':
-        case 'cy':
-        case 'fy':
-        case 'y':
-            // Y坐标转换
-            transformedValue = numValue * matrix.scaleY + matrix.translateY;
-            break;
+    case 'y1':
+    case 'y2':
+    case 'cy':
+    case 'fy':
+    case 'y':
+        // Y坐标转换
+        transformedValue = numValue * matrix.scaleY + matrix.translateY;
+        break;
 
-        case 'r':
-            // 半径转换（使用平均缩放比例）
-            transformedValue = numValue * Math.sqrt(matrix.scaleX * matrix.scaleY);
-            break;
+    case 'r':
+        // 半径转换（使用平均缩放比例）
+        transformedValue = numValue * Math.sqrt(matrix.scaleX * matrix.scaleY);
+        break;
 
-        case 'width':
-            // 宽度转换
-            transformedValue = numValue * matrix.scaleX;
-            break;
+    case 'width':
+        // 宽度转换
+        transformedValue = numValue * matrix.scaleX;
+        break;
 
-        case 'height':
-            // 高度转换
-            transformedValue = numValue * matrix.scaleY;
-            break;
+    case 'height':
+        // 高度转换
+        transformedValue = numValue * matrix.scaleY;
+        break;
 
-        default:
-            transformedValue = numValue;
+    default:
+        transformedValue = numValue;
     }
 
     // 保留合理的小数位数
@@ -396,9 +392,7 @@ function transformGradientValue(attr: string, value: string, matrix: TransformMa
  * 更新路径中的 defs 引用
  */
 export function updateDefsReferences(
-    pathData: string,
-    attrs: Record<string, any>,
-    oldToNewIdMap: Record<string, string>
+    pathData: string, attrs: Record<string, any>, oldToNewIdMap: Record<string, string>
 ): { pathData: string; attrs: Record<string, any>; } {
     let updatedAttrs = { ...attrs };
 

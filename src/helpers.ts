@@ -11,33 +11,33 @@ export function styleNormCalc(
     for (const key in styleNormFrom) {
         const i = key as keyof NormalizedStyle;
         switch (i) {
-            case 'fill':
-            case 'stroke':
-                if (styleNormFrom[i] && styleNormTo[i]) {
-                    const fromValue = styleNormFrom[i];
-                    const toValue = styleNormTo[i];
+        case 'fill':
+        case 'stroke':
+            if (styleNormFrom[i] && styleNormTo[i]) {
+                const fromValue = styleNormFrom[i];
+                const toValue = styleNormTo[i];
 
-                    // 检测是否为渐变引用（字符串值）
-                    if (typeof fromValue === 'string' || typeof toValue === 'string') {
-                        // 对于渐变引用，根据进度选择源值或目标值。在动画中期（progress < 0.5）使用源值，后期使用目标值
-                        styleNorm[i] = progress < .5 ? fromValue : toValue;
-                    } else { // 对于 RGB 颜色值，进行正常插值
-                        styleNorm[i] = fromValue.clone();
-                        styleNorm[i].r = fromValue.r + (toValue.r - fromValue.r) * progress;
-                        styleNorm[i].g = fromValue.g + (toValue.g - fromValue.g) * progress;
-                        styleNorm[i].b = fromValue.b + (toValue.b - fromValue.b) * progress;
-                        styleNorm[i].alpha = fromValue.alpha + (toValue.alpha - fromValue.alpha) * progress;
-                    }
+                // 检测是否为渐变引用（字符串值）
+                if (typeof fromValue === 'string' || typeof toValue === 'string') {
+                    // 对于渐变引用，根据进度选择源值或目标值。在动画中期（progress < 0.5）使用源值，后期使用目标值
+                    styleNorm[i] = progress < .5 ? fromValue : toValue;
+                } else { // 对于 RGB 颜色值，进行正常插值
+                    styleNorm[i] = fromValue.clone();
+                    styleNorm[i].r = fromValue.r + (toValue.r - fromValue.r) * progress;
+                    styleNorm[i].g = fromValue.g + (toValue.g - fromValue.g) * progress;
+                    styleNorm[i].b = fromValue.b + (toValue.b - fromValue.b) * progress;
+                    styleNorm[i].alpha = fromValue.alpha + (toValue.alpha - fromValue.alpha) * progress;
                 }
-                break;
-            case 'opacity':
-            case 'fill-opacity':
-            case 'stroke-opacity':
-            case 'stroke-width':
-                if (typeof styleNormFrom[i] === 'number' && typeof styleNormTo[i] === 'number') {
-                    styleNorm[i] = styleNormFrom[i] + (styleNormTo[i] - styleNormFrom[i]) * progress;
-                }
-                break;
+            }
+            break;
+        case 'opacity':
+        case 'fill-opacity':
+        case 'stroke-opacity':
+        case 'stroke-width':
+            if (typeof styleNormFrom[i] === 'number' && typeof styleNormTo[i] === 'number') {
+                styleNorm[i] = styleNormFrom[i] + (styleNormTo[i] - styleNormFrom[i]) * progress;
+            }
+            break;
         }
     }
     return styleNorm;
@@ -49,23 +49,23 @@ export function styleNormToString(styleNorm: NormalizedStyle): StyleAttributes {
     for (const key in styleNorm) {
         const i = key as keyof NormalizedStyle;
         switch (i) {
-            case 'fill':
-            case 'stroke':
-                if (styleNorm[i]) {
-                    const value = styleNorm[i];
-                    if (typeof value === 'string') { // 对于渐变引用，直接使用字符串值
-                        style[i] = value;
-                    } else { // 对于 RGB 对象，转换为颜色字符串
-                        style[i] = value.toString();
-                    }
+        case 'fill':
+        case 'stroke':
+            if (styleNorm[i]) {
+                const value = styleNorm[i];
+                if (typeof value === 'string') { // 对于渐变引用，直接使用字符串值
+                    style[i] = value;
+                } else { // 对于 RGB 对象，转换为颜色字符串
+                    style[i] = value.toString();
                 }
-                break;
-            case 'opacity':
-            case 'fill-opacity':
-            case 'stroke-opacity':
-            case 'stroke-width':
-                if (typeof styleNorm[i] === 'number') { style[i] = styleNorm[i].toFixed(); }
-                break;
+            }
+            break;
+        case 'opacity':
+        case 'fill-opacity':
+        case 'stroke-opacity':
+        case 'stroke-width':
+            if (typeof styleNorm[i] === 'number') { style[i] = styleNorm[i].toFixed(); }
+            break;
         }
     }
     return style;
@@ -84,60 +84,60 @@ export function styleToNorm(
     for (const key in styleFrom) {
         const i = key as keyof StyleAttributes;
         switch (i) {
-            case 'fill':
-            case 'stroke':
-                if (styleFrom[i]) {
-                    if (isGradientReference(styleFrom[i]!)) { // 对于渐变引用，保持原始值，不进行 RGB 转换
-                        styleNorm[0][i] = styleFrom[i];
-                        if (styleTo[i] === undefined) { styleNorm[1][i] = styleFrom[i]; }
-                    } else { // 对于普通颜色值，进行 RGB 转换
-                        styleNorm[0][i] = getRGB(doc, styleFrom[i]!);
-                        if (styleTo[i] === undefined) {
-                            styleNorm[1][i] = getRGB(doc, styleFrom[i]!);
-                            styleNorm[1][i].alpha = 0;
-                        }
+        case 'fill':
+        case 'stroke':
+            if (styleFrom[i]) {
+                if (isGradientReference(styleFrom[i]!)) { // 对于渐变引用，保持原始值，不进行 RGB 转换
+                    styleNorm[0][i] = styleFrom[i];
+                    if (styleTo[i] === undefined) { styleNorm[1][i] = styleFrom[i]; }
+                } else { // 对于普通颜色值，进行 RGB 转换
+                    styleNorm[0][i] = getRGB(doc, styleFrom[i]!);
+                    if (styleTo[i] === undefined) {
+                        styleNorm[1][i] = getRGB(doc, styleFrom[i]!);
+                        styleNorm[1][i].alpha = 0;
                     }
                 }
-                break;
-            case 'opacity':
-            case 'fill-opacity':
-            case 'stroke-opacity':
-            case 'stroke-width':
-                if (styleFrom[i]) {
-                    (styleNorm[0][i] as any) = styleFrom[i];
-                    if (styleTo[i] === undefined) { styleNorm[1][i] = 1; }
-                }
-                break;
+            }
+            break;
+        case 'opacity':
+        case 'fill-opacity':
+        case 'stroke-opacity':
+        case 'stroke-width':
+            if (styleFrom[i]) {
+                (styleNorm[0][i] as any) = styleFrom[i];
+                if (styleTo[i] === undefined) { styleNorm[1][i] = 1; }
+            }
+            break;
         }
     }
 
     for (const key in styleTo) {
         const i = key as keyof StyleAttributes;
         switch (i) {
-            case 'fill':
-            case 'stroke':
-                if (styleTo[i]) {
-                    if (isGradientReference(styleTo[i]!)) { // 对于渐变引用，保持原始值，不进行 RGB 转换
-                        styleNorm[1][i] = styleTo[i];
-                        if (styleFrom[i] === undefined) { styleNorm[0][i] = styleTo[i]; }
-                    } else { // 对于普通颜色值，进行 RGB 转换
-                        styleNorm[1][i] = getRGB(doc, styleTo[i]!);
-                        if (styleFrom[i] === undefined) {
-                            styleNorm[0][i] = getRGB(doc, styleTo[i]!);
-                            styleNorm[0][i].alpha = 0;
-                        }
+        case 'fill':
+        case 'stroke':
+            if (styleTo[i]) {
+                if (isGradientReference(styleTo[i]!)) { // 对于渐变引用，保持原始值，不进行 RGB 转换
+                    styleNorm[1][i] = styleTo[i];
+                    if (styleFrom[i] === undefined) { styleNorm[0][i] = styleTo[i]; }
+                } else { // 对于普通颜色值，进行 RGB 转换
+                    styleNorm[1][i] = getRGB(doc, styleTo[i]!);
+                    if (styleFrom[i] === undefined) {
+                        styleNorm[0][i] = getRGB(doc, styleTo[i]!);
+                        styleNorm[0][i].alpha = 0;
                     }
                 }
-                break;
-            case 'opacity':
-            case 'fill-opacity':
-            case 'stroke-opacity':
-            case 'stroke-width':
-                if (styleTo[i]) {
-                    (styleNorm[1][i] as any) = styleTo[i];
-                    if (styleFrom[i] === undefined) { styleNorm[0][i] = 1; }
-                }
-                break;
+            }
+            break;
+        case 'opacity':
+        case 'fill-opacity':
+        case 'stroke-opacity':
+        case 'stroke-width':
+            if (styleTo[i]) {
+                (styleNorm[1][i] as any) = styleTo[i];
+                if (styleFrom[i] === undefined) { styleNorm[0][i] = 1; }
+            }
+            break;
         }
     }
     return styleNorm;
@@ -149,20 +149,20 @@ export function transCalc(transFrom: Transform, transTo: Transform, progress: nu
     for (const key in transFrom) {
         const i = key as keyof Transform;
         switch (i) {
-            case 'rotate':
-                if (transFrom[i] && transTo[i]) {
-                    res[i] = [0, 0, 0];
-                    for (let j = 0; j < 3; j++) {
-                        const fromVal = transFrom[i]![j];
-                        const toVal = transTo[i]![j];
-                        if (isFinite(fromVal) && isFinite(toVal) && isFinite(progress)) {
-                            res[i]![j] = fromVal + (toVal - fromVal) * progress;
-                        } else { // 如果任何值无效，使用 from 值或默认值
-                            res[i]![j] = isFinite(fromVal) ? fromVal : 0;
-                        }
+        case 'rotate':
+            if (transFrom[i] && transTo[i]) {
+                res[i] = [0, 0, 0];
+                for (let j = 0; j < 3; j++) {
+                    const fromVal = transFrom[i]![j];
+                    const toVal = transTo[i]![j];
+                    if (isFinite(fromVal) && isFinite(toVal) && isFinite(progress)) {
+                        res[i]![j] = fromVal + (toVal - fromVal) * progress;
+                    } else { // 如果任何值无效，使用 from 值或默认值
+                        res[i]![j] = isFinite(fromVal) ? fromVal : 0;
                     }
                 }
-                break;
+            }
+            break;
         }
     }
     return res;
@@ -317,7 +317,7 @@ async function createBundledSvgString(
             groupAttributes += ` data-original-viewbox="${originalViewBox.original}"`;
         }
         if (Object.keys(originalDefs.gradients).length > 0 || Object.keys(originalDefs.patterns).length > 0) {
-            groupAttributes += ` data-has-defs="true"`;
+            groupAttributes += ' data-has-defs="true"';
         }
 
         // 用 g 标签包裹，设置 id 和保留的属性
