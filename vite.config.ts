@@ -8,19 +8,19 @@ const packageJson = JSON.parse(readFileSync(resolve(__dirname, 'package.json'), 
 const version = packageJson.version;
 
 export default defineConfig(({ mode }) => {
-    // 根据环境设置base路径
+    // 根据环境设置 base 路径
     const isGitHubPages = process.env.GITHUB_PAGES === 'true';
     const base = isGitHubPages ? '/SVG-Morpheus-ts/' : '/';
 
     // 备选方案：也可以使用 import.meta.env
     // 在 .env 文件中设置：VITE_SVG_BASE_PATH=/SVG-Morpheus-ts/
-    // 然后在JS中使用：import.meta.env.VITE_SVG_BASE_PATH
+    // 然后在 JS 中使用：import.meta.env.VITE_SVG_BASE_PATH
 
     const isDemo = mode === 'demo';
     const isDev = mode === 'development' || !mode || mode === 'dev';
 
     return {
-        // 根据模式设置不同的root
+        // 根据模式设置不同的 root
         root: (isDemo || isDev) ? 'demos' : '.',
         base,
         publicDir: (isDemo || isDev) ? '../public' : 'public',
@@ -37,7 +37,7 @@ export default defineConfig(({ mode }) => {
         ],
 
         build: isDemo ? {
-            // Demo构建配置
+            // Demo 构建配置
             outDir: '../docs',
             emptyOutDir: true,
             target: ['es2022', 'chrome89', 'firefox89', 'safari15'],

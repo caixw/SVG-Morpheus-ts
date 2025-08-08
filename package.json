@@ -38,7 +38,7 @@
         "dev": "vite --host",
         "build": "tsc && vite build",
         "demo": "pnpm build && vite --mode demo --host",
-        "build:demo": "pnpm build && vite build --mode demo",
+        "build:demo": "pnpm build && GITHUB_PAGES=true vite build --mode demo",
         "preview": "vite preview",
         "lint": "eslint src/**/*.ts",
         "lint:fix": "eslint src/**/*.ts --fix",

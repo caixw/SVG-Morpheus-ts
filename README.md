@@ -91,7 +91,7 @@ transformedGradient: x1="0.0%" y1="7.652%" x2="57.636%" y2="78.411%"
 ## 🏗️ 安装
 
 ```bash
-npm install svg-morpheus
+npm install @iconsets/svg-morpheus-ts
 ```
 
 ## 📖 使用方法
