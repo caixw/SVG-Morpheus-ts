@@ -3,7 +3,7 @@ export const easings = {
     ['circ-in']: (t: number) => -1 * (Math.sqrt(1 - t * t) - 1),
     ['circ-out']: (t: number) => Math.sqrt(1 - (t = t - 1) * t),
     ['circ-in-out']: (t: number) => {
-        if ((t /= 1 / 2) < 1) return -1 / 2 * (Math.sqrt(1 - t * t) - 1);
+        if ((t /= 1 / 2) < 1) { return -1 / 2 * (Math.sqrt(1 - t * t) - 1); }
         return 1 / 2 * (Math.sqrt(1 - (t -= 2) * t) + 1);
     },
     ['cubic-in']: (t: number) => t * t * t,

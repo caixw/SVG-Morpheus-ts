@@ -1,36 +1,36 @@
 import {
+    clone,
+    curveCalc,
+    extractDefsInfo,
+    extractSvgRootAttributes,
+    extractViewBoxInfo,
     styleNormCalc,
     styleNormToString,
     styleToNorm,
-    transCalc,
     trans2string,
-    curveCalc,
-    clone,
-    extractViewBoxInfo,
-    extractDefsInfo,
-    extractSvgRootAttributes
+    transCalc
 } from './helpers';
 
-import { easings } from './easings';
-import { path2curve, path2string, curvePathBBox } from './svg-path';
 import {
     calculateTransformMatrix,
-    transformPath,
     transformGradientDefs,
+    transformPath,
     updateDefsReferences
 } from './coordinate-transform';
+import { easings } from './easings';
+import { curvePathBBox, path2curve, path2string } from './svg-path';
 import {
+    AnimationFrameId,
+    BoundingBox,
+    CallbackFunction,
+    DefsInfo,
     Icon,
     IconItem,
     MorphNode,
+    StyleAttributes,
     SVGMorpheusOptions,
     ToMethodOptions,
-    CallbackFunction,
-    AnimationFrameId,
-    BoundingBox,
-    StyleAttributes,
-    ViewBoxInfo,
-    DefsInfo
+    ViewBoxInfo
 } from './types';
 
 export class SVGMorpheus {
@@ -58,28 +58,26 @@ export class SVGMorpheus {
     /**
      * SVGMorpheus Constructor | SVGMorpheus 构造器
      * Creates a new SVGMorpheus instance for morphing SVG icons | 创建一个新的 SVGMorpheus 实例用于变形 SVG 图标
-     * 
+     *
      * @param element Target SVG element or CSS selector | 目标 SVG 元素或 CSS 选择器
-     *                - string: CSS selector to find the SVG element | 字符串：用于查找 SVG 元素的 CSS 选择器
-     *                - HTMLElement: Direct reference to HTML element containing SVG | HTML 元素：直接引用包含 SVG 的 HTML 元素
-     *                - SVGSVGElement: Direct reference to SVG element | SVG 元素：直接引用 SVG 元素
-     * 
+     *    - string: CSS selector to find the SVG element | 字符串：用于查找 SVG 元素的 CSS 选择器
+     *    - HTMLElement: Direct reference to HTML element containing SVG | HTML 元素：直接引用包含 SVG 的 HTML 元素
+     *    - SVGSVGElement: Direct reference to SVG element | SVG 元素：直接引用 SVG 元素
+     *
      * @param options Configuration options for default behavior | 默认行为的配置选项
-     *                - iconId: Initial icon to display | 初始显示的图标
-     *                - duration: Default animation duration (ms) | 默认动画持续时间（毫秒）
-     *                - easing: Default easing function name | 默认缓动函数名称
-     *                - rotation: Default rotation direction | 默认旋转方向
-     * 
+     *    - iconId: Initial icon to display | 初始显示的图标
+     *    - duration: Default animation duration (ms) | 默认动画持续时间（毫秒）
+     *    - easing: Default easing function name | 默认缓动函数名称
+     *    - rotation: Default rotation direction | 默认旋转方向
+     *
      * @param callback Default callback function executed after animations complete | 动画完成后执行的默认回调函数
-     *                 Called when any morphing animation finishes | 当任何变形动画完成时被调用
-     *                 Can be overridden by individual to() method calls | 可以被单独的 to() 方法调用覆盖
+     *     Called when any morphing animation finishes | 当任何变形动画完成时被调用
+     *     Can be overridden by individual to() method calls | 可以被单独的 to() 方法调用覆盖
      */
     constructor(
-        element: string | HTMLElement | SVGSVGElement,
-        options?: SVGMorpheusOptions,
-        callback?: CallbackFunction
+        element: string | HTMLElement | SVGSVGElement, options?: SVGMorpheusOptions, callback?: CallbackFunction
     ) {
-        if (!element) {
+        if (!element) { // 防止空字符串
             throw new Error('SVGMorpheus > "element" is required');
         }
 
@@ -125,17 +123,14 @@ export class SVGMorpheus {
         this._rafid = undefined;
 
         this._fnTick = function (timePassed: number) {
-            if (!that._startTime) {
-                that._startTime = timePassed;
-            }
+            if (!that._startTime) { that._startTime = timePassed; }
+
             const progress = Math.min((timePassed - that._startTime) / that._duration, 1);
             that._updateAnimationProgress(progress);
             if (progress < 1) {
                 that._rafid = window.requestAnimationFrame(that._fnTick);
             } else {
-                if (that._toIconId !== '') {
-                    that._animationEnd();
-                }
+                if (that._toIconId !== '') { that._animationEnd(); }
             }
         };
 
@@ -186,10 +181,10 @@ export class SVGMorpheus {
                         let iconDefs: DefsInfo = documentDefs;
                         let iconRootAttrs: Record<string, string> = documentRootAttrs;
 
-                        // 检查图标g元素是否保存了原始ViewBox信息
+                        // 检查图标 g 元素是否保存了原始 ViewBox 信息
                         const originalViewBox = iconElement.getAttribute('data-original-viewbox');
                         if (originalViewBox) {
-                            // 解析保存的ViewBox信息
+                            // 解析保存的 ViewBox 信息
                             const values = originalViewBox.trim().split(/\s+/).map(Number);
                             if (values.length === 4) {
                                 iconViewBox = {
@@ -199,11 +194,11 @@ export class SVGMorpheus {
                             }
                         }
 
-                        // 检查是否有defs信息需要提取（从原始SVG内容中）
+                        // 检查是否有 defs 信息需要提取（从原始 SVG 内容中）
                         const iconHTML = iconElement.outerHTML;
                         const iconSpecificDefs = extractDefsInfo(iconHTML);
 
-                        // 合并defs信息（图标特定的defs优先）
+                        // 合并 defs 信息（图标特定的 defs 优先）
                         iconDefs = {
                             gradients: { ...documentDefs.gradients, ...iconSpecificDefs.gradients },
                             patterns: { ...documentDefs.patterns, ...iconSpecificDefs.patterns },
@@ -289,17 +284,15 @@ export class SVGMorpheus {
                                 // Traverse all attributes and get style values
                                 for (let k = 0, len3 = nodeItem.attributes.length; k < len3; k++) {
                                     const attrib = nodeItem.attributes[k];
-                                    if (attrib.specified) {
-                                        const name = attrib.name.toLowerCase();
-                                        switch (name) {
-                                            case 'fill':
-                                            case 'fill-opacity':
-                                            case 'opacity':
-                                            case 'stroke':
-                                            case 'stroke-opacity':
-                                            case 'stroke-width':
-                                                item.attrs[name] = attrib.value;
-                                        }
+                                    const name = attrib.name.toLowerCase();
+                                    switch (name) {
+                                        case 'fill':
+                                        case 'fill-opacity':
+                                        case 'opacity':
+                                        case 'stroke':
+                                        case 'stroke-opacity':
+                                        case 'stroke-width':
+                                            item.attrs[name] = attrib.value;
                                     }
                                 }
 
@@ -363,7 +356,7 @@ export class SVGMorpheus {
             this._fromIconItems = clone(this._curIconItems);
             this._toIconItems = clone(this._icons[toIconId].items);
 
-            // **坐标系统标准化处理** 
+            // **坐标系统标准化处理**
             const fromIcon = this._icons[this._curIconId];
             const toIcon = this._icons[toIconId];
 
@@ -375,13 +368,13 @@ export class SVGMorpheus {
                 this._svgDoc.setAttribute('viewBox', targetViewBox.original);
             }
 
-            // 处理fromIcon的坐标转换 - 转换到目标坐标系统
+            // 处理 fromIcon 的坐标转换 - 转换到目标坐标系统
             if (fromIcon && fromIcon.viewBox && toIcon.viewBox) {
                 const fromTransformMatrix = calculateTransformMatrix(fromIcon.viewBox, targetViewBox);
                 const fromIdPrefix = `from_${this._curIconId}_`;
                 const fromOldToNewIdMap: Record<string, string> = {};
 
-                // 先建立fromIcon的defs ID映射
+                // 先建立f romIcon 的 defs ID 映射
                 if (fromIcon.defs) {
                     Object.keys(fromIcon.defs.gradients).forEach(oldId => {
                         fromOldToNewIdMap[oldId] = fromIdPrefix + oldId;
@@ -394,7 +387,7 @@ export class SVGMorpheus {
                     });
                 }
 
-                // 转换fromIcon的路径和引用到目标坐标系统
+                // 转换 fromIcon 的路径和引用到目标坐标系统
                 this._fromIconItems = this._fromIconItems.map(item => {
                     const transformedPath = transformPath(item.path, fromTransformMatrix);
                     const updatedAttrsRefs = updateDefsReferences(transformedPath, item.attrs, fromOldToNewIdMap);
@@ -409,12 +402,12 @@ export class SVGMorpheus {
                 });
             }
 
-            // toIcon已经在目标坐标系统中，只需要处理defs ID冲突
+            // toIcon 已经在目标坐标系统中，只需要处理 defs ID 冲突
             if (toIcon.defs) {
                 const toIdPrefix = `to_${toIconId}_`;
                 const toOldToNewIdMap: Record<string, string> = {};
 
-                // 先建立toIcon的defs ID映射
+                // 先建立 toIcona 的 defs ID 映射
                 Object.keys(toIcon.defs.gradients).forEach(oldId => {
                     toOldToNewIdMap[oldId] = toIdPrefix + oldId;
                 });
@@ -425,7 +418,7 @@ export class SVGMorpheus {
                     toOldToNewIdMap[oldId] = toIdPrefix + oldId;
                 });
 
-                // 再更新toIcon的defs引用以避免ID冲突
+                // 再更新 toIcon 的 defs 引用以避免 ID 冲突
                 this._toIconItems = this._toIconItems.map(item => {
                     const updatedAttrsRefs = updateDefsReferences(item.path, item.attrs, toOldToNewIdMap);
                     const updatedStyleRefs = updateDefsReferences(item.path, item.style, toOldToNewIdMap);
@@ -555,7 +548,7 @@ export class SVGMorpheus {
                     'rotate': [0, svgCenter.x, svgCenter.y]
                 };
 
-                // 为fromIcon设置统一旋转中心并重置角度
+                // 为 fromIcon 设置统一旋转中心并重置角度
                 if (!fromIconItem.trans) {
                     fromIconItem.trans = {
                         'rotate': [0, svgCenter.x, svgCenter.y]
@@ -650,22 +643,22 @@ export class SVGMorpheus {
         for (let i = this._morphNodes.length - 1; i >= 0; i--) {
             const morphNode = this._morphNodes[i];
             if (!!this._toIconItems[i]) {
-                // 使用更新后的_toIconItems而不是原始的this._icons[this._toIconId].items
+                // 使用更新后的 _toIconItems 而不是原始的 this._icons[this._toIconId].items
                 morphNode.node.setAttribute("d", this._toIconItems[i].path);
 
-                // 设置最终的attributes（包含更新后的defs引用）
+                // 设置最终的 attributes（包含更新后的 defs 引用）
                 const attrs = this._toIconItems[i].attrs;
                 for (const attrName in attrs) {
                     morphNode.node.setAttribute(attrName, (attrs as any)[attrName]);
                 }
 
-                // 设置最终的styles
+                // 设置最终的 styles
                 const styles = this._toIconItems[i].style as StyleAttributes;
                 for (const styleName in styles) {
                     (morphNode.node.style as any)[styleName] = (styles as any)[styleName];
                 }
 
-                // 设置最终的transform
+                // 设置最终的 transform
                 const finalTransform = this._toIconItems[i].transStr || "";
                 morphNode.node.setAttribute("transform", finalTransform);
             } else {
@@ -687,19 +680,19 @@ export class SVGMorpheus {
     /**
      * Morph to target icon | 变形到目标图标
      * Triggers morphing animation from current icon to specified target icon | 触发从当前图标到指定目标图标的变形动画
-     * 
+     *
      * @param iconId Target icon ID to morph to | 要变形到的目标图标ID
-     *               Must match an ID of a <g> element in the SVG | 必须匹配 SVG 中某个 <g> 元素的ID
-     * 
+     *     Must match an ID of a <g> element in the SVG | 必须匹配 SVG 中某个 <g> 元素的ID
+     *
      * @param options Animation options for this specific morph | 此次特定变形的动画选项
-     *                Overrides constructor defaults for this animation only | 仅为此次动画覆盖构造器默认值
-     *                - duration: Animation duration (ms) | 动画持续时间（毫秒）
-     *                - easing: Easing function name | 缓动函数名称
-     *                - rotation: Rotation direction | 旋转方向
-     * 
+     *    Overrides constructor defaults for this animation only | 仅为此次动画覆盖构造器默认值
+     *    - duration: Animation duration (ms) | 动画持续时间（毫秒）
+     *    - easing: Easing function name | 缓动函数名称
+     *    - rotation: Rotation direction | 旋转方向
+     *
      * @param callback Callback function for this specific morph | 此次特定变形的回调函数
-     *                 Overrides constructor default callback for this animation only | 仅为此次动画覆盖构造器默认回调
-     *                 Called when this specific morphing animation completes | 当此次特定变形动画完成时被调用
+     *     Overrides constructor default callback for this animation only | 仅为此次动画覆盖构造器默认回调
+     *     Called when this specific morphing animation completes | 当此次特定变形动画完成时被调用
      */
     public to(iconId: string, options?: ToMethodOptions, callback?: CallbackFunction): void {
         if (iconId !== this._toIconId) {
@@ -729,15 +722,15 @@ export class SVGMorpheus {
     /**
      * Register custom easing function | 注册自定义缓动函数
      * Adds a custom easing function that can be used in animations | 添加可在动画中使用的自定义缓动函数
-     * 
+     *
      * @param name Unique name for the easing function | 缓动函数的唯一名称
-     *             This name will be used to reference the function in options | 此名称将用于在选项中引用该函数
-     *             
+     *  his name will be used to reference the function in options | 此名称将用于在选项中引用该函数
+     *
      * @param fn Custom easing function | 自定义缓动函数
-     *           Takes progress (0-1) and returns eased progress (typically 0-1) | 接受进度值(0-1)并返回缓动后的进度值(通常为0-1)
-     *           @param progress Animation progress from 0 to 1 | 从0到1的动画进度
-     *           @returns Eased progress value | 缓动后的进度值
-     * 
+     *  es progress (0-1) and returns eased progress (typically 0-1) | 接受进度值(0-1)并返回缓动后的进度值(通常为0-1)
+     *  ram progress Animation progress from 0 to 1 | 从0到1的动画进度
+     *  turns Eased progress value | 缓动后的进度值
+     *
      * @example
      * // Register a custom bounce easing | 注册自定义弹跳缓动
      * morpheus.registerEasing('my-bounce', (t) => {
@@ -749,19 +742,19 @@ export class SVGMorpheus {
     }
 
     /**
-     * 动态插入转换后的defs到SVG文档中
+     * 动态插入转换后的 defs 到 SVG 文档中
      */
     private _injectTransformedDefs(fromIcon: Icon | undefined, toIcon: Icon): void {
         if (!this._svgDoc) return;
 
-        // 查找或创建defs元素
+        // 查找或创建 defs 元素
         let defsElement = this._svgDoc.querySelector('defs');
         if (!defsElement) {
             defsElement = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
             this._svgDoc.insertBefore(defsElement, this._svgDoc.firstChild);
         }
 
-        // 插入fromIcon的转换后defs（已经转换到目标坐标系统）
+        // 插入 fromIcon 的转换后 defs（已经转换到目标坐标系统）
         if (fromIcon && fromIcon.defs && fromIcon.viewBox) {
             const fromIdPrefix = `from_${this._curIconId}_`;
 
@@ -775,10 +768,10 @@ export class SVGMorpheus {
             this._insertDefsContent(defsElement, transformedFromDefs);
         }
 
-        // 插入toIcon的defs（已经在目标坐标系统中，无需坐标转换）
+        // 插入 toIcon 的 defs（已经在目标坐标系统中，无需坐标转换）
         if (toIcon.defs) {
             const toIdPrefix = `to_${toIcon.id}_`;
-            // toIcon不需要坐标转换，只需要ID重命名
+            // toIcon 不需要坐标转换，只需要 ID 重命名
             const transformedToDefs = transformGradientDefs(toIcon.defs, toIdPrefix);
 
             this._insertDefsContent(defsElement, transformedToDefs);
@@ -786,7 +779,7 @@ export class SVGMorpheus {
     }
 
     /**
-     * 插入defs内容到defs元素中
+     * 插入 defs 内容到 defs 元素中
      */
     private _insertDefsContent(defsElement: SVGDefsElement, defsInfo: DefsInfo): void {
         const parser = new DOMParser();
@@ -794,7 +787,7 @@ export class SVGMorpheus {
         // 插入渐变
         Object.values(defsInfo.gradients).forEach(gradientStr => {
             try {
-                // 使用DOMParser解析SVG字符串，避免HTML解析器的问题
+                // 使用 DOMParser 解析 SVG 字符串，避免 HTML 解析器的问题
                 const svgDoc = parser.parseFromString(`<svg xmlns="http://www.w3.org/2000/svg">${gradientStr}</svg>`, 'image/svg+xml');
                 const gradientElement = svgDoc.documentElement.firstElementChild;
 
@@ -841,4 +834,4 @@ export class SVGMorpheus {
 }
 
 // Default export for ESM
-export default SVGMorpheus; 
+export default SVGMorpheus;

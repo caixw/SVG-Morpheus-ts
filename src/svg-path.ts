@@ -6,16 +6,12 @@ const pathValues = new RegExp("(-?\\d*\\.?\\d*(?:e[\\-+]?\\d+)?)[" + spaces + "]
 
 // Parses given path string into an array of arrays of path segments
 export function parsePathString(pathString: any): any {
-    if (!pathString) {
-        return null;
-    }
+    if (!pathString) { return null; }
 
     if (Array.isArray(pathString)) {
         return pathString;
     } else {
-        const paramCounts: any = {
-            a: 7, c: 6, o: 2, h: 1, l: 2, m: 2, r: 4, q: 4, s: 4, t: 2, v: 1, u: 3, z: 0
-        };
+        const paramCounts: any = { a: 7, c: 6, o: 2, h: 1, l: 2, m: 2, r: 4, q: 4, s: 4, t: 2, v: 1, u: 3, z: 0 };
         const data: any = [];
 
         String(pathString).replace(pathCommand, function (_, b, c) {
@@ -54,9 +50,7 @@ export function parsePathString(pathString: any): any {
 export function pathToAbsolute(pathArray: any): any {
     const parsed = parsePathString(pathArray);
 
-    if (!parsed || !parsed.length) {
-        return [["M", 0, 0]]; // "M", 0, 0
-    }
+    if (!parsed || !parsed.length) { return [["M", 0, 0]]; } // "M", 0, 0
 
     const res: any = [];
     let x = 0, y = 0, mx = 0, my = 0;
@@ -250,9 +244,7 @@ export function path2curve(path: any, path2?: any): any {
             }
             p2[i] = processPath(p2[i], attrs2, pcom);
 
-            if (pcoms2[i] != "A" && pfirst == "C") {
-                pcoms2[i] = "C";
-            }
+            if (pcoms2[i] != "A" && pfirst == "C") { pcoms2[i] = "C"; }
 
             fixArc(p2, i);
         }
@@ -276,11 +268,11 @@ export function path2curve(path: any, path2?: any): any {
 }
 
 // Helper functions for path conversion
-const l2c = function (x1: any, y1: any, x2: any, y2: any) {
+function l2c(x1: any, y1: any, x2: any, y2: any) {
     return [x1, y1, x2, y2, x2, y2];
-};
+}
 
-const q2c = function (x1: any, y1: any, ax: any, ay: any, x2: any, y2: any) {
+ function q2c(x1: any, y1: any, ax: any, ay: any, x2: any, y2: any) {
     var _13 = 1 / 3,
         _23 = 2 / 3;
     return [
@@ -291,9 +283,9 @@ const q2c = function (x1: any, y1: any, ax: any, ay: any, x2: any, y2: any) {
         x2,
         y2
     ];
-};
+}
 
-const a2c = function (x1: any, y1: any, rx: any, ry: any, angle: any, large_arc_flag: any, sweep_flag: any, x2: any, y2: any, recursive?: any) {
+ function a2c(x1: any, y1: any, rx: any, ry: any, angle: any, large_arc_flag: any, sweep_flag: any, x2: any, y2: any, recursive?: any) {
     // for more information of where this math came from visit:
     // http://www.w3.org/TR/SVG11/implnote.html#ArcImplementationNotes
     var _120 = Math.PI * 120 / 180,
@@ -301,9 +293,7 @@ const a2c = function (x1: any, y1: any, rx: any, ry: any, angle: any, large_arc_
         res: any = [],
         xy: any,
         rotate = function (x: any, y: any, rad: any) {
-            var X = x * Math.cos(rad) - y * Math.sin(rad),
-                Y = x * Math.sin(rad) + y * Math.cos(rad);
-            return { x: X, y: Y };
+            return { x: x * Math.cos(rad) - y * Math.sin(rad), y: x * Math.sin(rad) + y * Math.cos(rad) };
         };
     if (!recursive) {
         xy = rotate(x1, y1, -rad);
@@ -333,12 +323,8 @@ const a2c = function (x1: any, y1: any, rx: any, ry: any, angle: any, large_arc_
         f2 = x2 < cx ? Math.PI - f2 : f2;
         f1 < 0 && (f1 = Math.PI * 2 + f1);
         f2 < 0 && (f2 = Math.PI * 2 + f2);
-        if (sweep_flag && f1 > f2) {
-            f1 = f1 - Math.PI * 2;
-        }
-        if (!sweep_flag && f2 > f1) {
-            f2 = f2 - Math.PI * 2;
-        }
+        if (sweep_flag && f1 > f2) { f1 = f1 - Math.PI * 2; }
+        if (!sweep_flag && f2 > f1) { f2 = f2 - Math.PI * 2; }
     } else {
         f1 = recursive[0];
         f2 = recursive[1];
@@ -379,7 +365,7 @@ const a2c = function (x1: any, y1: any, rx: any, ry: any, angle: any, large_arc_
         }
         return newres;
     }
-};
+}
 
 // Convert curve back to path string
 const p2s = /,?([a-z]),?/gi;
@@ -390,9 +376,7 @@ export function path2string(path: any): any {
 // Calculate bounding box of a curve path
 export function curvePathBBox(path: any): any {
     // 如果路径为空或无效，返回默认边界框
-    if (!path || !Array.isArray(path) || path.length === 0) {
-        return box(0, 0, 0, 0);
-    }
+    if (!path || !Array.isArray(path) || path.length === 0) { return box(0, 0, 0, 0); }
 
     let x = 0;
     let y = 0;
@@ -427,9 +411,7 @@ export function curvePathBBox(path: any): any {
     }
 
     // 确保有有效的边界值
-    if (X.length === 0 || Y.length === 0) {
-        return box(0, 0, 0, 0);
-    }
+    if (X.length === 0 || Y.length === 0) { return box(0, 0, 0, 0); }
 
     const xmin = Math.min(...X);
     const ymin = Math.min(...Y);
@@ -444,7 +426,7 @@ export function curvePathBBox(path: any): any {
     return box(xmin, ymin, xmax - xmin, ymax - ymin);
 }
 
-const box = function (x: number, y: number, width: number, height: number) {
+function box(x: number, y: number, width: number, height: number) {
     // 确保所有值都是有效数字
     x = isFinite(x) ? x : 0;
     y = isFinite(y) ? y : 0;
@@ -459,10 +441,10 @@ const box = function (x: number, y: number, width: number, height: number) {
         cx: x + width / 2,
         cy: y + height / 2
     };
-};
+}
 
 // Returns bounding box of cubic bezier curve.
-const curveDim = function (x0: any, y0: any, x1: any, y1: any, x2: any, y2: any, x3: any, y3: any) {
+function curveDim(x0: any, y0: any, x1: any, y1: any, x2: any, y2: any, x3: any, y3: any) {
     var tvalues: any = [],
         bounds: any = [[], []],
         a: any, b: any, c: any, t: any, t1: any, t2: any, b2ac: any, sqrtb2ac: any;
@@ -477,28 +459,18 @@ const curveDim = function (x0: any, y0: any, x1: any, y1: any, x2: any, y2: any,
             c = 3 * y1 - 3 * y0;
         }
         if (Math.abs(a) < 1e-12) {
-            if (Math.abs(b) < 1e-12) {
-                continue;
-            }
+            if (Math.abs(b) < 1e-12) { continue; }
             t = -c / b;
-            if (0 < t && t < 1) {
-                tvalues.push(t);
-            }
+            if (0 < t && t < 1) { tvalues.push(t); }
             continue;
         }
         b2ac = b * b - 4 * c * a;
         sqrtb2ac = Math.sqrt(b2ac);
-        if (b2ac < 0) {
-            continue;
-        }
+        if (b2ac < 0) { continue; }
         t1 = (-b + sqrtb2ac) / (2 * a);
-        if (0 < t1 && t1 < 1) {
-            tvalues.push(t1);
-        }
+        if (0 < t1 && t1 < 1) { tvalues.push(t1); }
         t2 = (-b - sqrtb2ac) / (2 * a);
-        if (0 < t2 && t2 < 1) {
-            tvalues.push(t2);
-        }
+        if (0 < t2 && t2 < 1) { tvalues.push(t2); }
     }
 
     var j = tvalues.length,
@@ -521,4 +493,4 @@ const curveDim = function (x0: any, y0: any, x1: any, y1: any, x2: any, y2: any,
         min: { x: Math.min.apply(0, bounds[0]), y: Math.min.apply(0, bounds[1]) },
         max: { x: Math.max.apply(0, bounds[0]), y: Math.max.apply(0, bounds[1]) }
     };
-}; 
+}

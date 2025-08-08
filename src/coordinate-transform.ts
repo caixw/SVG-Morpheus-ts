@@ -8,18 +8,18 @@ import { DefsInfo, ViewBoxInfo } from './types';
  * 坐标转换矩阵
  */
 export interface TransformMatrix {
-    /** Scale X | X轴缩放 */
+    /** Scale X | X 轴缩放 */
     scaleX: number;
-    /** Scale Y | Y轴缩放 */
+    /** Scale Y | Y 轴缩放 */
     scaleY: number;
-    /** Translate X | X轴平移 */
+    /** Translate X | X 轴平移 */
     translateX: number;
-    /** Translate Y | Y轴平移 */
+    /** Translate Y | Y 轴平移 */
     translateY: number;
 }
 
 /**
- * 解析ViewBox字符串
+ * 解析 ViewBox 字符串
  */
 export function parseViewBox(viewBoxStr: string): ViewBoxInfo {
     const values = viewBoxStr.trim().split(/\s+/).map(Number);
@@ -34,7 +34,7 @@ export function parseViewBox(viewBoxStr: string): ViewBoxInfo {
 }
 
 /**
- * 计算从源ViewBox到目标ViewBox的转换矩阵
+ * 计算从源 ViewBox 到目标 ViewBox 的转换矩阵
  */
 export function calculateTransformMatrix(
     fromViewBox: ViewBoxInfo,
@@ -74,7 +74,7 @@ export function transformPoint(
 }
 
 /**
- * 转换SVG路径数据
+ * 转换 SVG 路径数据
  */
 export function transformPath(pathData: string, matrix: TransformMatrix): string {
     if (!pathData || !pathData.trim()) {
@@ -186,10 +186,10 @@ export function transformPath(pathData: string, matrix: TransformMatrix): string
 }
 
 /**
- * 根据起始和目标ViewBox计算最佳的过渡ViewBox
+ * 根据起始和目标 ViewBox 计算最佳的过渡 ViewBox
  */
 export function calculateOptimalViewBox(fromViewBox: ViewBoxInfo | undefined, toViewBox: ViewBoxInfo | undefined): ViewBoxInfo {
-    // 如果都没有ViewBox，使用默认
+    // 如果都没有 ViewBox，使用默认
     if (!fromViewBox && !toViewBox) {
         return {
             values: [0, 0, 24, 24],
@@ -197,30 +197,22 @@ export function calculateOptimalViewBox(fromViewBox: ViewBoxInfo | undefined, to
         };
     }
 
-    // 如果只有一个ViewBox，使用该ViewBox
-    if (!fromViewBox && toViewBox) {
-        return toViewBox;
-    }
-    if (fromViewBox && !toViewBox) {
-        return fromViewBox;
-    }
+    // 如果只有一个 ViewBox，使用该 ViewBox
+    if (!fromViewBox && toViewBox) { return toViewBox; }
+    if (fromViewBox && !toViewBox) { return fromViewBox; }
 
-    // 如果两个ViewBox相同，直接返回
+    // 如果两个 ViewBox 相同，直接返回
     if (fromViewBox && toViewBox) {
         const [fx, fy, fw, fh] = fromViewBox.values;
         const [tx, ty, tw, th] = toViewBox.values;
 
-        if (fx === tx && fy === ty && fw === tw && fh === th) {
-            return fromViewBox;
-        }
+        if (fx === tx && fy === ty && fw === tw && fh === th) { return fromViewBox; }
 
-        // 对于动画过程，我们使用目标ViewBox作为最终坐标系统
-        // 这样动画结束时图标会在正确的坐标系统中
+        // 对于动画过程，我们使用目标 ViewBox 作为最终坐标系统。这样动画结束时图标会在正确的坐标系统中
         return toViewBox;
     }
 
-    // 默认fallback
-    return {
+    return { // 默认 fallback
         values: [0, 0, 24, 24],
         original: '0 0 24 24'
     };
@@ -245,7 +237,7 @@ export function transformGradientDefs(
         const newId = idPrefix + id;
         let transformed = gradientStr;
 
-        // 重命名ID避免冲突
+        // 重命名 ID 避免冲突
         transformed = transformed.replace(new RegExp(`id="${id}"`, 'g'), `id="${newId}"`);
         transformed = transformed.replace(new RegExp(`id='${id}'`, 'g'), `id='${newId}'`);
 
@@ -262,7 +254,7 @@ export function transformGradientDefs(
         const newId = idPrefix + id;
         let transformed = patternStr;
 
-        // 重命名ID避免冲突
+        // 重命名 ID 避免冲突
         transformed = transformed.replace(new RegExp(`id="${id}"`, 'g'), `id="${newId}"`);
         transformed = transformed.replace(new RegExp(`id='${id}'`, 'g'), `id='${newId}'`);
 
@@ -401,7 +393,7 @@ function transformGradientValue(attr: string, value: string, matrix: TransformMa
 }
 
 /**
- * 更新路径中的defs引用
+ * 更新路径中的 defs 引用
  */
 export function updateDefsReferences(
     pathData: string,

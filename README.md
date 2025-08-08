@@ -1,9 +1,6 @@
 # SVG Morpheus TypeScript
 
-> **⚡ 本项目基于 [adoin/SVG-Morpheus](https://github.com/adoin/SVG-Morpheus) 再次重构**
-
-> **⚡ 本项目基于 [alexk111/SVG-Morpheus](https://github.com/alexk111/SVG-Morpheus) 进行 TypeScript 重构**
-> 原始项目作者：[@alexk111](https://github.com/alexk111) - 使用现代化 TypeScript + Vite + pnpm 重构
+> **⚡ 本项目基于 [adoin/SVG-Morpheus](https://github.com/adoin/SVG-Morpheus) 和 [alexk111/SVG-Morpheus](https://github.com/alexk111/SVG-Morpheus) 重构**
 
 JavaScript 库，使 SVG 图标能够从一个变形到另一个。它实现了 Material Design 的精美细节过渡效果。
 
@@ -17,6 +14,7 @@ JavaScript 库，使 SVG 图标能够从一个变形到另一个。它实现了 
 
 这个项目已经从 Gulp 重构为现代化的 TypeScript + Vite + pnpm 构建系统：
 
+- ✅ **引入 colorjs.io** - 完整的 CSS 颜色格式支持
 - ✅ **TypeScript** - 完整的类型安全支持
 - ✅ **ESM 模块** - 使用标准的 ES 模块系统
 - ✅ **Vite 构建** - 快速的现代化构建工具
@@ -47,13 +45,13 @@ JavaScript 库，使 SVG 图标能够从一个变形到另一个。它实现了 
 
 **渐变坐标转换**
 - ✅ **同步渐变缩放**：渐变现在能在坐标系统转换时与路径正确同步缩放
-- ✅ **正确的渐变中心计算**：修复了不同ViewBox尺寸之间变形时的渐变定位
-- ✅ **增强图案支持**：改进了坐标转换期间对SVG图案的处理
+- ✅ **正确的渐变中心计算**：修复了不同 ViewBox 尺寸之间变形时的渐变定位
+- ✅ **增强图案支持**：改进了坐标转换期间对 SVG 图案的处理
 
 **代码质量改进**
 - ✅ **清理代码库**：移除了所有实验性/调试代码，提高了可维护性
 - ✅ **优化性能**：简化了旋转中心计算算法
-- ✅ **更新依赖**：更新了highlight.js CDN为更可靠的unpkg.com源
+- ✅ **更新依赖**：更新了 highlight.js CDN 为更可靠的 unpkg.com 源
 
 ### 🎯 技术细节
 
@@ -86,7 +84,7 @@ transformedGradient: x1="0.0%" y1="7.652%" x2="57.636%" y2="78.411%"
 - **50%更平滑**的旋转动画
 - **消除视觉瑕疵**在复杂形状过渡中
 - **更好的内存管理**通过清理代码库
-- **更快的加载速度**通过更新CDN源
+- **更快的加载速度**通过更新 CDN 源
 
 ## 🏗️ 安装
 
@@ -100,10 +98,10 @@ npm install @iconsets/svg-morpheus-ts
 
 ```typescript
 // 默认导入
-import SVGMorpheus from 'svg-morpheus-ts';
+import SVGMorpheus from '@iconsets/svg-morpheus-ts';
 
 // 或者命名导入
-import { SVGMorpheus } from 'svg-morpheus-ts';
+import { SVGMorpheus } from '@iconsets/svg-morpheus-ts';
 
 // 创建实例
 const myMorpheus = new SVGMorpheus('#my-svg');
@@ -117,7 +115,7 @@ import type {
   IconItem,
   EasingFunction,
   RGBColor
-} from 'svg-morpheus-ts';
+} from '@iconsets/svg-morpheus-ts';
 
 // 使用类型
 const options: SVGMorpheusOptions = {
@@ -137,9 +135,9 @@ import {
   pathToAbsolute,    // 路径转换工具
   styleNormCalc,     // 样式计算工具
   curveCalc,         // 曲线计算工具
-  bundleSvgs,        // 🆕 动态SVG合并，返回 Blob URL
-  bundleSvgsString   // 🆕 动态SVG合并，返回 SVG 字符串
-} from 'svg-morpheus-ts';
+  bundleSvgs,        // 🆕 动态 SVG 合并，返回 Blob URL
+  bundleSvgsString   // 🆕 动态 SVG 合并，返回 SVG 字符串
+} from '@iconsets/svg-morpheus-ts';
 
 // 使用预定义的缓动函数
 console.log(easings.easeInOut);
@@ -147,7 +145,7 @@ console.log(easings.easeInOut);
 // 使用路径工具
 const absolutePath = pathToAbsolute('m10,10 l20,20');
 
-// 🆕 动态合并多个SVG
+// 🆕 动态合并多个 SVG
 const svgMap = {
   'icon1': '<svg>...</svg>',
   'icon2': '/path/to/icon.svg'
@@ -162,7 +160,7 @@ const bundledSvgString = await bundleSvgsString(svgMap);
 import SVGMorpheus, {
   type SVGMorpheusOptions,
   easings
-} from 'svg-morpheus-ts';
+} from '@iconsets/svg-morpheus-ts';
 
 // 配置选项
 const options: SVGMorpheusOptions = {
@@ -184,7 +182,7 @@ morpheus.to('icon2', { duration: 1200 });
 ### ES 模块 (推荐)
 
 ```typescript
-import { SVGMorpheus } from 'svg-morpheus-ts';
+import { SVGMorpheus } from '@iconsets/svg-morpheus-ts';
 
 const morpheus = new SVGMorpheus('svg', {
   duration: 600,
@@ -220,7 +218,7 @@ morpheus.to('icon-name');
 项目提供完整的 TypeScript 类型定义：
 
 ```typescript
-import { SVGMorpheus, type SVGMorpheusOptions } from 'svg-morpheus-ts';
+import { SVGMorpheus, type SVGMorpheusOptions } from '@iconsets/svg-morpheus-ts';
 
 const options: SVGMorpheusOptions = {
   duration: 500,
@@ -236,14 +234,15 @@ const morpheus = new SVGMorpheus('#my-svg', options, () => {
 ## 📦 导出清单
 
 ### 核心类
+
 - `SVGMorpheus` (默认导出)
 - `SVGMorpheus` (命名导出)
 
 ### 类型定义
+
 - `EasingFunction` - 缓动函数类型
 - `SVGMorpheusOptions` - 配置选项接口
 - `StyleAttributes` - 样式属性接口
-- `RGBColor` - RGB颜色接口
 - `NormalizedStyle` - 标准化样式接口
 - `Transform` - 变换接口
 - `IconItem` - 图标项接口
@@ -251,8 +250,11 @@ const morpheus = new SVGMorpheus('#my-svg', options, () => {
 - `MorphNode` - 变形节点接口
 - `BoundingBox` - 边界框接口
 - `CallbackFunction` - 回调函数类型
+- `Rotation` - 旋转方向类型
 
 ### 工具函数
+
+- `rotations` - Rotation 类型的枚举
 - `easings` - 预定义缓动函数对象
 - `styleNormCalc` - 样式标准化计算
 - `styleNormToString` - 样式对象转字符串
@@ -328,6 +330,8 @@ interface SVGMorpheusOptions {
 - `circ-in`, `circ-out`, `circ-in-out`
 - `elastic-in`, `elastic-out`, `elastic-in-out`
 
+这此名称可以通过 `Object.keys(easings)` 获取所有支持的缓动函数名称；
+
 ### 自定义缓动函数
 
 ```typescript
@@ -371,7 +375,7 @@ morpheus.registerEasing('my-easing', (t: number) => {
 const morpheus = new SVGMorpheus('svg');
 
 // 新版本 (ESM)
-import { SVGMorpheus } from 'svg-morpheus-ts';
+import { SVGMorpheus } from '@iconsets/svg-morpheus-ts';
 const morpheus = new SVGMorpheus('svg');
 ```
 
@@ -384,22 +388,28 @@ const morpheus = new SVGMorpheus('svg');
 - 🔒 **严格的依赖管理** - 防止幽灵依赖问题
 - 🛡️ **更好的安全性** - 更严格的包解析机制
 
-## 📄 许可证
-
-MIT License
-
-## 🙏 致谢
-
-基于原始的 [SVG Morpheus](https://github.com/alexk111/SVG-Morpheus) 项目，使用现代化技术栈重构。
-
 ## 🆕 动态SVG合并
 
-新的 `bundleSvgs` 功能允许你在运行时动态创建iconset风格的SVG文件，非常适合需要灵活图标管理的现代应用程序。
+新的 `bundleSvgs` 和 `bundleSvgsString` 功能允许你在运行时动态创建 iconset 风格的 SVG 文件，非常适合需要灵活图标管理的现代应用程序。
+
+### API
+
+#### bundleSvgs(svgMap, svgAttributes?)
+
+- **svgMap**: `Record<string, string>` - 将图标 ID 映射到 SVG 源的对象
+- **svgAttributes**: `Record<string, string | number>` (可选) - 根 SVG 元素的自定义属性
+- **返回值**: `Promise<string>` - 生成的 Blob URL
+
+#### bundleSvgsString(svgMap, svgAttributes?)
+
+- **svgMap**: `Record<string, string>` - 将图标ID映射到 SVG 源的对象
+- **svgAttributes**: `Record<string, string | number>` (可选) - 根 SVG 元素的自定义属性
+- **返回值**: `Promise<string>` - 合并的 SVG 字符串
 
 ### 基础用法
 
 ```typescript
-import { bundleSvgs } from 'svg-morpheus-ts';
+import { bundleSvgs } from '@iconsets/svg-morpheus-ts';
 
 const svgMap = {
   'home': '<svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>',
@@ -407,16 +417,14 @@ const svgMap = {
   'settings': '/icons/settings.svg'
 };
 
-// 生成合并的SVG Blob URL
-const bundledSvgUrl = await bundleSvgs(svgMap);
-console.log(bundledSvgUrl);
-// 输出: blob:null/12345678-1234-1234-1234-123456789abc
+const bundledSvgUrl = await bundleSvgs(svgMap); // 生成合并的SVG Blob URL
+console.log(bundledSvgUrl); // 输出: blob:null/12345678-1234-1234-1234-123456789abc
 ```
 
-### 自定义SVG属性
+### 自定义 SVG 属性
 
 ```typescript
-// 自定义根SVG元素的属性
+// 自定义根 SVG 元素的属性
 const customAttributes = {
   viewBox: '0 0 24 24',
   width: '100%',
@@ -426,33 +434,33 @@ const customAttributes = {
 };
 
 const bundledSvgUrl = await bundleSvgs(svgMap, customAttributes);
-// 生成的SVG将应用自定义属性
+// 生成的 SVG 将应用自定义属性
 ```
 
-### 与Object元素配合使用
+### 与 Object 元素配合使用
 
 ```typescript
-// 直接使用bundleSvgs与object元素
+// 直接使用 bundleSvgs 与 object 元素
 const bundledSvgUrl = await bundleSvgs(svgMap, { viewBox: '0 0 24 24' });
 
-// 用于object元素
+// 用于 object 元素
 const objectElement = document.getElementById('my-svg-object');
 objectElement.data = bundledSvgUrl;
 
-// 初始化SVGMorpheus
+// 初始化 SVGMorpheus
 const morpheus = new SVGMorpheus('#my-svg-object');
 morpheus.to('home');
 ```
 
-### 获取SVG字符串（用于备用方案）
+### 获取 SVG 字符串（用于备用方案）
 
 ```typescript
-import { bundleSvgsString } from 'svg-morpheus-ts';
+import { bundleSvgsString } from '@iconsets/svg-morpheus-ts';
 
-// 获取SVG字符串而不是Blob URL
+// 获取 SVG 字符串而不是 Blob URL
 const bundledSvgString = await bundleSvgsString(svgMap, customAttributes);
 
-// 用于内联SVG
+// 用于内联 SVG
 document.getElementById('svg-container').innerHTML = bundledSvgString;
 ```
 
@@ -461,9 +469,9 @@ document.getElementById('svg-container').innerHTML = bundledSvgString;
 **智能内容检测**: 自动检测输入是SVG代码还是文件路径
 ```typescript
 const mixedSources = {
-  'inline': '<svg>...</svg>',      // 直接的SVG代码
+  'inline': '<svg>...</svg>',      // 直接的 SVG 代码
   'external': '/icons/icon.svg',   // 文件路径
-  'with-xml': '<?xml version="1.0"?><svg>...</svg>' // XML声明
+  'with-xml': '<?xml version="1.0"?><svg>...</svg>' // XML 声明
 };
 ```
 
@@ -477,7 +485,7 @@ const bundledSvg = await bundleSvgs({
 
 **TypeScript支持**: 包含完整的类型定义
 ```typescript
-import type { bundleSvgs } from 'svg-morpheus-ts';
+import type { bundleSvgs } from '@iconsets/svg-morpheus-ts';
 
 const svgAttributes: Record<string, string | number> = {
   'data-theme': 'dark',
@@ -485,25 +493,7 @@ const svgAttributes: Record<string, string | number> = {
 };
 ```
 
-### API参考
-
-#### bundleSvgs(svgMap, svgAttributes?)
-
-- **svgMap**: `Record<string, string>` - 将图标ID映射到SVG源的对象
-- **svgAttributes**: `Record<string, string | number>` (可选) - 根SVG元素的自定义属性
-- **返回值**: `Promise<string>` - 生成的 Blob URL
-
-#### bundleSvgsString(svgMap, svgAttributes?)
-
-- **svgMap**: `Record<string, string>` - 将图标ID映射到SVG源的对象
-- **svgAttributes**: `Record<string, string | number>` (可选) - 根SVG元素的自定义属性
-- **返回值**: `Promise<string>` - 合并的SVG字符串
-
 ## 浏览器兼容性
-
-此库使用现代 Web API。以下是实现完整功能所需的最低浏览器版本：
-
-### 核心功能兼容性
 
 | 浏览器 | 最低版本 | 说明 |
 |--------|---------|------|
@@ -513,33 +503,10 @@ const svgAttributes: Record<string, string | number> = {
 | **Edge** | 14+ | 完全支持所有功能 |
 | **Internet Explorer** | ❌ 不支持 | 缺少 fetch API 和其他现代功能 |
 
-### 功能特定兼容性
+## 📄 许可证
 
-| API/功能 | Chrome | Firefox | Safari | Edge | IE |
-|----------|--------|---------|--------|------|-----|
-| **SVG 变形 (核心)** | 22+ | 11+ | 6+ | 12+ | 10+ |
-| **bundleSvgs (fetch API)** | 42+ | 39+ | 10.1+ | 14+ | ❌ |
-| **Blob/URL.createObjectURL** | 8+ | 4+ | 6+ | 12+ | 10+ |
-| **querySelector/querySelectorAll** | 4+ | 3.5+ | 3.1+ | 12+ | 9+ |
-| **requestAnimationFrame** | 22+ | 11+ | 6+ | 12+ | 10+ |
-| **addEventListener** | 1+ | 1+ | 1+ | 12+ | 9+ |
-| **createElementNS** | 1+ | 1+ | 1+ | 12+ | 9+ |
-| **getComputedStyle** | 1+ | 1+ | 1+ | 12+ | 9+ |
+MIT License
 
-### 建议
+## 🙏 致谢
 
-- **现代开发**: 使用 Chrome 42+、Firefox 39+、Safari 10.1+ 或 Edge 14+
-- **旧版支持**: 对于 IE 支持，考虑使用 fetch API 的 polyfill 或使用 XMLHttpRequest
-- **移动浏览器**: 支持所有现代移动浏览器
-- **bundleSvgs 功能**: 需要支持 fetch API 的现代浏览器
-
-### 旧版浏览器的 Polyfill
-
-如果需要支持旧版浏览器，请考虑这些 polyfill：
-
-```html
-<!-- 适用于 IE 11 和更旧的浏览器 -->
-<script src="https://polyfill.io/v3/polyfill.min.js?features=fetch,Promise"></script>
-```
-
-**注意**：核心 SVG 变形功能在较旧的浏览器中有效（IE 10+），但新的 `bundleSvgs` 功能需要支持 fetch API 的现代浏览器。
+基于 [adoin/SVG-Morpheus](https://github.com/adoin/SVG-Morpheus) 和 [SVG Morpheus](https://github.com/alexk111/SVG-Morpheus) 项目进行的重构。

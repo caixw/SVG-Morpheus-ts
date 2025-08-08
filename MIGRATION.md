@@ -7,21 +7,25 @@
 ## 📋 重构内容
 
 ### 1. 构建系统重构
+
 - **从**: Gulp 4.x + 复杂的构建配置
 - **到**: Vite 5.x + 简化的配置
 - **优势**: 更快的构建速度、HMR、现代化工具链
 
 ### 2. 语言升级
+
 - **从**: 纯 JavaScript (ES5/ES6)
 - **到**: TypeScript 5.x
 - **优势**: 类型安全、更好的IDE支持、编译时错误检查
 
 ### 3. 模块系统现代化
+
 - **从**: IIFE/UMD 全局变量模式
 - **到**: ESM 标准模块系统
 - **优势**: 标准化、树摇优化、更好的工具支持
 
 ### 4. 包管理器升级
+
 - **从**: npm
 - **到**: pnpm 8.x
 - **优势**: 更快安装速度、磁盘空间节省、严格依赖管理
@@ -54,9 +58,9 @@ SVG-Morpheus-ts/
 │   ├── svg-path.ts       # SVG路径处理 (替代snapsvglite)
 │   └── svg-morpheus.ts   # 主类 (TypeScript)
 ├── dist/                 # 构建输出
-│   ├── svg-morpheus.js   # ES模块
-│   ├── svg-morpheus.cjs  # CommonJS模块
-│   ├── svg-morpheus.umd.js # UMD模块
+│   ├── index.js   # ES模块
+│   ├── index.cjs  # CommonJS模块
+│   ├── index.umd.js # UMD模块
 │   └── *.d.ts           # TypeScript声明文件
 ├── vite.config.ts        # Vite配置
 ├── tsconfig.json         # TypeScript配置
@@ -67,6 +71,7 @@ SVG-Morpheus-ts/
 ## 🔧 技术改进
 
 ### 类型安全
+
 ```typescript
 // 重构前 (JavaScript)
 function SVGMorpheus(element, options, callback) {
@@ -86,16 +91,18 @@ class SVGMorpheus {
 ```
 
 ### 模块化
+
 ```javascript
 // 重构前 (全局变量)
 var morpheus = new SVGMorpheus('svg');
 
 // 重构后 (ESM)
-import { SVGMorpheus } from 'svg-morpheus-ts';
+import { SVGMorpheus } from '@iconsets/svg-morpheus-ts';
 const morpheus = new SVGMorpheus('svg');
 ```
 
 ### 构建优化
+
 ```json
 // 重构前 (Gulp)
 {
@@ -134,6 +141,7 @@ const morpheus = new SVGMorpheus('svg');
 - TypeScript声明文件 (`*.d.ts`)
 
 ### 2. 完整类型支持
+
 ```typescript
 interface SVGMorpheusOptions {
   iconId?: string;
@@ -144,6 +152,7 @@ interface SVGMorpheusOptions {
 ```
 
 ### 3. 现代开发工具
+
 - ESLint 代码质量检查
 - TypeScript 类型检查
 - Vite 热更新
@@ -152,7 +161,8 @@ interface SVGMorpheusOptions {
 ## 🔄 API 兼容性
 
 ### 向后兼容
-重构后的API保持与原版本的向后兼容性：
+
+重构后的 API 保持与原版本的向后兼容性：
 
 ```javascript
 // 原API - 仍然有效
@@ -163,7 +173,7 @@ const morpheus = new SVGMorpheus('svg', {
 morpheus.to('icon-name');
 
 // 新TypeScript API - 增强版
-import { SVGMorpheus, type SVGMorpheusOptions } from 'svg-morpheus-ts';
+import { SVGMorpheus, type SVGMorpheusOptions } from '@iconsets/svg-morpheus-ts';
 const options: SVGMorpheusOptions = { duration: 750 };
 const morpheus = new SVGMorpheus('svg', options);
 morpheus.to('icon-name');
@@ -173,7 +183,7 @@ morpheus.to('icon-name');
 
 ### 对于使用者
 
-#### ESM项目
+#### ESM 项目
 ```typescript
 // 旧版本
 <script src="svg-morpheus.js"></script>
@@ -184,9 +194,9 @@ import { SVGMorpheus } from 'svg-morpheus-ts';
 const morpheus = new SVGMorpheus('svg');
 ```
 
-#### TypeScript项目
+#### TypeScript 项目
 ```typescript
-import { SVGMorpheus, type SVGMorpheusOptions } from 'svg-morpheus-ts';
+import { SVGMorpheus, type SVGMorpheusOptions } from '@iconsets/svg-morpheus-ts';
 
 const options: SVGMorpheusOptions = {
   duration: 500,
@@ -259,4 +269,4 @@ const morpheus = new SVGMorpheus('#icon', options);
 - ✅ **多格式支持** - ESM、CJS、UMD
 - ✅ **完整类型定义** - TypeScript 原生支持
 
-这为项目的长期维护和发展奠定了坚实的基础。 
+这为项目的长期维护和发展奠定了坚实的基础。

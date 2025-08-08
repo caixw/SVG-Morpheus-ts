@@ -1,9 +1,11 @@
 import Color from 'colorjs.io';
 
-import { NormalizedStyle, StyleAttributes, Transform, CurveData } from './types';
+import { CurveData, NormalizedStyle, StyleAttributes, Transform } from './types';
 
 // Calculate style
-export function styleNormCalc(styleNormFrom: NormalizedStyle, styleNormTo: NormalizedStyle, progress: number): NormalizedStyle {
+export function styleNormCalc(
+    styleNormFrom: NormalizedStyle, styleNormTo: NormalizedStyle, progress: number
+): NormalizedStyle {
     const styleNorm: NormalizedStyle = {};
 
     for (const key in styleNormFrom) {
@@ -17,11 +19,9 @@ export function styleNormCalc(styleNormFrom: NormalizedStyle, styleNormTo: Norma
 
                     // 检测是否为渐变引用（字符串值）
                     if (typeof fromValue === 'string' || typeof toValue === 'string') {
-                        // 对于渐变引用，根据进度选择源值或目标值
-                        // 在动画中期（progress < 0.5）使用源值，后期使用目标值
+                        // 对于渐变引用，根据进度选择源值或目标值。在动画中期（progress < 0.5）使用源值，后期使用目标值
                         styleNorm[i] = progress < .5 ? fromValue : toValue;
-                    } else {
-                        // 对于RGB颜色值，进行正常插值
+                    } else { // 对于 RGB 颜色值，进行正常插值
                         styleNorm[i] = fromValue.clone();
                         styleNorm[i].r = fromValue.r + (toValue.r - fromValue.r) * progress;
                         styleNorm[i].g = fromValue.g + (toValue.g - fromValue.g) * progress;
@@ -53,11 +53,9 @@ export function styleNormToString(styleNorm: NormalizedStyle): StyleAttributes {
             case 'stroke':
                 if (styleNorm[i]) {
                     const value = styleNorm[i];
-                    if (typeof value === 'string') {
-                        // 对于渐变引用，直接使用字符串值
+                    if (typeof value === 'string') { // 对于渐变引用，直接使用字符串值
                         style[i] = value;
-                    } else {
-                        // 对于RGB对象，转换为颜色字符串
+                    } else { // 对于 RGB 对象，转换为颜色字符串
                         style[i] = value.toString();
                     }
                 }
@@ -66,16 +64,16 @@ export function styleNormToString(styleNorm: NormalizedStyle): StyleAttributes {
             case 'fill-opacity':
             case 'stroke-opacity':
             case 'stroke-width':
-                if (typeof styleNorm[i] === 'number') {
-                    style[i] = styleNorm[i].toFixed();
-                }
+                if (typeof styleNorm[i] === 'number') { style[i] = styleNorm[i].toFixed(); }
                 break;
         }
     }
     return style;
 }
 
-export function styleToNorm(styleFrom: StyleAttributes, styleTo: StyleAttributes, doc: SVGSVGElement | null): [NormalizedStyle, NormalizedStyle] {
+export function styleToNorm(
+    styleFrom: StyleAttributes, styleTo: StyleAttributes, doc: SVGSVGElement | null
+): [NormalizedStyle, NormalizedStyle] {
     const styleNorm: [NormalizedStyle, NormalizedStyle] = [{}, {}];
 
     // 检测是否为渐变引用
@@ -89,14 +87,10 @@ export function styleToNorm(styleFrom: StyleAttributes, styleTo: StyleAttributes
             case 'fill':
             case 'stroke':
                 if (styleFrom[i]) {
-                    if (isGradientReference(styleFrom[i]!)) {
-                        // 对于渐变引用，保持原始值，不进行RGB转换
+                    if (isGradientReference(styleFrom[i]!)) { // 对于渐变引用，保持原始值，不进行 RGB 转换
                         styleNorm[0][i] = styleFrom[i];
-                        if (styleTo[i] === undefined) {
-                            styleNorm[1][i] = styleFrom[i];
-                        }
-                    } else {
-                        // 对于普通颜色值，进行RGB转换
+                        if (styleTo[i] === undefined) { styleNorm[1][i] = styleFrom[i]; }
+                    } else { // 对于普通颜色值，进行 RGB 转换
                         styleNorm[0][i] = getRGB(doc, styleFrom[i]!);
                         if (styleTo[i] === undefined) {
                             styleNorm[1][i] = getRGB(doc, styleFrom[i]!);
@@ -111,9 +105,7 @@ export function styleToNorm(styleFrom: StyleAttributes, styleTo: StyleAttributes
             case 'stroke-width':
                 if (styleFrom[i]) {
                     (styleNorm[0][i] as any) = styleFrom[i];
-                    if (styleTo[i] === undefined) {
-                        styleNorm[1][i] = 1;
-                    }
+                    if (styleTo[i] === undefined) { styleNorm[1][i] = 1; }
                 }
                 break;
         }
@@ -125,14 +117,10 @@ export function styleToNorm(styleFrom: StyleAttributes, styleTo: StyleAttributes
             case 'fill':
             case 'stroke':
                 if (styleTo[i]) {
-                    if (isGradientReference(styleTo[i]!)) {
-                        // 对于渐变引用，保持原始值，不进行RGB转换
+                    if (isGradientReference(styleTo[i]!)) { // 对于渐变引用，保持原始值，不进行 RGB 转换
                         styleNorm[1][i] = styleTo[i];
-                        if (styleFrom[i] === undefined) {
-                            styleNorm[0][i] = styleTo[i];
-                        }
-                    } else {
-                        // 对于普通颜色值，进行RGB转换
+                        if (styleFrom[i] === undefined) { styleNorm[0][i] = styleTo[i]; }
+                    } else { // 对于普通颜色值，进行 RGB 转换
                         styleNorm[1][i] = getRGB(doc, styleTo[i]!);
                         if (styleFrom[i] === undefined) {
                             styleNorm[0][i] = getRGB(doc, styleTo[i]!);
@@ -147,9 +135,7 @@ export function styleToNorm(styleFrom: StyleAttributes, styleTo: StyleAttributes
             case 'stroke-width':
                 if (styleTo[i]) {
                     (styleNorm[1][i] as any) = styleTo[i];
-                    if (styleFrom[i] === undefined) {
-                        styleNorm[0][i] = 1;
-                    }
+                    if (styleFrom[i] === undefined) { styleNorm[0][i] = 1; }
                 }
                 break;
         }
@@ -171,8 +157,7 @@ export function transCalc(transFrom: Transform, transTo: Transform, progress: nu
                         const toVal = transTo[i]![j];
                         if (isFinite(fromVal) && isFinite(toVal) && isFinite(progress)) {
                             res[i]![j] = fromVal + (toVal - fromVal) * progress;
-                        } else {
-                            // 如果任何值无效，使用 from 值或默认值
+                        } else { // 如果任何值无效，使用 from 值或默认值
                             res[i]![j] = isFinite(fromVal) ? fromVal : 0;
                         }
                     }
@@ -190,8 +175,7 @@ export function trans2string(trans: Transform): string {
         const [angle, centerX, centerY] = trans.rotate;
         if (isFinite(angle) && isFinite(centerX) && isFinite(centerY)) {
             res += 'rotate(' + trans.rotate.join(' ') + ')';
-        } else {
-            // 如果有无效值，使用默认的变换
+        } else { // 如果有无效值，使用默认的变换
             res += 'rotate(0 0 0)';
         }
     }
@@ -204,9 +188,7 @@ export function curveCalc(curveFrom: CurveData, curveTo: CurveData, progress: nu
     for (let i = 0, len1 = curveFrom.length; i < len1; i++) {
         curve.push([curveFrom[i][0]]);
 
-        // 检查 curveTo[i] 是否存在
-        if (!curveTo[i]) {
-            // 如果 curveTo[i] 不存在，使用 curveFrom[i] 的值
+        if (!curveTo[i]) { // 如果 curveTo[i] 不存在，使用 curveFrom[i] 的值
             for (let j = 1, len2 = curveFrom[i].length; j < len2; j++) {
                 curve[i].push(curveFrom[i][j] as number);
             }
@@ -216,10 +198,8 @@ export function curveCalc(curveFrom: CurveData, curveTo: CurveData, progress: nu
         for (let j = 1, len2 = curveFrom[i].length; j < len2; j++) {
             const fromVal = curveFrom[i][j] as number;
 
-            // 检查 curveTo[i][j] 是否存在
-            const toVal = (curveTo[i] && curveTo[i][j] !== undefined) ?
-                curveTo[i][j] as number :
-                fromVal; // 如果不存在，使用 fromVal 作为默认值
+            // 检查 curveTo[i][j] 是否存在。如果不存在，使用 fromVal 作为默认值
+            const toVal = (curveTo[i] && curveTo[i][j] !== undefined) ? curveTo[i][j] as number : fromVal;
 
             curve[i].push(fromVal + (toVal - fromVal) * progress);
         }
@@ -228,8 +208,7 @@ export function curveCalc(curveFrom: CurveData, curveTo: CurveData, progress: nu
 }
 
 export function clone<T>(obj: T): T {
-    // Handle Array
-    if (obj instanceof Array) {
+    if (obj instanceof Array) { // Handle Array
         const copy = [];
         for (let i = 0, len = obj.length; i < len; i++) {
             copy[i] = clone(obj[i]);
@@ -237,17 +216,12 @@ export function clone<T>(obj: T): T {
         return copy as T;
     }
 
-    if (obj instanceof Color) {
-        return obj.clone();
-    }
+    if (obj instanceof Color) { return obj.clone(); } // Handle Color
 
-    // Handle Object
-    if (obj instanceof Object) {
+    if (obj instanceof Object) { // Handle Object
         const copy = {};
         for (const attr in obj) {
-            if (obj.hasOwnProperty(attr)) {
-                (copy as any)[attr] = clone((obj as any)[attr]);
-            }
+            if (obj.hasOwnProperty(attr)) { (copy as any)[attr] = clone((obj as any)[attr]); }
         }
         return copy as T;
     }
@@ -255,12 +229,12 @@ export function clone<T>(obj: T): T {
     return obj;
 }
 
-// Helper functions for color conversion - from snapsvglite.js
-
-// Parses color string as RGB object
-const getRGB = function (doc: SVGSVGElement | null, colour: string): Color {
+// 将字符串颜色值转换为用 RGB 表示的 Color 对象
+function getRGB(doc: SVGSVGElement | null, colour: string): Color {
     if (colour.toUpperCase() === 'CURRENTCOLOR') { // 如果是 currentColor，则尝试从 SVG 对象上获取真实的颜色值
-        const i = doc || window.document.getElementsByTagName('head')[0] || window.document.getElementsByTagName('svg')[0];
+        const i = doc || window.document.getElementsByTagName('head')[0]
+            || window.document.getElementsByTagName('svg')[0];
+
         if (i.style.color) {
             if (i.style.color.toUpperCase() === 'CURRENTCOLOR') { // SVG 上的 color 也是 currentColor
                 colour = window.getComputedStyle(i).getPropertyValue('color')!;
@@ -283,20 +257,16 @@ const getRGB = function (doc: SVGSVGElement | null, colour: string): Color {
  * @returns Promise<string> 合并后的 SVG 字符串
  */
 async function createBundledSvgString(
-    svgMap: Record<string, string>,
-    svgAttributes?: Record<string, string | number>
+    svgMap: Record<string, string>, svgAttributes?: Record<string, string | number>
 ): Promise<string> {
     const svgGroups: string[] = [];
 
     for (const [id, svgSource] of Object.entries(svgMap)) {
         let svgContent: string;
 
-        // 判断是 SVG 代码还是路径
-        if (isSvgContent(svgSource)) {
-            // 直接是 SVG 代码
+        if (isSvgContent(svgSource)) { // 直接是 SVG 代码
             svgContent = svgSource;
-        } else {
-            // 是路径，需要加载
+        } else { // 是路径，需要加载
             try {
                 const response = await fetch(svgSource);
                 if (!response.ok) {
@@ -310,30 +280,28 @@ async function createBundledSvgString(
             }
         }
 
-        // 提取原始SVG的ViewBox信息
+        // 提取原始 SVG 的 ViewBox 信息
         const originalViewBox = extractViewBoxInfo(svgContent);
         const originalDefs = extractDefsInfo(svgContent);
-        // 新增：提取SVG根属性（包括fill）
+
+        // 新增：提取 SVG 根属性（包括 fill）
         const rootAttributes = extractSvgRootAttributes(svgContent);
         const svgRootFill = rootAttributes['fill'];
 
-        // 提取 SVG 内容（去除外层 svg 标签）
-        let innerContent = extractSvgInnerContent(svgContent);
+        let innerContent = extractSvgInnerContent(svgContent); // 提取 SVG 内容（去除外层 svg 标签）
 
-        // 新增：如果svg标签有fill，处理所有可填充元素
-        if (svgRootFill) {
-            // 需要处理的标签列表
-            const fillTags = [
+
+        if (svgRootFill) { // 新增：如果 svg 标签有 fill，处理所有可填充元素
+            const fillTags = [ // 需要处理的标签列表
                 'path', 'polygon', 'rect', 'circle', 'ellipse', 'line', 'polyline'
             ];
             fillTags.forEach(tag => {
                 const tagReg = new RegExp(`<${tag}(\\s[^>]*)?>`, 'gi');
                 innerContent = innerContent.replace(tagReg, (match) => {
-                    // 如果已有fill属性，保持原样
-                    if (/fill\s*=\s*['"][^'"]*['"]/i.test(match)) {
+                    if (/fill\s*=\s*['"][^'"]*['"]/i.test(match)) { // 如果已有fill属性，保持原样
                         return match;
                     }
-                    // 没有fill属性，补上fill
+                    // 没有 fill 属性则补上
                     if (match.endsWith('/>')) {
                         return match.replace(new RegExp(`<${tag}(\\s*)`), `<${tag}$1 fill=\"${svgRootFill}\" `);
                     } else {
@@ -343,7 +311,7 @@ async function createBundledSvgString(
             });
         }
 
-        // 构建g标签的属性，保留ViewBox和其他重要信息
+        // 构建 g 标签的属性，保留 ViewBox 和其他重要信息
         let groupAttributes = `id="${id}"`;
         if (originalViewBox) {
             groupAttributes += ` data-original-viewbox="${originalViewBox.original}"`;
@@ -357,14 +325,12 @@ async function createBundledSvgString(
         svgGroups.push(groupContent);
     }
 
-    // 构建 SVG 属性字符串
-    const defaultAttributes = {
-        xmlns: 'http://www.w3.org/2000/svg',
-        style: 'display:none;'
-    };
-
     // 合并默认属性和用户自定义属性
-    const finalAttributes = { ...defaultAttributes, ...svgAttributes };
+    const finalAttributes = {
+        xmlns: 'http://www.w3.org/2000/svg',
+        style: 'display:none;',
+        ...svgAttributes
+    };
 
     // 将属性对象转换为字符串
     const attributesString = Object.entries(finalAttributes)
@@ -372,11 +338,9 @@ async function createBundledSvgString(
         .join(' ');
 
     // 合并所有 g 标签到一个 SVG 容器中
-    const bundledSvg = `<svg ${attributesString}>
+    return `<svg ${attributesString}>
 ${svgGroups.join('\n')}
 </svg>`;
-
-    return bundledSvg;
 }
 
 /**
@@ -386,8 +350,7 @@ ${svgGroups.join('\n')}
  * @returns Promise<string> 生成的 Blob URL
  */
 export async function bundleSvgs(
-    svgMap: Record<string, string>,
-    svgAttributes?: Record<string, string | number>
+    svgMap: Record<string, string>, svgAttributes?: Record<string, string | number>
 ): Promise<string> {
     const bundledSvg = await createBundledSvgString(svgMap, svgAttributes);
 
@@ -405,8 +368,7 @@ export async function bundleSvgs(
  * @returns Promise<string> 合并后的 SVG 字符串
  */
 export async function bundleSvgsString(
-    svgMap: Record<string, string>,
-    svgAttributes?: Record<string, string | number>
+    svgMap: Record<string, string>, svgAttributes?: Record<string, string | number>
 ): Promise<string> {
     return createBundledSvgString(svgMap, svgAttributes);
 }
@@ -418,21 +380,11 @@ export async function bundleSvgsString(
  */
 function isSvgContent(content: string): boolean {
     const trimmedContent = content.trim();
-
-    // 检查是否以 XML 声明开头
-    if (trimmedContent.startsWith('<?xml')) {
-        return trimmedContent.includes('<svg');
-    }
-
-    // 检查是否直接以 <svg 开头
-    if (trimmedContent.startsWith('<svg')) {
-        return true;
-    }
+    if (trimmedContent.startsWith('<?xml')) { return trimmedContent.includes('<svg'); } // 检查是否以 XML 声明开头
+    if (trimmedContent.startsWith('<svg')) { return true; } // 检查是否直接以 <svg 开头
 
     // 检查是否以 DOCTYPE 开头（某些 SVG 可能只有 DOCTYPE 而没有 XML 声明）
-    if (trimmedContent.startsWith('<!DOCTYPE svg')) {
-        return true;
-    }
+    if (trimmedContent.startsWith('<!DOCTYPE svg')) { return true; }
 
     return false;
 }
@@ -443,65 +395,46 @@ function isSvgContent(content: string): boolean {
  * @returns 内部内容
  */
 function extractSvgInnerContent(svgContent: string): string {
-    // 移除多余的空白字符
-    let cleanContent = svgContent.trim();
+    let cleanContent = svgContent.trim(); // 移除多余的空白字符
+    cleanContent = cleanContent.replace(/<\?xml[^?]*\?>\s*/gi, ''); // 移除 XML 声明（<?xml ... ?>）
+    cleanContent = cleanContent.replace(/<!DOCTYPE[^>]*>\s*/gi, ''); // 移除 DOCTYPE 声明
+    cleanContent = cleanContent.replace(/<\?[^?]*\?>\s*/gi, ''); // 移除其他可能的处理指令
+    cleanContent = cleanContent.trim(); // 重新移除可能产生的多余空白
+    const svgMatch = cleanContent.match(/<svg[^>]*>([\s\S]*?)<\/svg>/i); // 使用正则表达式匹配 svg 开始和结束标签
 
-    // 移除 XML 声明（<?xml ... ?>）
-    cleanContent = cleanContent.replace(/<\?xml[^?]*\?>\s*/gi, '');
+    if (svgMatch && svgMatch[1]) { return svgMatch[1].trim(); }
 
-    // 移除 DOCTYPE 声明
-    cleanContent = cleanContent.replace(/<!DOCTYPE[^>]*>\s*/gi, '');
-
-    // 移除其他可能的处理指令
-    cleanContent = cleanContent.replace(/<\?[^?]*\?>\s*/gi, '');
-
-    // 重新移除可能产生的多余空白
-    cleanContent = cleanContent.trim();
-
-    // 使用正则表达式匹配 svg 开始和结束标签
-    const svgMatch = cleanContent.match(/<svg[^>]*>([\s\S]*?)<\/svg>/i);
-
-    if (svgMatch && svgMatch[1]) {
-        return svgMatch[1].trim();
-    }
-
-    // 如果没有匹配到 svg 标签，可能内容本身就不是完整的 svg
-    // 尝试检查是否以 svg 标签开头
+    // 如果没有匹配到 svg 标签，可能内容本身就不是完整的 svg，尝试检查是否以 svg 标签开头
     if (cleanContent.startsWith('<svg')) {
-        // 找到第一个 > 后的内容
-        const firstTagEnd = cleanContent.indexOf('>');
+        const firstTagEnd = cleanContent.indexOf('>'); // 找到第一个 > 后的内容
         if (firstTagEnd !== -1) {
             const withoutOpenTag = cleanContent.substring(firstTagEnd + 1);
-            // 移除最后的 </svg>
-            const lastSvgTag = withoutOpenTag.lastIndexOf('</svg>');
-            if (lastSvgTag !== -1) {
-                return withoutOpenTag.substring(0, lastSvgTag).trim();
-            }
+            const lastSvgTag = withoutOpenTag.lastIndexOf('</svg>'); // 移除最后的 </svg>
+            if (lastSvgTag !== -1) { return withoutOpenTag.substring(0, lastSvgTag).trim(); }
         }
     }
 
-    // 如果都不匹配，返回原内容（可能已经是内部内容）
-    return cleanContent;
+    return cleanContent; // 如果都不匹配，返回原内容（可能已经是内部内容）
 }
 
 /**
- * 提取SVG的ViewBox信息
- * @param svgContent SVG字符串
- * @returns ViewBox信息
+ * 提取 SVG 的 ViewBox 信息
+ * @param svgContent SVG 字符串
+ * @returns ViewBox 信息
  */
 export function extractViewBoxInfo(svgContent: string) {
     const svgMatch = svgContent.match(/<svg[^>]*>/i);
-    if (!svgMatch) return null;
+    if (!svgMatch) { return null; }
 
     const svgTag = svgMatch[0];
     const viewBoxMatch = svgTag.match(/viewBox\s*=\s*["']([^"']+)["']/i);
 
-    if (!viewBoxMatch) return null;
+    if (!viewBoxMatch) { return null; }
 
     const viewBoxStr = viewBoxMatch[1];
     const values = viewBoxStr.trim().split(/\s+/).map(Number);
 
-    if (values.length !== 4) return null;
+    if (values.length !== 4) { return null; }
 
     return {
         values: [values[0], values[1], values[2], values[3]] as [number, number, number, number],
@@ -510,9 +443,9 @@ export function extractViewBoxInfo(svgContent: string) {
 }
 
 /**
- * 提取SVG的defs信息
- * @param svgContent SVG字符串
- * @returns defs信息
+ * 提取 SVG 的 defs 信息
+ * @param svgContent SVG 字符串
+ * @returns defs 信息
  */
 export function extractDefsInfo(svgContent: string) {
     const defsInfo = {
@@ -522,7 +455,7 @@ export function extractDefsInfo(svgContent: string) {
         raw: undefined as string | undefined
     };
 
-    // 提取整个defs块
+    // 提取整个 defs 块
     const defsMatch = svgContent.match(/<defs[^>]*>([\s\S]*?)<\/defs>/i);
     if (!defsMatch) return defsInfo;
 
@@ -534,9 +467,7 @@ export function extractDefsInfo(svgContent: string) {
     if (linearGradients) {
         linearGradients.forEach(gradient => {
             const idMatch = gradient.match(/id\s*=\s*["']([^"']+)["']/i);
-            if (idMatch) {
-                defsInfo.gradients[idMatch[1]] = gradient;
-            }
+            if (idMatch) { defsInfo.gradients[idMatch[1]] = gradient; }
         });
     }
 
@@ -545,9 +476,7 @@ export function extractDefsInfo(svgContent: string) {
     if (radialGradients) {
         radialGradients.forEach(gradient => {
             const idMatch = gradient.match(/id\s*=\s*["']([^"']+)["']/i);
-            if (idMatch) {
-                defsInfo.gradients[idMatch[1]] = gradient;
-            }
+            if (idMatch) { defsInfo.gradients[idMatch[1]] = gradient; }
         });
     }
 
@@ -556,9 +485,7 @@ export function extractDefsInfo(svgContent: string) {
     if (patterns) {
         patterns.forEach(pattern => {
             const idMatch = pattern.match(/id\s*=\s*["']([^"']+)["']/i);
-            if (idMatch) {
-                defsInfo.patterns[idMatch[1]] = pattern;
-            }
+            if (idMatch) { defsInfo.patterns[idMatch[1]] = pattern; }
         });
     }
 
@@ -567,9 +494,7 @@ export function extractDefsInfo(svgContent: string) {
     if (others) {
         others.forEach(other => {
             const idMatch = other.match(/id\s*=\s*["']([^"']+)["']/i);
-            if (idMatch) {
-                defsInfo.others[idMatch[1]] = other;
-            }
+            if (idMatch) { defsInfo.others[idMatch[1]] = other; }
         });
     }
 
@@ -577,8 +502,8 @@ export function extractDefsInfo(svgContent: string) {
 }
 
 /**
- * 提取SVG根元素的属性
- * @param svgContent SVG字符串
+ * 提取 SVG 根元素的属性
+ * @param svgContent SVG 字符串
  * @returns 属性对象
  */
 export function extractSvgRootAttributes(svgContent: string) {
@@ -593,11 +518,9 @@ export function extractSvgRootAttributes(svgContent: string) {
     if (attrMatches) {
         attrMatches.forEach(attr => {
             const [, name, value] = attr.match(/(\w+)\s*=\s*["']([^"']*)["']/) || [];
-            if (name && value) {
-                attributes[name] = value;
-            }
+            if (name && value) { attributes[name] = value; }
         });
     }
 
     return attributes;
-} 
+}
