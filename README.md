@@ -388,7 +388,7 @@ const morpheus = new SVGMorpheus('svg');
 - 🔒 **严格的依赖管理** - 防止幽灵依赖问题
 - 🛡️ **更好的安全性** - 更严格的包解析机制
 
-## 🆕 动态SVG合并
+## 🆕 动态 SVG 合并
 
 新的 `bundleSvgs` 和 `bundleSvgsString` 功能允许你在运行时动态创建 iconset 风格的 SVG 文件，非常适合需要灵活图标管理的现代应用程序。
 

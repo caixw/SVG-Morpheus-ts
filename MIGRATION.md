@@ -190,7 +190,7 @@ morpheus.to('icon-name');
 const morpheus = new SVGMorpheus('svg');
 
 // 新版本
-import { SVGMorpheus } from 'svg-morpheus-ts';
+import { SVGMorpheus } from '@iconsets/svg-morpheus-ts';
 const morpheus = new SVGMorpheus('svg');
 ```
 

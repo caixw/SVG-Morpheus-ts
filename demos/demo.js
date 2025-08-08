@@ -102,7 +102,7 @@ const i18nData = {
         id="icon"></object>
 
 // 3. JavaScript initialization
-import { SVGMorpheus } from 'svg-morpheus-ts';
+import { SVGMorpheus } from '@iconsets/svg-morpheus-ts';
 
 const morpheus = new SVGMorpheus('#icon', {
   duration: 600,
@@ -123,7 +123,7 @@ morpheus.to('another-icon', {
 import {
   SVGMorpheus,
   bundleSvgs
-} from 'svg-morpheus-ts';
+} from '@iconsets/svg-morpheus-ts';
 
 // 2. Define SVG icon mapping (including new icons!)
 const svgMap = {
@@ -196,7 +196,7 @@ morpheus.to('diving'); // Try the new diving icon!`
         id="icon"></object>
 
 // 3. JavaScript 初始化
-import { SVGMorpheus } from 'svg-morpheus-ts';
+import { SVGMorpheus } from '@iconsets/svg-morpheus-ts';
 
 const morpheus = new SVGMorpheus('#icon', {
   duration: 600,
@@ -217,7 +217,7 @@ morpheus.to('another-icon', {
 import {
   SVGMorpheus,
   bundleSvgs
-} from 'svg-morpheus-ts';
+} from '@iconsets/svg-morpheus-ts';
 
 // 2. 定义 SVG 图标映射（包含新图标！）
 const svgMap = {

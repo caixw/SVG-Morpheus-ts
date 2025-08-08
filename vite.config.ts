@@ -23,7 +23,7 @@ export default defineConfig(({ mode }) => {
         // 根据模式设置不同的 root
         root: (isDemo || isDev) ? 'demos' : '.',
         base,
-        publicDir: (isDemo || isDev) ? '../public' : 'public',
+        publicDir: (isDemo || isDev) ? '../public' : undefined,
 
         // 定义全局常量，在开发和构建环境都可用
         define: {
@@ -32,12 +32,11 @@ export default defineConfig(({ mode }) => {
         },
 
         plugins: [
-            // 只在库模式下使用dts插件
+            // 只在库模式下使用 dts 插件
             ...(isDemo || isDev ? [] : [dts({ insertTypesEntry: true })]),
         ],
 
-        build: isDemo ? {
-            // Demo 构建配置
+        build: isDemo ? { // Demo 构建配置
             outDir: '../docs',
             emptyOutDir: true,
             target: ['es2022', 'chrome89', 'firefox89', 'safari15'],
@@ -62,22 +61,21 @@ export default defineConfig(({ mode }) => {
  */`,
                 },
             },
-        } : {
-            // 库构建配置
+        } : { // 库构建配置
             lib: {
                 entry: './src/index.ts',
                 name: 'SVGMorpheus',
                 formats: ['es', 'cjs', 'umd'],
                 fileName: (format) => {
                     switch (format) {
-                        case 'es':
-                            return 'index.js';
-                        case 'cjs':
-                            return 'index.cjs';
-                        case 'umd':
-                            return 'index.umd.js';
-                        default:
-                            return `index.${format}.js`;
+                    case 'es':
+                        return 'index.js';
+                    case 'cjs':
+                        return 'index.cjs';
+                    case 'umd':
+                        return 'index.umd.js';
+                    default:
+                        return `index.${format}.js`;
                     }
                 },
             },
@@ -86,6 +84,12 @@ export default defineConfig(({ mode }) => {
                 output: {
                     exports: 'named',
                     globals: {},
+                    banner: () => `/*!
+ * SVG Morpheus TypeScript
+ * Version: v${version}
+ * Build Date: ${new Date().toISOString()}
+ * Repository: https://github.com/caixw/SVG-Morpheus-ts
+ */`,
                 },
             },
         },
@@ -98,7 +102,7 @@ export default defineConfig(({ mode }) => {
         resolve: {
             alias: {
                 '@': resolve(__dirname, 'src'),
-                'svg-morpheus-ts': resolve(__dirname, 'src/index.ts'),
+                '@iconsets/svg-morpheus-ts': resolve(__dirname, 'src/index.ts'),
             },
         },
     };
