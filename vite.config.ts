@@ -1,7 +1,7 @@
+import { readFileSync } from 'fs';
+import { resolve } from 'path';
 import { defineConfig } from 'vite';
 import dts from 'vite-plugin-dts';
-import { resolve } from 'path';
-import { readFileSync } from 'fs';
 
 // 读取 package.json 获取版本号
 const packageJson = JSON.parse(readFileSync(resolve(__dirname, 'package.json'), 'utf-8'));
@@ -38,7 +38,7 @@ export default defineConfig(({ mode }) => {
 
         build: isDemo ? {
             // Demo构建配置
-            outDir: '../dist-demo',
+            outDir: '../docs',
             emptyOutDir: true,
             target: ['es2022', 'chrome89', 'firefox89', 'safari15'],
             minify: 'terser',
@@ -58,7 +58,7 @@ export default defineConfig(({ mode }) => {
  * SVG Morpheus TypeScript Demo - Compiled Version
  * Version: v${version}
  * Build Date: ${new Date().toISOString()}
- * Repository: https://github.com/adoin/SVG-Morpheus-ts
+ * Repository: https://github.com/caixw/SVG-Morpheus-ts
  */`,
                 },
             },
