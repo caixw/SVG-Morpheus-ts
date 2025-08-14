@@ -33,7 +33,8 @@
 ## 🗂️ 文件结构对比
 
 ### 重构前
-```
+
+```text
 SVG-Morpheus/
 ├── source/js/
 │   ├── deps/
@@ -49,7 +50,8 @@ SVG-Morpheus/
 ```
 
 ### 重构后
-```
+
+```text
 SVG-Morpheus-ts/
 ├── src/
 │   ├── types.ts          # TypeScript 类型定义
@@ -135,6 +137,7 @@ const morpheus = new SVGMorpheus('svg');
 ## 🚀 新功能特性
 
 ### 1. 多格式输出
+
 - ES模块 (`svg-morpheus.js`)
 - CommonJS (`svg-morpheus.cjs`)
 - UMD (`svg-morpheus.umd.js`)
@@ -184,6 +187,7 @@ morpheus.to('icon-name');
 ### 对于使用者
 
 #### ESM 项目
+
 ```typescript
 // 旧版本
 <script src="svg-morpheus.js"></script>
@@ -195,6 +199,7 @@ const morpheus = new SVGMorpheus('svg');
 ```
 
 #### TypeScript 项目
+
 ```typescript
 import { SVGMorpheus, type SVGMorpheusOptions } from '@iconsets/svg-morpheus-ts';
 
@@ -209,11 +214,13 @@ const morpheus = new SVGMorpheus('#icon', options);
 ### 对于开发者
 
 1. **安装 pnpm**
+
    ```bash
    npm install -g pnpm
    ```
 
 2. **克隆并安装依赖**
+
    ```bash
    git clone <repo>
    cd SVG-Morpheus-ts
@@ -221,11 +228,13 @@ const morpheus = new SVGMorpheus('#icon', options);
    ```
 
 3. **开发模式**
+
    ```bash
    pnpm dev
    ```
 
 4. **构建**
+
    ```bash
    pnpm build
    ```

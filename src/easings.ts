@@ -1,6 +1,7 @@
 // Easing functions collection - from easings.js
 
 const asin1 = Math.asin(1);
+
 const pi2 = Math.PI * 2;
 
 export const easings = {

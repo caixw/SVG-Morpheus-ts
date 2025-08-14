@@ -1,6 +1,6 @@
 # SVG Morpheus TypeScript
 
-> **⚡ 本项目基于 [adoin/SVG-Morpheus](https://github.com/adoin/SVG-Morpheus) 和 [alexk111/SVG-Morpheus](https://github.com/alexk111/SVG-Morpheus) 重构**
+> **⚡ 本项目基于 [adoin/SVG-Morpheus](https://github.com/adoin/SVG-Morpheus-ts) 和 [alexk111/SVG-Morpheus](https://github.com/alexk111/SVG-Morpheus) 重构**
 
 JavaScript 库，使 SVG 图标能够从一个变形到另一个。它实现了 Material Design 的精美细节过渡效果。
 
@@ -26,16 +26,17 @@ JavaScript 库，使 SVG 图标能够从一个变形到另一个。它实现了 
 
 ## 🎉 v1.3.0 新特性
 
-###  🔧 功能增强
+### 🔧 功能增强
 
- - 引入 colorjs.io，基本支持所有的 CSS 颜色类型；
- - 采用 colorjs.io 中的 Color 对象代替了原来自定义的 RGBColor 和 RGBColorWithError；
+- 引入 colorjs.io，基本支持所有的 CSS 颜色类型；
+- 采用 colorjs.io 中的 Color 对象代替了原来自定义的 RGBColor 和 RGBColorWithError；
 
 ## 🎉 v1.2.0 新特性
 
 ### 🐛 关键错误修复
 
-**修复旋转动画"位移"效果**
+**修复旋转动画"位移"效果**:
+
 - ✅ **统一旋转中心**：所有路径现在围绕统一的几何中心旋转，而不是各自的路径中心
 - ✅ **修复角度累积**：解决了旋转角度无限累积的错误（5760° → 6120°）
 - ✅ **平滑变形**：消除了旋转动画中的"飞行"或"位移"效果
@@ -43,12 +44,14 @@ JavaScript 库，使 SVG 图标能够从一个变形到另一个。它实现了 
 
 ### 🔧 功能增强
 
-**渐变坐标转换**
+**渐变坐标转换**:
+
 - ✅ **同步渐变缩放**：渐变现在能在坐标系统转换时与路径正确同步缩放
 - ✅ **正确的渐变中心计算**：修复了不同 ViewBox 尺寸之间变形时的渐变定位
 - ✅ **增强图案支持**：改进了坐标转换期间对 SVG 图案的处理
 
-**代码质量改进**
+**代码质量改进**:
+
 - ✅ **清理代码库**：移除了所有实验性/调试代码，提高了可维护性
 - ✅ **优化性能**：简化了旋转中心计算算法
 - ✅ **更新依赖**：更新了 highlight.js CDN 为更可靠的 unpkg.com 源
@@ -56,6 +59,7 @@ JavaScript 库，使 SVG 图标能够从一个变形到另一个。它实现了 
 ### 🎯 技术细节
 
 **修复前 (v1.1.x)**:
+
 ```javascript
 // 各自的旋转中心导致"位移"效果
 path1Center: (17.38, 0.006)  // vite 路径 1
@@ -65,6 +69,7 @@ targetCenter: (12, 12)       // diamond 中心
 ```
 
 **修复后 (v1.2.0)**:
+
 ```javascript
 // 统一旋转中心消除位移效果
 unifiedCenter: (147.02, 107.00)  // 所有路径中心的平均值
@@ -72,6 +77,7 @@ unifiedCenter: (147.02, 107.00)  // 所有路径中心的平均值
 ```
 
 **渐变转换**:
+
 ```javascript
 // 现在能正确转换渐变坐标
 linearGradient: x1="0%" y1="0%" x2="100%" y2="100%"
@@ -294,6 +300,7 @@ pnpm build
 ```
 
 构建产物将输出到 `dist/` 目录：
+
 - `index.js` - ES 模块
 - `index.cjs` - CommonJS 模块
 - `index.umd.js` - UMD 模块
@@ -468,6 +475,7 @@ document.getElementById('svg-container').innerHTML = bundledSvgString;
 ### 高级特性
 
 **智能内容检测**: 自动检测输入是SVG代码还是文件路径
+
 ```typescript
 const mixedSources = {
   'inline': '<svg>...</svg>',      // 直接的 SVG 代码
@@ -477,6 +485,7 @@ const mixedSources = {
 ```
 
 **错误处理**: 优雅地处理加载失败
+
 ```typescript
 const bundledSvg = await bundleSvgs({
   'valid': '<svg>...</svg>',
@@ -485,6 +494,7 @@ const bundledSvg = await bundleSvgs({
 ```
 
 **TypeScript支持**: 包含完整的类型定义
+
 ```typescript
 import type { bundleSvgs } from '@iconsets/svg-morpheus-ts';
 
@@ -510,4 +520,4 @@ MIT License
 
 ## 🙏 致谢
 
-基于 [adoin/SVG-Morpheus](https://github.com/adoin/SVG-Morpheus) 和 [SVG Morpheus](https://github.com/alexk111/SVG-Morpheus) 项目进行的重构。
+基于 [adoin/SVG-Morpheus](https://github.com/adoin/SVG-Morpheus-ts) 和 [SVG Morpheus](https://github.com/alexk111/SVG-Morpheus) 项目进行的重构。

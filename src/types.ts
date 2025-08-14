@@ -16,7 +16,7 @@ export type Rotation = typeof rotations[number];
 // SVG Morpheus configuration options | SVG Morpheus 配置选项
 export interface SVGMorpheusOptions {
     /**
-     * Initial icon ID to display | 初始显示的图标ID
+     * Initial icon ID to display | 初始显示的图标 ID
      * Specifies which icon to display by default when SVGMorpheus is instantiated | 指定 SVGMorpheus 实例化后默认显示哪个图标
      * If not specified, the last icon in the SVG will be used as default | 如果不指定，将使用 SVG 中的最后一个图标作为默认图标
      */

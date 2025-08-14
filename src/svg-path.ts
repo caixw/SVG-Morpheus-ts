@@ -93,7 +93,7 @@ export function pathToAbsolute(pathArray: any): any {
                 mx = +pa[1] + x;
                 my = +pa[2] + y;
                 // Intentional fallthrough to default case
-                 
+
             default:
                 for (let j = 1, jj = pa.length; j < jj; j++) {
                     r[j] = +pa[j] + ((j % 2) ? x : y);

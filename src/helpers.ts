@@ -298,7 +298,7 @@ async function createBundledSvgString(
             fillTags.forEach(tag => {
                 const tagReg = new RegExp(`<${tag}(\\s[^>]*)?>`, 'gi');
                 innerContent = innerContent.replace(tagReg, (match) => {
-                    if (/fill\s*=\s*['"][^'"]*['"]/i.test(match)) { // 如果已有fill属性，保持原样
+                    if (/fill\s*=\s*['"][^'"]*['"]/i.test(match)) { // 如果已有 fill 属性，保持原样
                         return match;
                     }
                     // 没有 fill 属性则补上
