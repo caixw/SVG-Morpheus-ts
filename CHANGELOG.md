@@ -83,4 +83,4 @@ After:  unifiedCenter(147.02, 107.00) for all paths
 - Vite-based build system
 - Full type safety support
 - Backward compatibility with original API
-- Chinese and English documentation 
+- Chinese and English documentation
