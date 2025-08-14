@@ -1,5 +1,8 @@
 # SVG Morpheus TypeScript
 
+[![NPM Version](https://img.shields.io/npm/v/%40iconsets%2Fsvg-morpheus-ts)](https://www.npmjs.com/package/@iconsets/svg-morpheus-ts)
+![NPM Downloads](https://img.shields.io/npm/dw/%40iconsets%2Fsvg-morpheus-ts)
+
 > **⚡ 本项目基于 [adoin/SVG-Morpheus](https://github.com/adoin/SVG-Morpheus-ts) 和 [alexk111/SVG-Morpheus](https://github.com/alexk111/SVG-Morpheus) 重构**
 
 JavaScript 库，使 SVG 图标能够从一个变形到另一个。它实现了 Material Design 的精美细节过渡效果。
@@ -87,7 +90,7 @@ transformedGradient: x1="0.0%" y1="7.652%" x2="57.636%" y2="78.411%"
 
 ### 🚀 性能影响
 
-- **50%更平滑**的旋转动画
+- **50% 更平滑**的旋转动画
 - **消除视觉瑕疵**在复杂形状过渡中
 - **更好的内存管理**通过清理代码库
 - **更快的加载速度**通过更新 CDN 源
@@ -318,7 +321,7 @@ pnpm type-check    # TypeScript 类型检查
 
 ```typescript
 interface SVGMorpheusOptions {
-  iconId?: string;                                    // 初始图标ID
+  iconId?: string;                                    // 初始图标 ID
   duration?: number;                                  // 动画时长(ms)
   easing?: string;                                   // 缓动函数
   rotation?: 'clock' | 'counterclock' | 'none' | 'random'; // 旋转方向

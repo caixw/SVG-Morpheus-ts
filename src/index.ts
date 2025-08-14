@@ -3,6 +3,7 @@
 export { SVGMorpheus as default, SVGMorpheus } from './svg-morpheus';
 
 export { rotations } from './types';
+
 export type {
     BoundingBox,
     CallbackFunction,
@@ -22,8 +23,7 @@ export { easings } from './easings';
 export {
     bundleSvgs, // 🆕 动态 SVG 合并，返回 Blob URL
     bundleSvgsString, // 🆕 动态 SVG 合并，返回 SVG 字符串
-    clone, curveCalc, styleNormCalc,
-    styleNormToString,
+    clone, curveCalc, styleNormCalc, styleNormToString,
     styleToNorm, trans2string, transCalc
 } from './helpers';
 

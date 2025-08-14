@@ -9,7 +9,7 @@
 ### 1. 构建系统重构
 
 - **从**: Gulp 4.x + 复杂的构建配置
-- **到**: Vite 5.x + 简化的配置
+- **到**: Vite 7.x + 简化的配置
 - **优势**: 更快的构建速度、HMR、现代化工具链
 
 ### 2. 语言升级
@@ -27,7 +27,7 @@
 ### 4. 包管理器升级
 
 - **从**: npm
-- **到**: pnpm 8.x
+- **到**: pnpm 9.x
 - **优势**: 更快安装速度、磁盘空间节省、严格依赖管理
 
 ## 🗂️ 文件结构对比
@@ -138,10 +138,10 @@ const morpheus = new SVGMorpheus('svg');
 
 ### 1. 多格式输出
 
-- ES模块 (`svg-morpheus.js`)
-- CommonJS (`svg-morpheus.cjs`)
-- UMD (`svg-morpheus.umd.js`)
-- TypeScript声明文件 (`*.d.ts`)
+- ES 模块 (`index.js`)
+- CommonJS (`index.cjs`)
+- UMD (`index.umd.js`)
+- TypeScript 声明文件 (`*.d.ts`)
 
 ### 2. 完整类型支持
 
@@ -175,7 +175,7 @@ const morpheus = new SVGMorpheus('svg', {
 });
 morpheus.to('icon-name');
 
-// 新TypeScript API - 增强版
+// 新 TypeScript API - 增强版
 import { SVGMorpheus, type SVGMorpheusOptions } from '@iconsets/svg-morpheus-ts';
 const options: SVGMorpheusOptions = { duration: 750 };
 const morpheus = new SVGMorpheus('svg', options);
@@ -243,12 +243,12 @@ const morpheus = new SVGMorpheus('#icon', options);
 
 | 工具类别 | 重构前 | 重构后 |
 |----------|--------|--------|
-| 构建工具 | Gulp | Vite |
-| 语言 | JavaScript | TypeScript |
+| 构建工具 | Gulp   | Vite |
+| 语言     | JavaScript | TypeScript |
 | 代码检查 | JSHint | ESLint + TypeScript |
-| 包管理 | npm | pnpm |
+| 包管理   | npm    | pnpm |
 | 模块格式 | IIFE/UMD | ESM/CJS/UMD |
-| 热更新 | LiveReload | Vite HMR |
+| 热更新   | LiveReload | Vite HMR |
 
 ## 📈 未来规划
 

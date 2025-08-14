@@ -7,7 +7,7 @@
  * Build Date: ${new Date().toISOString()}
  */
 
-// 动态导入SVGMorpheus模块
+// 动态导入 SVGMorpheus 模块
 async function loadSVGMorpheus() {
   // 根据环境选择导入路径
   const isDemoMode = import.meta.env.MODE === 'demo';
@@ -37,8 +37,8 @@ async function loadSVGMorpheus() {
 let SVGMorpheus, bundleSvgs;
 
 // 全局变量由 Vite 构建时注入
-// __SVG_BASE_PATH__: string - SVG文件的基础路径
-// __IS_GITHUB_PAGES__: boolean - 是否为GitHub Pages环境
+// __SVG_BASE_PATH__: string - SVG 文件的基础路径
+// __IS_GITHUB_PAGES__: boolean - 是否为 GitHub Pages 环境
 
 // 动态路径处理函数
 function getSvgPath(filename) {
@@ -287,19 +287,19 @@ function updateTexts() {
     }
   });
 
-  // 更新代码块 - 使用特殊处理避免highlight.js清理HTML标签
+  // 更新代码块 - 使用特殊处理避免 highlight.js 清理 HTML 标签
   document.querySelectorAll('[data-i18n-code]').forEach(element => {
     const key = element.getAttribute('data-i18n-code');
     if (texts[key]) {
       // 先设置文本内容
       element.textContent = texts[key];
-      // 移除之前的高亮类，让highlight.js重新处理
+      // 移除之前的高亮类，让 highlight.js 重新处理
       element.removeAttribute('data-highlighted');
       element.className = element.className.replace(/hljs[^\s]*/g, '').trim();
     }
   });
 
-  // 延迟执行highlight.js，确保DOM更新完成
+  // 延迟执行 highlight.js，确保 DOM 更新完成
   if (typeof hljs !== 'undefined') {
     setTimeout(() => {
       document.querySelectorAll('[data-i18n-code]').forEach((block) => {
@@ -569,7 +569,7 @@ async function init() {
           loadingIndicator.style.display = 'none';
         }
 
-        // 显示SVG和选项
+        // 显示 SVG 和选项
         iconObject.style.display = 'block';
         if (dynamicOptionsContainer) {
           dynamicOptionsContainer.style.display = 'block';
@@ -709,7 +709,7 @@ function copyCode(button) {
   const codeSection = button.closest('.code-section');
   const codeElement = codeSection.querySelector('pre code');
 
-  // 获取纯文本内容，去掉HTML标签
+  // 获取纯文本内容，去掉 HTML 标签
   let codeText = codeElement.textContent || codeElement.innerText;
 
   // 清理多余的空白
