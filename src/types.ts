@@ -3,7 +3,6 @@ import Color from 'colorjs.io';
 // Animation easing functions | 动画缓动函数类型
 export type EasingFunction = (t: number) => number;
 
-
 /**
  * 可用的旋转方式
  */
@@ -173,7 +172,7 @@ export interface ToMethodOptions {
     /**
      * Animation duration in milliseconds | 动画持续时间（毫秒）
      * Overrides the instance default animation duration, only applies to current morph | 覆盖实例默认的动画持续时间，仅对当前这次变形生效
-     * @example 500 // 0.5 second fast morph | 0.5秒的快速变形
+     * @example 500 // 0.5 second fast morph | 0.5 秒的快速变形
      */
     duration?: number;
 
@@ -192,7 +191,7 @@ export interface ToMethodOptions {
      * - 'none': No rotation | 不旋转
      * - 'random': Random rotation direction | 随机旋转方向
      */
-    rotation?: 'clock' | 'counterclock' | 'none' | 'random';
+    rotation?: Rotation;
 }
 
 /**
@@ -204,9 +203,6 @@ export interface ToMethodOptions {
  * };
  */
 export type CallbackFunction = () => void;
-
-// Animation frame request ID | 动画帧请求ID
-export type AnimationFrameId = number;
 
 // Easing functions map | 缓动函数映射
 export interface EasingMap {

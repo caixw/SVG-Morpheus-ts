@@ -22,7 +22,7 @@ JavaScript 库，使 SVG 图标能够从一个变形到另一个。它实现了 
 - ✅ **现代工具链** - ESLint、TypeScript 类型检查
 - ✅ **开发体验** - HMR、快速重载
 - ✅ **pnpm** - 高效的包管理器
-- ✅ **动态SVG合并** - 🆕 运行时SVG图标集生成
+- ✅ **动态 SVG 合并** - 🆕 运行时 SVG 图标集生成
 
 ## 🎉 v1.3.0 新特性
 
@@ -268,8 +268,8 @@ const morpheus = new SVGMorpheus('#my-svg', options, () => {
 - `path2curve` - 路径转曲线
 - `path2string` - 路径转字符串
 - `curvePathBBox` - 计算曲线边界框
-- `bundleSvgs` - 🆕 动态SVG合并工具
-- `bundleSvgsString` - 🆕 动态SVG合并，返回 SVG 字符串
+- `bundleSvgs` - 🆕 动态 SVG 合并工具
+- `bundleSvgsString` - 🆕 动态 SVG 合并，返回 SVG 字符串
 
 ## 🛠️ 开发
 
@@ -330,7 +330,7 @@ interface SVGMorpheusOptions {
 - `circ-in`, `circ-out`, `circ-in-out`
 - `elastic-in`, `elastic-out`, `elastic-in-out`
 
-这此名称可以通过 `Object.keys(easings)` 获取所有支持的缓动函数名称；
+这些名称可以通过 `Object.keys(easings)` 获取；
 
 ### 自定义缓动函数
 

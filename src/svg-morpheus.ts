@@ -8,7 +8,7 @@ import {
 } from './helpers';
 import { curvePathBBox, path2curve, path2string } from './svg-path';
 import {
-    AnimationFrameId, BoundingBox, CallbackFunction, DefsInfo, EasingFunction, Icon,
+    BoundingBox, CallbackFunction, DefsInfo, EasingFunction, Icon,
     IconItem, MorphNode, StyleAttributes, SVGMorpheusOptions, ToMethodOptions, ViewBoxInfo
 } from './types';
 
@@ -30,7 +30,7 @@ export class SVGMorpheus {
     private _easing: string;
     private _rotation: string;
     private _callback: CallbackFunction;
-    private _rafid: AnimationFrameId | undefined;
+    private _rafid: number | undefined;
     private _svgDoc: SVGSVGElement | null = null;
     private _fnTick: (timePassed: number) => void;
 

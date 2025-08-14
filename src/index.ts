@@ -20,8 +20,8 @@ export type {
 export { easings } from './easings';
 
 export {
-    bundleSvgs, // 🆕 动态SVG合并，返回 Blob URL
-    bundleSvgsString, // 🆕 动态SVG合并，返回 SVG 字符串
+    bundleSvgs, // 🆕 动态 SVG 合并，返回 Blob URL
+    bundleSvgsString, // 🆕 动态 SVG 合并，返回 SVG 字符串
     clone, curveCalc, styleNormCalc,
     styleNormToString,
     styleToNorm, trans2string, transCalc

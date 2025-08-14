@@ -16,7 +16,7 @@
 
 - **从**: 纯 JavaScript (ES5/ES6)
 - **到**: TypeScript 5.x
-- **优势**: 类型安全、更好的IDE支持、编译时错误检查
+- **优势**: 类型安全、更好的 IDE 支持、编译时错误检查
 
 ### 3. 模块系统现代化
 
@@ -55,16 +55,16 @@ SVG-Morpheus-ts/
 │   ├── types.ts          # TypeScript 类型定义
 │   ├── helpers.ts        # 工具函数 (TypeScript)
 │   ├── easings.ts        # 缓动函数 (TypeScript)
-│   ├── svg-path.ts       # SVG路径处理 (替代snapsvglite)
+│   ├── svg-path.ts       # SVG 路径处理 (替代 snapsvglite)
 │   └── svg-morpheus.ts   # 主类 (TypeScript)
 ├── dist/                 # 构建输出
-│   ├── index.js   # ES模块
-│   ├── index.cjs  # CommonJS模块
-│   ├── index.umd.js # UMD模块
-│   └── *.d.ts           # TypeScript声明文件
-├── vite.config.ts        # Vite配置
-├── tsconfig.json         # TypeScript配置
-├── .npmrc               # pnpm配置
+│   ├── index.js   # ES 模块
+│   ├── index.cjs  # CommonJS 模块
+│   ├── index.umd.js # UMD 模块
+│   └── *.d.ts           # TypeScript 声明文件
+├── vite.config.ts        # Vite 配置
+├── tsconfig.json         # TypeScript 配置
+├── .npmrc               # pnpm 配置
 └── package.json
 ```
 
