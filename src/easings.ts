@@ -1,4 +1,8 @@
 // Easing functions collection - from easings.js
+
+const asin1 = Math.asin(1);
+const pi2 = Math.PI * 2;
+
 export const easings = {
     ['circ-in']: (t: number) => -1 * (Math.sqrt(1 - t * t) - 1),
     ['circ-out']: (t: number) => Math.sqrt(1 - (t = t - 1) * t),
@@ -14,25 +18,25 @@ export const easings = {
         if (t == 1) { return 1; }
 
         const p = .3;
-        const s = p / (2 * Math.PI) * Math.asin(1);
-        return -(Math.pow(2, 10 * (t -= 1)) * Math.sin((t - s) * (2 * Math.PI) / p));
+        const s = p / pi2 * asin1;
+        return -(Math.pow(2, 10 * (t -= 1)) * Math.sin((t - s) * pi2 / p));
     },
     ['elastic-out']: (t: number) => {
         if (t == 0) { return 0; }
         if (t == 1) { return 1; }
 
         const p = .3;
-        const s = p / (2 * Math.PI) * Math.asin(1);
-        return Math.pow(2, -10 * t) * Math.sin((t - s) * (2 * Math.PI) / p) + 1;
+        const s = p / pi2 * asin1;
+        return Math.pow(2, -10 * t) * Math.sin((t - s) * pi2 / p) + 1;
     },
     ['elastic-in-out']: (t: number) => {
         if (t == 0) { return 0; }
         if ((t /= .5) == 2) { return 1; }
 
         const p = .45;
-        const s = p / (2 * Math.PI) * Math.asin(1);
-        if (t < 1) { return -.5 * (Math.pow(2, 10 * (t -= 1)) * Math.sin((t - s) * (2 * Math.PI) / p)); }
-        return Math.pow(2, -10 * (t -= 1)) * Math.sin((t - s) * (2 * Math.PI) / p) * .5 + 1;
+        const s = p / pi2 * asin1;
+        if (t < 1) { return -.5 * (Math.pow(2, 10 * (t -= 1)) * Math.sin((t - s) * pi2 / p)); }
+        return Math.pow(2, -10 * (t -= 1)) * Math.sin((t - s) * pi2 / p) * .5 + 1;
     },
     ['expo-in']: (t: number) => (t == 0) ? 0 : Math.pow(2, 10 * (t - 1)),
     ['expo-out']: (t: number) => (t == 1) ? 1 : 1 - Math.pow(2, -10 * t),
