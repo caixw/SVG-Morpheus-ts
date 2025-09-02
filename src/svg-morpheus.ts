@@ -129,7 +129,7 @@ export class SVGMorpheus {
     }
 
     private _init(): void {
-        if (!this._svgDoc) return;
+        if (!this._svgDoc) { return; }
 
         if (this._svgDoc.nodeName.toUpperCase() !== 'SVG') {
             const svgElements = this._svgDoc.getElementsByTagName('svg');
@@ -340,7 +340,9 @@ export class SVGMorpheus {
             const toIcon = this._icons[toIconId];
 
             // 使用目标图标的 ViewBox 作为最终坐标系统
-            const targetViewBox = toIcon.viewBox || fromIcon?.viewBox || { values: [0, 0, 24, 24], original: '0 0 24 24' };
+            const targetViewBox = toIcon.viewBox
+                || fromIcon?.viewBox
+                || { values: [0, 0, 24, 24], original: '0 0 24 24' };
 
             // 立即更新 SVG 根元素的 ViewBox 为目标 ViewBox
             if (this._svgDoc) {
@@ -582,22 +584,26 @@ export class SVGMorpheus {
         // Update path/attrs/transform
         for (i = 0, len = this._curIconItems.length; i < len; i++) {
             if (this._fromIconItems[i].curve && this._toIconItems[i].curve) {
-                this._curIconItems[i].curve = curveCalc(this._fromIconItems[i].curve!, this._toIconItems[i].curve!, progress);
+                this._curIconItems[i].curve
+                    = curveCalc(this._fromIconItems[i].curve!, this._toIconItems[i].curve!, progress);
                 this._curIconItems[i].path = path2string(this._curIconItems[i].curve);
             }
 
             if (this._fromIconItems[i].attrsNorm && this._toIconItems[i].attrsNorm) {
-                this._curIconItems[i].attrsNorm = styleNormCalc(this._fromIconItems[i].attrsNorm!, this._toIconItems[i].attrsNorm!, progress);
+                this._curIconItems[i].attrsNorm
+                    = styleNormCalc(this._fromIconItems[i].attrsNorm!, this._toIconItems[i].attrsNorm!, progress);
                 this._curIconItems[i].attrs = styleNormToString(this._curIconItems[i].attrsNorm!);
             }
 
             if (this._fromIconItems[i].styleNorm && this._toIconItems[i].styleNorm) {
-                this._curIconItems[i].styleNorm = styleNormCalc(this._fromIconItems[i].styleNorm!, this._toIconItems[i].styleNorm!, progress);
+                this._curIconItems[i].styleNorm
+                    = styleNormCalc(this._fromIconItems[i].styleNorm!, this._toIconItems[i].styleNorm!, progress);
                 this._curIconItems[i].style = styleNormToString(this._curIconItems[i].styleNorm!);
             }
 
             if (this._fromIconItems[i].trans && this._toIconItems[i].trans) {
-                this._curIconItems[i].trans = transCalc(this._fromIconItems[i].trans!, this._toIconItems[i].trans!, progress);
+                this._curIconItems[i].trans
+                    = transCalc(this._fromIconItems[i].trans!, this._toIconItems[i].trans!, progress);
                 this._curIconItems[i].transStr = trans2string(this._curIconItems[i].trans!);
             }
         }
@@ -657,21 +663,31 @@ export class SVGMorpheus {
     // Public methods | 公共方法
 
     /**
-     * Morph to target icon | 变形到目标图标
-     * Triggers morphing animation from current icon to specified target icon | 触发从当前图标到指定目标图标的变形动画
+     * 变形到目标图标
      *
-     * @param iconId Target icon ID to morph to | 要变形到的目标图标ID
-     *     Must match an ID of a <g> element in the SVG | 必须匹配 SVG 中某个 <g> 元素的 ID
+     * @remarks 当图标的颜色是 `currentColor` 时，颜色将自动向上一级元素获取，此时如果上一次的元素是变化的，
+     * 比如存在 `:active` 伪类选择器，那么在点击时，获取的颜色可能是 `:active` 下指定的 color 属性，
+     * 而不是平常设置的值。
+     * ```css
+     * button:active {color: green}
+     * ```
+     * ```html
+     * <button style="color: red;">
+     *     <svg style:"color:currentColor">...</svg>
+     * </button>
+     *```
+     * 以上的代码，如果在点击 button 时调用当前方法，其图标的颜色会是 `green`，而不是 `red`。
      *
-     * @param options Animation options for this specific morph | 此次特定变形的动画选项
-     *    Overrides constructor defaults for this animation only | 仅为此次动画覆盖构造器默认值
-     *    - duration: Animation duration (ms) | 动画持续时间（毫秒）
-     *    - easing: Easing function name | 缓动函数名称
-     *    - rotation: Rotation direction | 旋转方向
+     * @param iconId - 要变形到的目标图标ID，必须匹配 SVG 中某个 <g> 元素的 ID
      *
-     * @param callback Callback function for this specific morph | 此次特定变形的回调函数
-     *     Overrides constructor default callback for this animation only | 仅为此次动画覆盖构造器默认回调
-     *     Called when this specific morphing animation completes | 当此次特定变形动画完成时被调用
+     * @param options - 此次特定变形的动画选项。仅为此次动画覆盖构造器默认值：
+     *    - duration: 动画持续时间（毫秒）
+     *    - easing: 缓动函数名称
+     *    - rotation: 旋转方向
+     *
+     * @param callback - 此次特定变形的回调函数
+     *     仅为此次动画覆盖构造器默认回调
+     *     当此次特定变形动画完成时被调用
      */
     public to(iconId: string, options?: ToMethodOptions, callback?: CallbackFunction): void {
         if (iconId !== this._toIconId) {
@@ -773,7 +789,8 @@ export class SVGMorpheus {
         Object.values(defsInfo.gradients).forEach(gradientStr => {
             try {
                 // 使用 DOMParser 解析 SVG 字符串，避免 HTML 解析器的问题
-                const svgDoc = parser.parseFromString(`<svg xmlns="http://www.w3.org/2000/svg">${gradientStr}</svg>`, 'image/svg+xml');
+                const str = `<svg xmlns="http://www.w3.org/2000/svg">${gradientStr}</svg>`;
+                const svgDoc = parser.parseFromString(str, 'image/svg+xml');
                 const gradientElement = svgDoc.documentElement.firstElementChild;
 
                 if (gradientElement) {
@@ -789,7 +806,8 @@ export class SVGMorpheus {
         // 插入图案
         Object.values(defsInfo.patterns).forEach(patternStr => {
             try {
-                const svgDoc = parser.parseFromString(`<svg xmlns="http://www.w3.org/2000/svg">${patternStr}</svg>`, 'image/svg+xml');
+                const str = `<svg xmlns="http://www.w3.org/2000/svg">${patternStr}</svg>`;
+                const svgDoc = parser.parseFromString(str, 'image/svg+xml');
                 const patternElement = svgDoc.documentElement.firstElementChild;
 
                 if (patternElement) {
@@ -804,7 +822,8 @@ export class SVGMorpheus {
         // 插入其他定义
         Object.values(defsInfo.others).forEach(otherStr => {
             try {
-                const svgDoc = parser.parseFromString(`<svg xmlns="http://www.w3.org/2000/svg">${otherStr}</svg>`, 'image/svg+xml');
+                const str = `<svg xmlns="http://www.w3.org/2000/svg">${otherStr}</svg>`;
+                const svgDoc = parser.parseFromString(str, 'image/svg+xml');
                 const otherElement = svgDoc.documentElement.firstElementChild;
 
                 if (otherElement) {
