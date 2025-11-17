@@ -388,7 +388,7 @@ export class SVGMorpheus {
                 const toIdPrefix = `to_${toIconId}_`;
                 const toOldToNewIdMap: Record<string, string> = {};
 
-                // 先建立 toIcona 的 defs ID 映射
+                // 先建立 toIcon 的 defs ID 映射
                 Object.keys(toIcon.defs.gradients).forEach(oldId => {
                     toOldToNewIdMap[oldId] = toIdPrefix + oldId;
                 });

@@ -27,10 +27,12 @@ JavaScript 库，使 SVG 图标能够从一个变形到另一个。它实现了 
 - ✅ **pnpm** - 高效的包管理器
 - ✅ **动态 SVG 合并** - 🆕 运行时 SVG 图标集生成
 
-## 🎉 v1.3.0 新特性
+## 🎉 v1.3.x 新特性
 
 ### 🔧 功能增强
 
+- `bundleSvgs` 添加了同步版本 `bundleSvgsSync`；
+- `bundleSvgsString` 添加了同步版本 `bundleSvgsStringSync`；
 - 引入 colorjs.io，基本支持所有的 CSS 颜色类型；
 - 采用 colorjs.io 中的 Color 对象代替了原来自定义的 RGBColor 和 RGBColorWithError；
 

@@ -259,37 +259,52 @@ function getRGB(doc: SVGSVGElement | null, colour: string): Color {
 async function createBundledSvgString(
     svgMap: Record<string, string>, svgAttributes?: Record<string, string | number>
 ): Promise<string> {
-    const svgGroups: string[] = [];
-
     for (const [id, svgSource] of Object.entries(svgMap)) {
-        let svgContent: string;
-
-        if (isSvgContent(svgSource)) { // 直接是 SVG 代码
-            svgContent = svgSource;
-        } else { // 是路径，需要加载
+        if (!isSvgContent(svgSource)) { // 不是 SVG 代码，那有可能是一个 URI。
             try {
                 const response = await fetch(svgSource);
                 if (!response.ok) {
                     console.warn(`Failed to load SVG from ${svgSource}`);
                     continue;
                 }
-                svgContent = await response.text();
+                svgMap[id] = await response.text();
             } catch (error) {
                 console.warn(`Error loading SVG from ${svgSource}:`, error);
                 continue;
             }
         }
+    }
+
+    return createSvgsStringFromString(svgMap, svgAttributes);
+}
+
+/**
+ * 动态合并多个 SVG 为类似 iconset.svg 的格式字符串
+ *
+ * @param svgMap 对象，key 为 g 标签的 id，value 为 svg 代码
+ * @param svgAttributes 可选，生成的 SVG 根元素的属性集合
+ * @returns string 合并后的 SVG 字符串
+ */
+function createSvgsStringFromString(
+    svgMap: Record<string, string>, svgAttributes?: Record<string, string | number>
+): string {
+    const svgGroups: string[] = [];
+
+    for (const [id, svgSource] of Object.entries(svgMap)) {
+        if (!isSvgContent(svgSource)) { // 直接是 SVG 代码
+            console.warn(`${svgSource} is not a valid SVG source`);
+            continue;
+        }
 
         // 提取原始 SVG 的 ViewBox 信息
-        const originalViewBox = extractViewBoxInfo(svgContent);
-        const originalDefs = extractDefsInfo(svgContent);
+        const originalViewBox = extractViewBoxInfo(svgSource);
+        const originalDefs = extractDefsInfo(svgSource);
 
         // 新增：提取 SVG 根属性（包括 fill）
-        const rootAttributes = extractSvgRootAttributes(svgContent);
+        const rootAttributes = extractSvgRootAttributes(svgSource);
         const svgRootFill = rootAttributes['fill'];
 
-        let innerContent = extractSvgInnerContent(svgContent); // 提取 SVG 内容（去除外层 svg 标签）
-
+        let innerContent = extractSvgInnerContent(svgSource); // 提取 SVG 内容（去除外层 svg 标签）
 
         if (svgRootFill) { // 新增：如果 svg 标签有 fill，处理所有可填充元素
             const fillTags = [ // 需要处理的标签列表
@@ -344,10 +359,28 @@ ${svgGroups.join('\n')}
 }
 
 /**
+ * 动态合并多个 SVG 为类似 iconset.svg 的格式，并返回 Blob URL。
+ * 与异步版本的相比，当前函数不支持 svgMap 参数中的键值只能为 svg 源码。
+ * @param svgMap 对象，key 为 g 标签的 id，value 为 svg 代码
+ * @param svgAttributes 可选，生成的 SVG 根元素的属性集合
+ * @returns 生成的 Blob URL
+ */
+export function bundleSvgsSync(
+    svgMap: Record<string, string>, svgAttributes?: Record<string, string | number>
+): string {
+    const bundledSvg = createSvgsStringFromString(svgMap, svgAttributes);
+
+    // 创建 Blob 和 URL
+    const blob = new Blob([bundledSvg], { type: 'image/svg+xml' });
+    const url = URL.createObjectURL(blob);
+    return url;
+}
+
+/**
  * 动态合并多个 SVG 为类似 iconset.svg 的格式，并返回 Blob URL
  * @param svgMap 对象，key 为 g 标签的 id，value 为 svg 路径或 svg 代码
  * @param svgAttributes 可选，生成的 SVG 根元素的属性集合
- * @returns Promise<string> 生成的 Blob URL
+ * @returns 生成的 Blob URL
  */
 export async function bundleSvgs(
     svgMap: Record<string, string>, svgAttributes?: Record<string, string | number>
@@ -371,6 +404,19 @@ export async function bundleSvgsString(
     svgMap: Record<string, string>, svgAttributes?: Record<string, string | number>
 ): Promise<string> {
     return createBundledSvgString(svgMap, svgAttributes);
+}
+
+/**
+ * 动态合并多个 SVG 为类似 iconset.svg 的格式，并返回 SVG 字符串（用于需要直接操作 SVG 内容的场景）。
+ * 与异步版本的相比，当前函数不支持 svgMap 参数中的键值只能为 svg 源码。
+ * @param svgMap 对象，key 为 g 标签的 id，value 为 svg 路径或 svg 代码
+ * @param svgAttributes 可选，生成的 SVG 根元素的属性集合
+ * @returns Promise<string> 合并后的 SVG 字符串
+ */
+export function bundleSvgsStringSync(
+    svgMap: Record<string, string>, svgAttributes?: Record<string, string | number>
+): string {
+    return createSvgsStringFromString(svgMap, svgAttributes);
 }
 
 /**

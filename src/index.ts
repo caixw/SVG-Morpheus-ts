@@ -23,6 +23,8 @@ export { easings } from './easings';
 export {
     bundleSvgs, // 🆕 动态 SVG 合并，返回 Blob URL
     bundleSvgsString, // 🆕 动态 SVG 合并，返回 SVG 字符串
+    bundleSvgsStringSync,
+    bundleSvgsSync,
     clone, curveCalc, styleNormCalc, styleNormToString,
     styleToNorm, trans2string, transCalc
 } from './helpers';
