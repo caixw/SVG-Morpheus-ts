@@ -14,40 +14,13 @@ export const rotations = ['clock', 'counterclock', 'none', 'random'] as const;
 export type Rotation = typeof rotations[number];
 
 // SVG Morpheus configuration options | SVG Morpheus 配置选项
-export interface SVGMorpheusOptions {
+export interface SVGMorpheusOptions extends ToMethodOptions {
     /**
      * Initial icon ID to display | 初始显示的图标 ID
      * Specifies which icon to display by default when SVGMorpheus is instantiated | 指定 SVGMorpheus 实例化后默认显示哪个图标
      * If not specified, the last icon in the SVG will be used as default | 如果不指定，将使用 SVG 中的最后一个图标作为默认图标
      */
     iconId?: string;
-
-    /**
-     * Animation duration in milliseconds | 动画持续时间（毫秒）
-     * Controls the playback duration of icon morphing animation | 控制图标变形动画的播放时长
-     * @default 750 milliseconds | 750 毫秒
-     * @example 1000 // 1 second animation duration | 1 秒的动画时长
-     */
-    duration?: number;
-
-    /**
-     * Animation easing function name | 动画缓动函数名称
-     * Controls the animation curve, affecting the speed changes of the animation | 控制动画的播放曲线，影响动画的速度变化
-     * @default 'quad-in-out'
-     * @example 'ease-in', 'ease-out', 'linear', 'bounce' etc. | 'ease-in', 'ease-out', 'linear', 'bounce' 等
-     */
-    easing?: string;
-
-    /**
-     * Icon rotation direction | 图标旋转方向
-     * Controls the rotation behavior of icons during morphing | 控制在变形过程中图标的旋转行为
-     * - 'clock': Clockwise rotation 360° | 顺时针旋转 360°
-     * - 'counterclock': Counterclockwise rotation 360° | 逆时针旋转 360°
-     * - 'none': No rotation | 不进行旋转
-     * - 'random': Randomly choose clockwise or counterclockwise | 随机选择顺时针或逆时针
-     * @default 'clock'
-     */
-    rotation?: Rotation;
 }
 
 // Style attributes for SVG elements | SVG 元素样式属性
@@ -172,6 +145,7 @@ export interface ToMethodOptions {
     /**
      * Animation duration in milliseconds | 动画持续时间（毫秒）
      * Overrides the instance default animation duration, only applies to current morph | 覆盖实例默认的动画持续时间，仅对当前这次变形生效
+     * @example 0 // No animation | 没有动画
      * @example 500 // 0.5 second fast morph | 0.5 秒的快速变形
      */
     duration?: number;

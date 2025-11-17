@@ -44,10 +44,6 @@ export class SVGMorpheus {
      *    - SVGSVGElement: Direct reference to SVG element | SVG 元素：直接引用 SVG 元素
      *
      * @param options Configuration options for default behavior | 默认行为的配置选项
-     *    - iconId: Initial icon to display | 初始显示的图标
-     *    - duration: Default animation duration (ms) | 默认动画持续时间（毫秒）
-     *    - easing: Default easing function name | 默认缓动函数名称
-     *    - rotation: Default rotation direction | 默认旋转方向
      *
      * @param callback Default callback function executed after animations complete | 动画完成后执行的默认回调函数
      *     Called when any morphing animation finishes | 当任何变形动画完成时被调用
@@ -103,6 +99,8 @@ export class SVGMorpheus {
 
         this._fnTick = function (timePassed: number) {
             if (!that._startTime) { that._startTime = timePassed; }
+
+            if (that._duration === 0) { return; }
 
             const progress = Math.min((timePassed - that._startTime) / that._duration, 1);
             that._updateAnimationProgress(progress);
@@ -680,10 +678,7 @@ export class SVGMorpheus {
      *
      * @param iconId - 要变形到的目标图标ID，必须匹配 SVG 中某个 <g> 元素的 ID
      *
-     * @param options - 此次特定变形的动画选项。仅为此次动画覆盖构造器默认值：
-     *    - duration: 动画持续时间（毫秒）
-     *    - easing: 缓动函数名称
-     *    - rotation: 旋转方向
+     * @param options - 此次特定变形的动画选项
      *
      * @param callback - 此次特定变形的回调函数
      *     仅为此次动画覆盖构造器默认回调
@@ -702,13 +697,19 @@ export class SVGMorpheus {
 
             if (this._rafid) { window.cancelAnimationFrame(this._rafid); }
 
-            this._duration = options.duration || this._defDuration;
+            this._duration = options.duration ?? this._defDuration; // 0 是一个有效值，不能用 ||
             this._easing = options.easing || this._defEasing;
             this._rotation = options.rotation || this._defRotation;
             this._callback = callback || this._defCallback;
 
             this._setupAnimation(iconId);
-            this._rafid = window.requestAnimationFrame(this._fnTick);
+
+            if (this._duration === 0) {
+                this._updateAnimationProgress(1); // 设置进度为 1（100%）
+                this._animationEnd(); // 立即完成动画
+            } else {
+                this._rafid = window.requestAnimationFrame(this._fnTick);
+            }
         }
     }
 
