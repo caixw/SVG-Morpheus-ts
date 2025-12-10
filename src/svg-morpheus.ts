@@ -13,7 +13,13 @@ import {
 } from './types';
 
 export class SVGMorpheus {
-    private _icons: Record<string, Icon> = {};
+    private readonly _icons: Record<string, Icon> = {};
+    private readonly _defDuration: number;
+    private readonly _defEasing: string;
+    private readonly _defRotation: string;
+    private readonly _defCallback: CallbackFunction;
+    private readonly _lite: boolean;
+
     private _curIconId: string = '';
     private _toIconId: string = ''; // 当前正在跳转的图标 ID，执行完成之后会清空。
     private _curIconItems: IconItem[] = [];
@@ -22,10 +28,6 @@ export class SVGMorpheus {
     private _morphNodes: MorphNode[] = [];
     private _morphG: SVGGElement | null = null;
     private _startTime: number | undefined;
-    private _defDuration: number;
-    private _defEasing: string;
-    private _defRotation: string;
-    private _defCallback: CallbackFunction;
     private _duration: number;
     private _easing: string;
     private _rotation: string;
@@ -33,8 +35,6 @@ export class SVGMorpheus {
     private _rafid: number | undefined;
     private _svgDoc: SVGSVGElement | null = null;
     private _fnTick: (timePassed: number) => void;
-
-    private readonly _lite: boolean;
 
     /**
      * SVGMorpheus Constructor | SVGMorpheus 构造器
@@ -81,6 +81,12 @@ export class SVGMorpheus {
         const that = this;
 
         this._icons = {};
+        this._defDuration = options.duration || 750;
+        this._defEasing = options.easing || 'quad-in-out';
+        this._defRotation = options.rotation || 'clock';
+        this._defCallback = callback || function () { };
+        this._lite = options.lite || false;
+
         this._curIconId = options.iconId || '';
         this._toIconId = '';
         this._curIconItems = [];
@@ -89,17 +95,11 @@ export class SVGMorpheus {
         this._morphNodes = [];
         this._morphG = null;
         this._startTime = undefined;
-        this._defDuration = options.duration || 750;
-        this._defEasing = options.easing || 'quad-in-out';
-        this._defRotation = options.rotation || 'clock';
-        this._defCallback = callback || function () { };
         this._duration = this._defDuration;
         this._easing = this._defEasing;
         this._rotation = this._defRotation;
         this._callback = this._defCallback;
         this._rafid = undefined;
-        this._lite = options.lite || false;
-
         this._fnTick = function (timePassed: number) {
             if (!that._startTime) { that._startTime = timePassed; }
 

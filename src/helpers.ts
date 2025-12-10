@@ -82,7 +82,7 @@ export function styleToNorm(
         case 'fill':
         case 'stroke':
             if (styleFrom[i]) {
-                if (lite || isGradientReference(styleFrom[i]!)) { // 对于lite 或渐变引用，保持原始值，不进行 RGB 转换
+                if (lite || isGradientReference(styleFrom[i]!)) { // 对于 lite 或渐变，保持原始值，不进行 RGB 转换
                     styleNorm[0][i] = styleFrom[i];
                     if (styleTo[i] === undefined) { styleNorm[1][i] = styleFrom[i]; }
                 } else { // 对于普通颜色值，进行 RGB 转换
@@ -112,7 +112,7 @@ export function styleToNorm(
         case 'fill':
         case 'stroke':
             if (styleTo[i]) {
-                if (lite || isGradientReference(styleTo[i]!)) { // 对于lite 或渐变引用，保持原始值，不进行 RGB 转换
+                if (lite || isGradientReference(styleTo[i]!)) { // 对于 lite 或渐变，保持原始值，不进行 RGB 转换
                     styleNorm[1][i] = styleTo[i];
                     if (styleFrom[i] === undefined) { styleNorm[0][i] = styleTo[i]; }
                 } else { // 对于普通颜色值，进行 RGB 转换

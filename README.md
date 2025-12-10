@@ -5,7 +5,7 @@
 
 > **⚡ 本项目基于 [adoin/SVG-Morpheus](https://github.com/adoin/SVG-Morpheus-ts) 和 [alexk111/SVG-Morpheus](https://github.com/alexk111/SVG-Morpheus) 重构**
 
-JavaScript 库，使 SVG 图标能够从一个变形到另一个。它实现了 Material Design 的精美细节过渡效果。
+TypeScript 库，使 SVG 图标能够从一个变形到另一个。它实现了 Material Design 的精美细节过渡效果。
 
 ## 🌐 在线演示
 
@@ -26,6 +26,12 @@ JavaScript 库，使 SVG 图标能够从一个变形到另一个。它实现了 
 - ✅ **开发体验** - HMR、快速重载
 - ✅ **pnpm** - 高效的包管理器
 - ✅ **动态 SVG 合并** - 🆕 运行时 SVG 图标集生成
+
+## 🎉 v1.4.x 新特性
+
+### 🔧 功能增强
+
+- 添加了 SVGMorpheusOptions.lite 属性；
 
 ## 🎉 v1.3.x 新特性
 
