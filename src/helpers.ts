@@ -4,7 +4,7 @@ import { CurveData, NormalizedStyle, StyleAttributes, Transform } from './types'
 
 // Calculate style
 export function styleNormCalc(
-    styleNormFrom: NormalizedStyle, styleNormTo: NormalizedStyle, progress: number
+    styleNormFrom: NormalizedStyle, styleNormTo: NormalizedStyle, progress: number, lite: boolean
 ): NormalizedStyle {
     const styleNorm: NormalizedStyle = {};
 
@@ -17,9 +17,8 @@ export function styleNormCalc(
                 const fromValue = styleNormFrom[i];
                 const toValue = styleNormTo[i];
 
-                // 检测是否为渐变引用（字符串值）
-                if (typeof fromValue === 'string' || typeof toValue === 'string') {
-                    // 对于渐变引用，根据进度选择源值或目标值。在动画中期（progress < 0.5）使用源值，后期使用目标值
+                if (lite || typeof fromValue === 'string' || typeof toValue === 'string') {
+                    // 对于渐变引用或是 lite，根据进度选择源值或目标值。在动画中期（progress < 0.5）使用源值，后期使用目标值
                     styleNorm[i] = progress < .5 ? fromValue : toValue;
                 } else { // 对于 RGB 颜色值，进行正常插值
                     styleNorm[i] = fromValue.clone();
@@ -53,11 +52,7 @@ export function styleNormToString(styleNorm: NormalizedStyle): StyleAttributes {
         case 'stroke':
             if (styleNorm[i]) {
                 const value = styleNorm[i];
-                if (typeof value === 'string') { // 对于渐变引用，直接使用字符串值
-                    style[i] = value;
-                } else { // 对于 RGB 对象，转换为颜色字符串
-                    style[i] = value.toString();
-                }
+                style[i] = typeof value === 'string' ? value : value.toString();
             }
             break;
         case 'opacity':
@@ -72,7 +67,7 @@ export function styleNormToString(styleNorm: NormalizedStyle): StyleAttributes {
 }
 
 export function styleToNorm(
-    styleFrom: StyleAttributes, styleTo: StyleAttributes, doc: SVGSVGElement | null
+    styleFrom: StyleAttributes, styleTo: StyleAttributes, lite: boolean, doc: SVGSVGElement | null
 ): [NormalizedStyle, NormalizedStyle] {
     const styleNorm: [NormalizedStyle, NormalizedStyle] = [{}, {}];
 
@@ -87,7 +82,7 @@ export function styleToNorm(
         case 'fill':
         case 'stroke':
             if (styleFrom[i]) {
-                if (isGradientReference(styleFrom[i]!)) { // 对于渐变引用，保持原始值，不进行 RGB 转换
+                if (lite || isGradientReference(styleFrom[i]!)) { // 对于lite 或渐变引用，保持原始值，不进行 RGB 转换
                     styleNorm[0][i] = styleFrom[i];
                     if (styleTo[i] === undefined) { styleNorm[1][i] = styleFrom[i]; }
                 } else { // 对于普通颜色值，进行 RGB 转换
@@ -117,7 +112,7 @@ export function styleToNorm(
         case 'fill':
         case 'stroke':
             if (styleTo[i]) {
-                if (isGradientReference(styleTo[i]!)) { // 对于渐变引用，保持原始值，不进行 RGB 转换
+                if (lite || isGradientReference(styleTo[i]!)) { // 对于lite 或渐变引用，保持原始值，不进行 RGB 转换
                     styleNorm[1][i] = styleTo[i];
                     if (styleFrom[i] === undefined) { styleNorm[0][i] = styleTo[i]; }
                 } else { // 对于普通颜色值，进行 RGB 转换

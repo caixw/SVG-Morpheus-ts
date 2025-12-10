@@ -34,18 +34,20 @@ export class SVGMorpheus {
     private _svgDoc: SVGSVGElement | null = null;
     private _fnTick: (timePassed: number) => void;
 
+    private readonly _lite: boolean;
+
     /**
      * SVGMorpheus Constructor | SVGMorpheus 构造器
      * Creates a new SVGMorpheus instance for morphing SVG icons | 创建一个新的 SVGMorpheus 实例用于变形 SVG 图标
      *
-     * @param element Target SVG element or CSS selector | 目标 SVG 元素或 CSS 选择器
+     * @param element - Target SVG element or CSS selector | 目标 SVG 元素或 CSS 选择器
      *    - string: CSS selector to find the SVG element | 字符串：用于查找 SVG 元素的 CSS 选择器
      *    - HTMLElement: Direct reference to HTML element containing SVG | HTML 元素：直接引用包含 SVG 的 HTML 元素
      *    - SVGSVGElement: Direct reference to SVG element | SVG 元素：直接引用 SVG 元素
      *
-     * @param options Configuration options for default behavior | 默认行为的配置选项
+     * @param options - Configuration options for default behavior | 默认行为的配置选项
      *
-     * @param callback Default callback function executed after animations complete | 动画完成后执行的默认回调函数
+     * @param callback - Default callback function executed after animations complete | 动画完成后执行的默认回调函数
      *     Called when any morphing animation finishes | 当任何变形动画完成时被调用
      *     Can be overridden by individual to() method calls | 可以被单独的 to() 方法调用覆盖
      */
@@ -96,6 +98,7 @@ export class SVGMorpheus {
         this._rotation = this._defRotation;
         this._callback = this._defCallback;
         this._rafid = undefined;
+        this._lite = options.lite || false;
 
         this._fnTick = function (timePassed: number) {
             if (!that._startTime) { that._startTime = timePassed; }
@@ -264,9 +267,9 @@ export class SVGMorpheus {
                                     const name = attrib.name.toLowerCase();
                                     switch (name) {
                                     case 'fill':
+                                    case 'stroke':
                                     case 'fill-opacity':
                                     case 'opacity':
-                                    case 'stroke':
                                     case 'stroke-opacity':
                                     case 'stroke-width':
                                         item.attrs[name] = attrib.value;
@@ -279,9 +282,9 @@ export class SVGMorpheus {
                                     const styleName = elementStyle[l];
                                     switch (styleName) {
                                     case 'fill':
+                                    case 'stroke':
                                     case 'fill-opacity':
                                     case 'opacity':
-                                    case 'stroke':
                                     case 'stroke-opacity':
                                     case 'stroke-width':
                                         item.style[styleName] = elementStyle[l];
@@ -489,14 +492,14 @@ export class SVGMorpheus {
                 toIconItem.curve = curves[1];
 
                 // Normalize from/to attrs
-                const attrsNorm = styleToNorm(this._fromIconItems[i].attrs, this._toIconItems[i].attrs, this._svgDoc);
+                const attrsNorm = styleToNorm(this._fromIconItems[i].attrs, this._toIconItems[i].attrs, this._lite, this._svgDoc);
                 fromIconItem.attrsNorm = attrsNorm[0];
                 toIconItem.attrsNorm = attrsNorm[1];
                 fromIconItem.attrs = styleNormToString(fromIconItem.attrsNorm);
                 toIconItem.attrs = styleNormToString(toIconItem.attrsNorm);
 
                 // Normalize from/to style
-                const styleNorm = styleToNorm(this._fromIconItems[i].style, this._toIconItems[i].style, this._svgDoc);
+                const styleNorm = styleToNorm(this._fromIconItems[i].style, this._toIconItems[i].style, this._lite, this._svgDoc);
                 fromIconItem.styleNorm = styleNorm[0];
                 toIconItem.styleNorm = styleNorm[1];
                 fromIconItem.style = styleNormToString(fromIconItem.styleNorm);
@@ -589,13 +592,13 @@ export class SVGMorpheus {
 
             if (this._fromIconItems[i].attrsNorm && this._toIconItems[i].attrsNorm) {
                 this._curIconItems[i].attrsNorm
-                    = styleNormCalc(this._fromIconItems[i].attrsNorm!, this._toIconItems[i].attrsNorm!, progress);
+                    = styleNormCalc(this._fromIconItems[i].attrsNorm!, this._toIconItems[i].attrsNorm!, progress, this._lite);
                 this._curIconItems[i].attrs = styleNormToString(this._curIconItems[i].attrsNorm!);
             }
 
             if (this._fromIconItems[i].styleNorm && this._toIconItems[i].styleNorm) {
                 this._curIconItems[i].styleNorm
-                    = styleNormCalc(this._fromIconItems[i].styleNorm!, this._toIconItems[i].styleNorm!, progress);
+                    = styleNormCalc(this._fromIconItems[i].styleNorm!, this._toIconItems[i].styleNorm!, progress, this._lite);
                 this._curIconItems[i].style = styleNormToString(this._curIconItems[i].styleNorm!);
             }
 

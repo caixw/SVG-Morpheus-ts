@@ -13,7 +13,9 @@ export const rotations = ['clock', 'counterclock', 'none', 'random'] as const;
  */
 export type Rotation = typeof rotations[number];
 
-// SVG Morpheus configuration options | SVG Morpheus 配置选项
+/**
+ * {@link SVGMorpheus} 的配置选项
+ */
 export interface SVGMorpheusOptions extends ToMethodOptions {
     /**
      * Initial icon ID to display | 初始显示的图标 ID
@@ -21,6 +23,14 @@ export interface SVGMorpheusOptions extends ToMethodOptions {
      * If not specified, the last icon in the SVG will be used as default | 如果不指定，将使用 SVG 中的最后一个图标作为默认图标
      */
     iconId?: string;
+
+    /**
+     * 是否为轻量级模式
+     *
+     * @remarks
+     * 该模式下，仅保存最核心的样式变化功能，而颜色转换等功能将被忽略。
+     */
+    lite?: boolean;
 }
 
 // Style attributes for SVG elements | SVG 元素样式属性
