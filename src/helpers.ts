@@ -20,11 +20,12 @@ export function styleNormCalc(
                 if (lite || typeof fromValue === 'string' || typeof toValue === 'string') {
                     // 对于渐变引用或是 lite，根据进度选择源值或目标值。在动画中期（progress < 0.5）使用源值，后期使用目标值
                     styleNorm[i] = progress < .5 ? fromValue : toValue;
-                } else { // 对于 RGB 颜色值，进行正常插值
+                } else { // 对于 Color 颜色值，进行正常插值
+                    // TODO: 直接使用 Color.coords 的三个值进行转换，这样就不用在 getRGB 中进行转换为 RGB 的操作？
                     styleNorm[i] = fromValue.clone();
-                    styleNorm[i].r = fromValue.r + (toValue.r - fromValue.r) * progress;
-                    styleNorm[i].g = fromValue.g + (toValue.g - fromValue.g) * progress;
-                    styleNorm[i].b = fromValue.b + (toValue.b - fromValue.b) * progress;
+                    styleNorm[i].r = fromValue.r! + (toValue.r! - fromValue.r!) * progress;
+                    styleNorm[i].g = fromValue.g! + (toValue.g! - fromValue.g!) * progress;
+                    styleNorm[i].b = fromValue.b! + (toValue.b! - fromValue.b!) * progress;
                     styleNorm[i].alpha = fromValue.alpha + (toValue.alpha - fromValue.alpha) * progress;
                 }
             }
@@ -313,9 +314,9 @@ function createSvgsStringFromString(
                     }
                     // 没有 fill 属性则补上
                     if (match.endsWith('/>')) {
-                        return match.replace(new RegExp(`<${tag}(\\s*)`), `<${tag}$1 fill=\"${svgRootFill}\" `);
+                        return match.replace(new RegExp(`<${tag}(\\s*)`), `<${tag}$1 fill="${svgRootFill}" `);
                     } else {
-                        return match.replace(new RegExp(`<${tag}(\\s*)`), `<${tag}$1 fill=\"${svgRootFill}\" `);
+                        return match.replace(new RegExp(`<${tag}(\\s*)`), `<${tag}$1 fill="${svgRootFill}" `);
                     }
                 });
             });

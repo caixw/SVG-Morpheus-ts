@@ -137,7 +137,7 @@ export class SVGMorpheus {
             this._svgDoc = svgElements[0] as SVGSVGElement;
         }
 
-        if (!!this._svgDoc) {
+        if (this._svgDoc) {
             let lastIconId = '';
 
             // 提取 SVG 文档级别的 ViewBox 和 defs 信息
@@ -153,7 +153,7 @@ export class SVGMorpheus {
                 if (nodeIcon.nodeName.toUpperCase() === 'G') {
                     const iconElement = nodeIcon as SVGGElement;
                     const id = iconElement.getAttribute('id');
-                    if (!!id) {
+                    if (id) {
                         const items: IconItem[] = [];
 
                         // 初始化图标的坐标系统信息（继承文档级别）
@@ -426,7 +426,7 @@ export class SVGMorpheus {
             for (i = 0; i < maxNum; i++) {
                 // Add items to fromIcon/toIcon if needed
                 if (!this._fromIconItems[i]) {
-                    if (!!this._toIconItems[i]) {
+                    if (this._toIconItems[i]) {
                         toBB = curvePathBBox(path2curve(this._toIconItems[i].path));
                         this._fromIconItems.push({
                             path: 'M' + toBB.cx + ',' + toBB.cy + 'l0,0',
@@ -448,7 +448,7 @@ export class SVGMorpheus {
                     }
                 }
                 if (!this._toIconItems[i]) {
-                    if (!!this._fromIconItems[i]) {
+                    if (this._fromIconItems[i]) {
                         toBB = curvePathBBox(path2curve(this._fromIconItems[i].path));
                         this._toIconItems.push({
                             path: 'M' + toBB.cx + ',' + toBB.cy + 'l0,0',
@@ -628,7 +628,7 @@ export class SVGMorpheus {
     private _animationEnd(): void {
         for (let i = this._morphNodes.length - 1; i >= 0; i--) {
             const morphNode = this._morphNodes[i];
-            if (!!this._toIconItems[i]) {
+            if (this._toIconItems[i]) {
                 // 使用更新后的 _toIconItems 而不是原始的 this._icons[this._toIconId].items
                 morphNode.node.setAttribute('d', this._toIconItems[i].path);
 
