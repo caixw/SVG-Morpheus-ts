@@ -259,28 +259,25 @@ export function clone<T>(obj: T): T {
 //
 // colour 是从 fill 和 stroke 中获取的颜色值类型，可能是一个需要计算的类型，比如 currentColor 或是 var(--xxx)。
 function getRGB(svg: SVGSVGElement, colour: string): Color {
-	if (colour.toUpperCase() === 'CURRENTCOLOR') {
-		// 如果是 colour 的值为 currentColor
+	if (colour.includes('var(--')) {
+		// 变量，直接放在 svg 上，进行计算。
 
-		if (svg.style.color) {
-			// svg.style.color 是 currentColor
-			if (svg.style.color.toUpperCase() === 'CURRENTCOLOR') {
-				colour = getComputedStyle(svg).getPropertyValue('color')!;
-			} else {
-				colour = svg.style.color;
-			}
-		} else {
-			// 如果 svg.style.color 为空，则将 colour 放在 svg.style 上，再进行计算得到真实的 colour 值。
-			svg.style.color = colour;
-			colour = getComputedStyle(svg).getPropertyValue('color')!;
-		}
-	} else {
-		// 其它可能需要计算的颜色值，比如 var(--color) 等
-
-		const old = svg.style.color;
-		svg.style.color = colour;
+		const old = svg.style.getPropertyValue('color');
+		svg.style.setProperty('color', colour);
 		colour = getComputedStyle(svg).getPropertyValue('color')!;
-		svg.style.color = old;
+		svg.style.setProperty('color', old);
+	} else if (colour.toUpperCase() === 'CURRENTCOLOR') {
+		const old = svg.style.getPropertyValue('color');
+
+		if (old === 'CURRENTCOLOR' || old.includes('var(--') || !old) {
+			// 特殊值，不影响 colour 的取值，直接在 svg 上设置 colour 后获取真实颜色值
+			svg.style.setProperty('color', colour);
+			colour = getComputedStyle(svg).getPropertyValue('color')!;
+			svg.style.setProperty('color', old);
+		} else {
+			// 其它正常值的颜色值，直接给到 colour
+			colour = old;
+		}
 	}
 
 	return new Color(colour).to('srgb');

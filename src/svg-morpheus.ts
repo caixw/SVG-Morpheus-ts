@@ -720,7 +720,8 @@ export class SVGMorpheus {
 	/**
 	 * 变形到目标图标
 	 *
-	 * @remarks 当图标的颜色是 `currentColor` 时，颜色将自动向上一级元素获取，此时如果上一次的元素是变化的，
+	 * @remarks
+	 * 当图标的颜色是 `currentColor` 时，颜色将自动向上一级元素获取，此时如果上一次的元素是变化的，
 	 * 比如存在 `:active` 伪类选择器，那么在点击时，获取的颜色可能是 `:active` 下指定的 color 属性，
 	 * 而不是平常设置的值。
 	 * ```css
