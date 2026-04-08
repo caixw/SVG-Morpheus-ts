@@ -1,0 +1,62 @@
+// SPDX-FileCopyrightText: 2026 caixw
+//
+// SPDX-License-Identifier: MIT
+
+{
+	"$schema": "https://biomejs.dev/schemas/2.4.10/schema.json",
+	"root": true,
+	"vcs": {
+		"enabled": true,
+		"clientKind": "git",
+		"useIgnoreFile": true
+	},
+	"files": {
+		"ignoreUnknown": true,
+		"includes": ["./**/*.{ts,tsx,mjs,mts,css,json}"]
+	},
+	"formatter": {
+		"enabled": true,
+		"indentStyle": "tab",
+		"lineEnding": "lf",
+		"lineWidth": 120
+	},
+	"linter": {
+		"enabled": true,
+		"rules": {
+			"recommended": true,
+			"style": {
+				"noNonNullAssertion": "off"
+			},
+			"nursery": {
+				"useSortedClasses": "error"
+			}
+		}
+	},
+	"assist": {
+		"enabled": true,
+		"actions": {
+			"source": {
+				"organizeImports": {
+					"level": "on",
+					"options": {
+						"groups": [[":NODE:", ":URL:", ":PACKAGE:"], ":BLANK_LINE:", ["**"]]
+					}
+				}
+			}
+		}
+	},
+	// 自定义语言相关的项
+	"javascript": {
+		"formatter": {
+			"arrowParentheses": "asNeeded",
+			"quoteStyle": "single",
+			"semicolons": "always"
+		}
+	},
+	"css": {
+		"parser": {
+			"tailwindDirectives": true,
+			"cssModules": true
+		}
+	}
+}

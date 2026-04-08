@@ -1,67 +1,60 @@
 {
-    "name": "@iconsets/svg-morpheus-ts",
-    "prettyName": "SVG Morpheus",
-    "version": "1.4.12",
-    "type": "module",
-    "main": "./dist/index.js",
-    "module": "./dist/index.js",
-    "types": "./dist/index.d.ts",
-    "exports": {
-        ".": {
-            "types": "./dist/index.d.ts",
-            "import": "./dist/index.js",
-            "require": "./dist/index.cjs"
-        }
-    },
-    "files": [
-        "dist"
-    ],
-    "description": "ESM TypeScript library enabling SVG icons to morph from one to the other. It implements Material Design's Delightful Details transitions. Refactored with modern TypeScript + Vite + pnpm stack. Supports both Chinese and English documentation.",
-    "homepage": "https://github.com/caixw/SVG-Morpheus-ts",
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/caixw/SVG-Morpheus-ts.git"
-    },
-    "license": "MIT",
-    "author": {
-        "name": "caixw",
-        "url": "https://caixw.io"
-    },
-    "keywords": [
-        "svg",
-        "animation",
-        "morphing",
-        "icons",
-        "material-design"
-    ],
-    "scripts": {
-        "dev": "vite --host",
-        "build": "tsc && vite build",
-        "demo": "pnpm build && vite --mode demo --host",
-        "build:demo": "pnpm build && GITHUB_PAGES=true vite build --mode demo",
-        "preview": "vite preview",
-        "lint": "eslint src/**/*.ts",
-        "lint:fix": "eslint src/**/*.ts --fix",
-        "type-check": "tsc --noEmit"
-    },
-    "engines": {
-        "node": ">=18.0.0",
-        "pnpm": ">=9.0.0"
-    },
-    "devDependencies": {
-        "@types/node": "^24.10.4",
-        "@typescript-eslint/eslint-plugin": "^8.50.1",
-        "@typescript-eslint/parser": "^8.50.1",
-        "@stylistic/eslint-plugin": "^5.6.1",
-        "globals": "^16.5.0",
-        "eslint": "^9.39.2",
-        "terser": "^5.44.1",
-        "typescript": "^5.9.3",
-        "vite": "^7.3.0",
-        "@eslint/compat": "^2.0.0",
-        "vite-plugin-dts": "^4.5.4"
-    },
-    "dependencies": {
-        "colorjs.io": "^0.6.0"
-    }
+	"name": "@iconsets/svg-morpheus-ts",
+	"prettyName": "SVG Morpheus",
+	"version": "1.4.12",
+	"type": "module",
+	"main": "./dist/index.js",
+	"module": "./dist/index.js",
+	"types": "./dist/index.d.ts",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.js",
+			"require": "./dist/index.cjs"
+		}
+	},
+	"files": [
+		"dist"
+	],
+	"description": "ESM TypeScript library enabling SVG icons to morph from one to the other. It implements Material Design's Delightful Details transitions. Refactored with modern TypeScript + Vite + pnpm stack. Supports both Chinese and English documentation.",
+	"homepage": "https://github.com/caixw/SVG-Morpheus-ts",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/caixw/SVG-Morpheus-ts.git"
+	},
+	"license": "MIT",
+	"author": {
+		"name": "caixw",
+		"url": "https://caixw.io"
+	},
+	"keywords": [
+		"svg",
+		"animation",
+		"morphing",
+		"icons",
+		"material-design"
+	],
+	"scripts": {
+		"dev": "vite --host",
+		"build": "vite build",
+		"demo": "pnpm build && vite --mode demo --host",
+		"build:demo": "pnpm build && GITHUB_PAGES=true vite build --mode demo",
+		"preview": "vite preview",
+		"lint": "pnpm exec biome lint",
+		"type-check": "tsc --noEmit"
+	},
+	"engines": {
+		"node": ">=18.0.0",
+		"pnpm": ">=9.0.0"
+	},
+	"devDependencies": {
+		"@types/node": "^24.10.4",
+		"typescript": "^6.0.2",
+		"vite": "^8.0.7",
+		"vite-plugin-dts": "^4.5.4",
+		"@biomejs/biome": "^2.4.10"
+	},
+	"dependencies": {
+		"colorjs.io": "^0.6.1"
+	}
 }
