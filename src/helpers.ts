@@ -77,7 +77,7 @@ export function styleToNorm(
 	styleFrom: StyleAttributes,
 	styleTo: StyleAttributes,
 	lite: boolean,
-	doc: SVGSVGElement | null,
+	doc: SVGSVGElement,
 ): [NormalizedStyle, NormalizedStyle] {
 	const styleNorm: [NormalizedStyle, NormalizedStyle] = [{}, {}];
 
@@ -256,21 +256,19 @@ export function clone<T>(obj: T): T {
 }
 
 // 将字符串颜色值转换为用 RGB 表示的 Color 对象
-function getRGB(doc: SVGSVGElement | null, colour: string): Color {
+function getRGB(doc: SVGSVGElement, colour: string): Color {
 	if (colour.toUpperCase() === 'CURRENTCOLOR') {
-		// 如果是 currentColor，则尝试从 SVG 对象上获取真实的颜色值
-		const i = doc || window.document.getElementsByTagName('head')[0] || window.document.getElementsByTagName('svg')[0];
-
-		if (i.style.color) {
-			if (i.style.color.toUpperCase() === 'CURRENTCOLOR') {
+		if (doc.style.color) {
+			// 如果是 currentColor，则尝试从 SVG 对象上获取真实的颜色值
+			if (doc.style.color.toUpperCase() === 'CURRENTCOLOR') {
 				// SVG 上的 color 也是 currentColor
-				colour = window.getComputedStyle(i).getPropertyValue('color')!;
+				colour = getComputedStyle(doc).getPropertyValue('color')!;
 			} else {
-				colour = i.style.color;
+				colour = doc.style.color;
 			}
 		} else {
-			i.style.color = colour;
-			colour = window.getComputedStyle(i).getPropertyValue('color')!;
+			doc.style.color = colour;
+			colour = getComputedStyle(doc).getPropertyValue('color')!;
 		}
 	}
 

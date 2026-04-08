@@ -23,6 +23,7 @@ import type {
 	CallbackFunction,
 	DefsInfo,
 	EasingFunction,
+	EasingMap,
 	Icon,
 	IconItem,
 	MorphNode,
@@ -53,7 +54,7 @@ export class SVGMorpheus {
 	private _rotation: string;
 	private _callback: CallbackFunction;
 	private _rafid: number | undefined;
-	private _svgDoc: SVGSVGElement | null = null;
+	private _svgDoc: SVGSVGElement;
 	private _fnTick: (timePassed: number) => void;
 
 	/**
@@ -144,13 +145,13 @@ export class SVGMorpheus {
 		if (targetElement.nodeName.toUpperCase() === 'SVG') {
 			this._svgDoc = targetElement as SVGSVGElement;
 		} else {
-			this._svgDoc = (targetElement as any).getSVGDocument();
+			this._svgDoc = (targetElement as HTMLObjectElement).getSVGDocument() as unknown as SVGSVGElement;
 		}
 		if (!this._svgDoc) {
 			targetElement.addEventListener(
 				'load',
 				() => {
-					this._svgDoc = (targetElement as any).getSVGDocument();
+					this._svgDoc = (targetElement as HTMLObjectElement).getSVGDocument() as unknown as SVGSVGElement;
 					this._init();
 				},
 				false,
@@ -626,7 +627,7 @@ export class SVGMorpheus {
 	}
 
 	private _updateAnimationProgress(progress: number): void {
-		progress = (easings as any)[this._easing](progress);
+		progress = (easings as EasingMap)[this._easing](progress);
 
 		let i: number, j: string, k: string, len: number;
 		// Update path/attrs/transform
@@ -800,7 +801,7 @@ export class SVGMorpheus {
 		if (name in easings) {
 			throw new Error(`Easing function with name '${name}' already exists.`);
 		}
-		(easings as any)[name] = fn;
+		(easings as EasingMap)[name] = fn;
 	}
 
 	/**

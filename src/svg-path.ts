@@ -3,10 +3,10 @@
 const spaces =
 	'\x09\x0a\x0b\x0c\x0d\x20\xa0\u1680\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u202f\u205f\u3000\u2028\u2029';
 const pathCommand = new RegExp(
-	'([a-z])[' + spaces + ',]*((-?\\d*\\.?\\d*(?:e[\\-+]?\\d+)?[' + spaces + ']*,?[' + spaces + ']*)+)',
+	`([a-z])[${spaces},]*((-?\\d*\\.?\\d*(?:e[\\-+]?\\d+)?[${spaces}]*,?[${spaces}]*)+)`,
 	'ig',
 );
-const pathValues = new RegExp('(-?\\d*\\.?\\d*(?:e[\\-+]?\\d+)?)[' + spaces + ']*,?[' + spaces + ']*', 'ig');
+const pathValues = new RegExp(`(-?\\d*\\.?\\d*(?:e[\\-+]?\\d+)?)[${spaces}]*,?[${spaces}]*`, 'ig');
 
 // Parses given path string into an array of arrays of path segments
 export function parsePathString(pathString: any): any {
@@ -56,7 +56,7 @@ export function parsePathString(pathString: any): any {
 export function pathToAbsolute(pathArray: any): any {
 	const parsed = parsePathString(pathArray);
 
-	if (!parsed || !parsed.length) {
+	if (!parsed?.length) {
 		return [['M', 0, 0]];
 	} // "M", 0, 0
 
@@ -236,17 +236,17 @@ export function path2curve(path: any, path2?: any): any {
 	const pcoms2: any = []; // path commands of original path p2
 	let pfirst = ''; // temporary holder for original path command
 	let pcom = ''; // holder for previous path command of original path
-	for (let i = 0, ii = Math.max(p.length, (p2 && p2.length) || 0); i < ii; i++) {
+	for (let i = 0, ii = Math.max(p.length, p2?.length || 0); i < ii; i++) {
 		p[i] && (pfirst = p[i][0]); // save current path command
 
-		if (pfirst != 'C') {
+		if (pfirst !== 'C') {
 			// C is not saved yet, because it may be result of conversion
 			pcoms1[i] = pfirst; // Save current path command
 			i && (pcom = pcoms1[i - 1]); // Get previous path command pcom
 		}
 		p[i] = processPath(p[i], attrs, pcom); // Previous path command is inputted to processPath
 
-		if (pcoms1[i] != 'A' && pfirst == 'C') pcoms1[i] = 'C'; // A is the only command
+		if (pcoms1[i] != 'A' && pfirst === 'C') pcoms1[i] = 'C'; // A is the only command
 		// which may produce multiple C:s
 		// so we have to make sure that C is also C in original path
 
@@ -261,7 +261,7 @@ export function path2curve(path: any, path2?: any): any {
 			}
 			p2[i] = processPath(p2[i], attrs2, pcom);
 
-			if (pcoms2[i] != 'A' && pfirst == 'C') {
+			if (pcoms2[i] != 'A' && pfirst === 'C') {
 				pcoms2[i] = 'C';
 			}
 
@@ -270,7 +270,7 @@ export function path2curve(path: any, path2?: any): any {
 		fixM(p, p2, attrs, attrs2, i);
 		fixM(p2, p, attrs2, attrs, i);
 		const seg = p[i];
-		const seg2 = p2 && p2[i];
+		const seg2 = p2?.[i];
 		const seglen = seg.length;
 		const seg2len = p2 && seg2.length;
 		attrs.x = seg[seglen - 2];
@@ -362,7 +362,7 @@ function a2c(
 	}
 	var df = f2 - f1;
 	if (Math.abs(df) > _120) {
-		var f2old = f2,
+		const f2old = f2,
 			x2old = x2,
 			y2old = y2;
 		f2 = f1 + _120 * (sweep_flag && f2 > f1 ? 1 : -1);
@@ -388,8 +388,8 @@ function a2c(
 		return [m2, m3, m4].concat(res);
 	} else {
 		res = [m2, m3, m4].concat(res).join().split(',');
-		var newres = [];
-		for (var i = 0, ii = res.length; i < ii; i++) {
+		const newres = [];
+		for (let i = 0, ii = res.length; i < ii; i++) {
 			newres[i] = i % 2 ? rotate(res[i - 1], res[i], rad).y : rotate(res[i], res[i + 1], rad).x;
 		}
 		return newres;
@@ -494,8 +494,8 @@ function curveDim(x0: any, y0: any, x1: any, y1: any, x2: any, y2: any, x3: any,
 		t2: any,
 		b2ac: any,
 		sqrtb2ac: any;
-	for (var i = 0; i < 2; ++i) {
-		if (i == 0) {
+	for (let i = 0; i < 2; ++i) {
+		if (i === 0) {
 			b = 6 * x0 - 12 * x1 + 6 * x2;
 			a = -3 * x0 + 9 * x1 - 9 * x2 + 3 * x3;
 			c = 3 * x1 - 3 * x0;

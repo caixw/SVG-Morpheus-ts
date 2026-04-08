@@ -6,6 +6,7 @@ import dts from 'vite-plugin-dts';
 // 读取 package.json 获取版本号
 const packageJson = JSON.parse(readFileSync(resolve(__dirname, 'package.json'), 'utf-8'));
 const version = packageJson.version;
+const homepage = packageJson.homepage;
 
 export default defineConfig(({ mode }) => {
 	// 根据环境设置 base 路径
@@ -52,7 +53,7 @@ export default defineConfig(({ mode }) => {
  * SVG Morpheus TypeScript Demo - Compiled Version
  * Version: v${version}
  * Build Date: ${new Date().toISOString()}
- * Repository: https://github.com/caixw/SVG-Morpheus-ts
+ * Repository: ${homepage}
  */`,
 						},
 					},
@@ -83,7 +84,7 @@ export default defineConfig(({ mode }) => {
  * SVG Morpheus TypeScript
  * Version: v${version}
  * Build Date: ${new Date().toISOString()}
- * Repository: https://github.com/caixw/SVG-Morpheus-ts
+ * Repository: ${homepage}
  */`,
 						},
 					},

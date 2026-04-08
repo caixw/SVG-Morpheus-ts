@@ -1,10 +1,12 @@
 // Easing functions collection - from easings.js
 
+import type { EasingMap } from './types';
+
 const asin1 = Math.asin(1);
 
 const pi2 = Math.PI * 2;
 
-export const easings = {
+export const easings: EasingMap = {
 	'circ-in': (t: number) => -1 * (Math.sqrt(1 - t * t) - 1),
 
 	'circ-out': (t: number) => Math.sqrt(1 - (t -= 1) * t),
