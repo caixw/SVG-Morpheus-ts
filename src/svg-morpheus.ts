@@ -27,7 +27,6 @@ import type {
 	Icon,
 	IconItem,
 	MorphNode,
-	StyleAttributes,
 	SVGMorpheusOptions,
 	ToMethodOptions,
 	ViewBoxInfo,
@@ -629,9 +628,8 @@ export class SVGMorpheus {
 	private _updateAnimationProgress(progress: number): void {
 		progress = (easings as EasingMap)[this._easing](progress);
 
-		let i: number, j: string, k: string, len: number;
 		// Update path/attrs/transform
-		for (i = 0, len = this._curIconItems.length; i < len; i++) {
+		for (let i = 0, len = this._curIconItems.length; i < len; i++) {
 			if (this._fromIconItems[i].curve && this._toIconItems[i].curve) {
 				this._curIconItems[i].curve = curveCalc(this._fromIconItems[i].curve!, this._toIconItems[i].curve!, progress);
 				this._curIconItems[i].path = path2string(this._curIconItems[i].curve);
@@ -664,17 +662,18 @@ export class SVGMorpheus {
 		}
 
 		// Update DOM
-		for (i = 0, len = this._morphNodes.length; i < len; i++) {
+		for (let i = 0, len = this._morphNodes.length; i < len; i++) {
 			const morphNode = this._morphNodes[i];
 			morphNode.node.setAttribute('d', this._curIconItems[i].path);
-			const attrs = this._curIconItems[i].attrs;
-			for (j in attrs) {
-				morphNode.node.setAttribute(j, (attrs as any)[j]);
-			}
-			const style = this._curIconItems[i].style;
-			for (k in style) {
-				(morphNode.node.style as any)[k] = (style as any)[k];
-			}
+
+			Object.entries(this._curIconItems[i].attrs).forEach(([k, v]) => {
+				morphNode.node.setAttribute(k, v);
+			});
+
+			Object.entries(this._curIconItems[i].style).forEach(([k, v]) => {
+				morphNode.node.style.setProperty(k, v);
+			});
+
 			morphNode.node.setAttribute('transform', this._curIconItems[i].transStr || '');
 		}
 	}
@@ -687,16 +686,14 @@ export class SVGMorpheus {
 				morphNode.node.setAttribute('d', this._toIconItems[i].path);
 
 				// 设置最终的 attributes（包含更新后的 defs 引用）
-				const attrs = this._toIconItems[i].attrs;
-				for (const attrName in attrs) {
-					morphNode.node.setAttribute(attrName, (attrs as any)[attrName]);
-				}
+				Object.entries(this._toIconItems[i].attrs).forEach(([k, v]) => {
+					morphNode.node.setAttribute(k, v);
+				});
 
 				// 设置最终的 styles
-				const styles = this._toIconItems[i].style as StyleAttributes;
-				for (const styleName in styles) {
-					(morphNode.node.style as any)[styleName] = (styles as any)[styleName];
-				}
+				Object.entries(this._toIconItems[i].style).forEach(([k, v]) => {
+					morphNode.node.style.setProperty(k, v);
+				});
 
 				// 设置最终的 transform
 				const finalTransform = this._toIconItems[i].transStr || '';

@@ -102,6 +102,7 @@ export function pathToAbsolute(pathArray: any): any {
 				case 'H':
 					r[1] = +pa[1] + x;
 					break;
+				// biome-ignore lint/suspicious/noFallthroughSwitchClause: fallthrough
 				case 'M':
 					mx = +pa[1] + x;
 					my = +pa[2] + y;
@@ -255,7 +256,7 @@ export function path2curve(path: any, path2?: any): any {
 		if (p2) {
 			// the same procedures is done to p2
 			p2[i] && (pfirst = p2[i][0]);
-			if (pfirst != 'C') {
+			if (pfirst !== 'C') {
 				pcoms2[i] = pfirst;
 				i && (pcom = pcoms2[i - 1]);
 			}

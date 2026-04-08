@@ -7,6 +7,8 @@
  * Build Date: ${new Date().toISOString()}
  */
 
+document.documentElement.style.setProperty('--color', 'red');
+
 // 动态导入 SVGMorpheus 模块
 async function loadSVGMorpheus() {
   // 根据环境选择导入路径
@@ -485,7 +487,7 @@ async function init() {
         <circle cx="12" cy="12" r="8" fill="currentColor"/>
       </svg>`,
       'square': `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-        <rect x="4" y="4" width="16" height="16" fill="currentColor"/>
+        <rect x="4" y="4" width="16" height="16" fill="var(--color)"/>
       </svg>`,
       'triangle': `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
         <polygon points="12,3 21,20 3,20" fill="currentColor"/>

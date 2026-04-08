@@ -30,8 +30,8 @@ export type {
 	IconItem,
 	MorphNode,
 	NormalizedStyle,
+	RawStyle,
 	Rotation,
-	StyleAttributes,
 	SVGMorpheusOptions,
 	Transform,
 } from './types';

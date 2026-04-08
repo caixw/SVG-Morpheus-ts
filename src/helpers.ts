@@ -1,6 +1,6 @@
 import Color from 'colorjs.io';
 
-import type { CurveData, NormalizedStyle, StyleAttributes, Transform } from './types';
+import type { CurveData, NormalizedStyle, RawStyle, Transform } from './types';
 
 // Calculate style
 export function styleNormCalc(
@@ -47,8 +47,8 @@ export function styleNormCalc(
 	return styleNorm;
 }
 
-export function styleNormToString(styleNorm: NormalizedStyle): StyleAttributes {
-	const style: StyleAttributes = {};
+export function styleNormToString(styleNorm: NormalizedStyle): RawStyle {
+	const style: RawStyle = {};
 
 	for (const key in styleNorm) {
 		const i = key as keyof NormalizedStyle;
@@ -74,8 +74,8 @@ export function styleNormToString(styleNorm: NormalizedStyle): StyleAttributes {
 }
 
 export function styleToNorm(
-	styleFrom: StyleAttributes,
-	styleTo: StyleAttributes,
+	styleFrom: RawStyle,
+	styleTo: RawStyle,
 	lite: boolean,
 	doc: SVGSVGElement,
 ): [NormalizedStyle, NormalizedStyle] {
@@ -87,7 +87,7 @@ export function styleToNorm(
 	};
 
 	for (const key in styleFrom) {
-		const i = key as keyof StyleAttributes;
+		const i = key as keyof RawStyle;
 		switch (i) {
 			case 'fill':
 			case 'stroke':
@@ -123,7 +123,7 @@ export function styleToNorm(
 	}
 
 	for (const key in styleTo) {
-		const i = key as keyof StyleAttributes;
+		const i = key as keyof RawStyle;
 		switch (i) {
 			case 'fill':
 			case 'stroke':

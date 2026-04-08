@@ -36,8 +36,8 @@ export interface SVGMorpheusOptions extends ToMethodOptions {
 	lite?: boolean;
 }
 
-// Style attributes for SVG elements | SVG 元素样式属性
-export interface StyleAttributes {
+// Style attributes for SVG elements | SVG 元素样式属性的原始值
+export interface RawStyle {
 	fill?: string;
 	stroke?: string;
 	opacity?: string;
@@ -78,9 +78,9 @@ export interface IconItem {
 	/** SVG path data | SVG 路径数据 */
 	path: string;
 	/** Element attributes | 元素属性 */
-	attrs: StyleAttributes;
+	attrs: RawStyle;
 	/** Element styles | 元素样式 */
-	style: StyleAttributes;
+	style: RawStyle;
 	/** Curve data for animation | 用于动画的曲线数据 */
 	curve?: CurveData;
 	/** Normalized attributes | 标准化属性 */
