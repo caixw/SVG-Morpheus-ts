@@ -256,20 +256,31 @@ export function clone<T>(obj: T): T {
 }
 
 // 将字符串颜色值转换为用 RGB 表示的 Color 对象
-function getRGB(doc: SVGSVGElement, colour: string): Color {
+//
+// colour 是从 fill 和 stroke 中获取的颜色值类型，可能是一个需要计算的类型，比如 currentColor 或是 var(--xxx)。
+function getRGB(svg: SVGSVGElement, colour: string): Color {
 	if (colour.toUpperCase() === 'CURRENTCOLOR') {
-		if (doc.style.color) {
-			// 如果是 currentColor，则尝试从 SVG 对象上获取真实的颜色值
-			if (doc.style.color.toUpperCase() === 'CURRENTCOLOR') {
-				// SVG 上的 color 也是 currentColor
-				colour = getComputedStyle(doc).getPropertyValue('color')!;
+		// 如果是 colour 的值为 currentColor
+
+		if (svg.style.color) {
+			// svg.style.color 是 currentColor
+			if (svg.style.color.toUpperCase() === 'CURRENTCOLOR') {
+				colour = getComputedStyle(svg).getPropertyValue('color')!;
 			} else {
-				colour = doc.style.color;
+				colour = svg.style.color;
 			}
 		} else {
-			doc.style.color = colour;
-			colour = getComputedStyle(doc).getPropertyValue('color')!;
+			// 如果 svg.style.color 为空，则将 colour 放在 svg.style 上，再进行计算得到真实的 colour 值。
+			svg.style.color = colour;
+			colour = getComputedStyle(svg).getPropertyValue('color')!;
 		}
+	} else {
+		// 其它可能需要计算的颜色值，比如 var(--color) 等
+
+		const old = svg.style.color;
+		svg.style.color = colour;
+		colour = getComputedStyle(svg).getPropertyValue('color')!;
+		svg.style.color = old;
 	}
 
 	return new Color(colour).to('srgb');
