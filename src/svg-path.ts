@@ -166,9 +166,19 @@ export function pathToAbsolute(pathArray: any): any {
 export function path2curve(path: any, path2?: any): any {
 	const p = pathToAbsolute(path);
 	const p2 = path2 && pathToAbsolute(path2);
-	const attrs = { x: 0, y: 0, bx: 0, by: 0, X: 0, Y: 0, qx: null, qy: null };
-	const attrs2 = { x: 0, y: 0, bx: 0, by: 0, X: 0, Y: 0, qx: null, qy: null };
-	const processPath = (path: any, d: any, pcom: any) => {
+	type AttrType = {
+		x: number;
+		y: number;
+		bx: number;
+		by: number;
+		X: number;
+		Y: number;
+		qx: number | null;
+		qy: number | null;
+	};
+	const attrs: AttrType = { x: 0, y: 0, bx: 0, by: 0, X: 0, Y: 0, qx: null, qy: null };
+	const attrs2: AttrType = { x: 0, y: 0, bx: 0, by: 0, X: 0, Y: 0, qx: null, qy: null };
+	const processPath = (path: any, d: AttrType, pcom: string) => {
 		let nx: any, ny: any;
 		if (!path) {
 			return ['C', d.x, d.y, d.x, d.y, d.x, d.y];
@@ -183,7 +193,7 @@ export function path2curve(path: any, path2?: any): any {
 				path = ['C'].concat((a2c as any).apply(0, [d.x, d.y].concat(path.slice(1))));
 				break;
 			case 'S':
-				if (pcom == 'C' || pcom == 'S') {
+				if (pcom === 'C' || pcom === 'S') {
 					// In "S" case we have to take into account, if the previous command is C/S.
 					nx = d.x * 2 - d.bx; // And reflect the previous
 					ny = d.y * 2 - d.by; // command's control point relative to the current point.
@@ -307,7 +317,7 @@ function l2c(x1: any, y1: any, x2: any, y2: any) {
 }
 
 function q2c(x1: any, y1: any, ax: any, ay: any, x2: any, y2: any) {
-	var _13 = 1 / 3,
+	const _13 = 1 / 3,
 		_23 = 2 / 3;
 	return [_13 * x1 + _23 * ax, _13 * y1 + _23 * ay, _13 * x2 + _23 * ax, _13 * y2 + _23 * ay, x2, y2];
 }

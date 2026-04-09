@@ -1,7 +1,7 @@
 {
 	"name": "@iconsets/svg-morpheus-ts",
 	"prettyName": "SVG Morpheus",
-	"version": "1.4.12",
+	"version": "1.4.13",
 	"type": "module",
 	"main": "./dist/index.js",
 	"module": "./dist/index.js",
@@ -50,7 +50,7 @@
 	"devDependencies": {
 		"@types/node": "^24.10.4",
 		"typescript": "^6.0.2",
-		"vite": "^8.0.7",
+		"vite": "^8.0.8",
 		"vite-plugin-dts": "^4.5.4",
 		"@biomejs/biome": "^2.4.10"
 	},

@@ -25,7 +25,6 @@ export function styleNormCalc(
 						styleNorm[i] = progress < 0.5 ? fromValue : toValue;
 					} else {
 						// 对于 Color 颜色值，进行正常插值
-						// TODO: 直接使用 Color.coords 的三个值进行转换，这样就不用在 getRGB 中进行转换为 RGB 的操作？
 						styleNorm[i] = fromValue.clone();
 						styleNorm[i].r = fromValue.r! + (toValue.r! - fromValue.r!) * progress;
 						styleNorm[i].g = fromValue.g! + (toValue.g! - fromValue.g!) * progress;
@@ -113,7 +112,7 @@ export function styleToNorm(
 			case 'stroke-opacity':
 			case 'stroke-width':
 				if (styleFrom[i]) {
-					(styleNorm[0][i] as any) = styleFrom[i];
+					(styleNorm[0][i] as unknown) = styleFrom[i];
 					if (styleTo[i] === undefined) {
 						styleNorm[1][i] = 1;
 					}
@@ -149,7 +148,7 @@ export function styleToNorm(
 			case 'stroke-opacity':
 			case 'stroke-width':
 				if (styleTo[i]) {
-					(styleNorm[1][i] as any) = styleTo[i];
+					(styleNorm[1][i] as unknown) = styleTo[i];
 					if (styleFrom[i] === undefined) {
 						styleNorm[0][i] = 1;
 					}
