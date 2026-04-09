@@ -92,7 +92,7 @@ export function styleToNorm(
 			case 'fill':
 			case 'stroke':
 				if (styleFrom[i]) {
-					if (lite || isGradientReference(styleFrom[i]!)) {
+					if (lite || isGradientReference(styleFrom[i])) {
 						// 对于 lite 或渐变，保持原始值，不进行 RGB 转换
 						styleNorm[0][i] = styleFrom[i];
 						if (styleTo[i] === undefined) {
@@ -100,9 +100,9 @@ export function styleToNorm(
 						}
 					} else {
 						// 对于普通颜色值，进行 RGB 转换
-						styleNorm[0][i] = getRGB(doc, styleFrom[i]!);
+						styleNorm[0][i] = getRGB(doc, styleFrom[i]);
 						if (styleTo[i] === undefined) {
-							styleNorm[1][i] = getRGB(doc, styleFrom[i]!);
+							styleNorm[1][i] = getRGB(doc, styleFrom[i]);
 							styleNorm[1][i].alpha = 0;
 						}
 					}
@@ -128,7 +128,7 @@ export function styleToNorm(
 			case 'fill':
 			case 'stroke':
 				if (styleTo[i]) {
-					if (lite || isGradientReference(styleTo[i]!)) {
+					if (lite || isGradientReference(styleTo[i])) {
 						// 对于 lite 或渐变，保持原始值，不进行 RGB 转换
 						styleNorm[1][i] = styleTo[i];
 						if (styleFrom[i] === undefined) {
@@ -136,9 +136,9 @@ export function styleToNorm(
 						}
 					} else {
 						// 对于普通颜色值，进行 RGB 转换
-						styleNorm[1][i] = getRGB(doc, styleTo[i]!);
+						styleNorm[1][i] = getRGB(doc, styleTo[i]);
 						if (styleFrom[i] === undefined) {
-							styleNorm[0][i] = getRGB(doc, styleTo[i]!);
+							styleNorm[0][i] = getRGB(doc, styleTo[i]);
 							styleNorm[0][i].alpha = 0;
 						}
 					}

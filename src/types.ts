@@ -77,9 +77,9 @@ export type CurveData = CurveSegment[];
 export interface IconItem {
 	/** SVG path data | SVG 路径数据 */
 	path: string;
-	/** Element attributes | 元素属性 */
+	/** Element attributes | 元素属性，比如 fill="red" */
 	attrs: RawStyle;
-	/** Element styles | 元素样式 */
+	/** Element styles | 元素样式，比如 style="fill:red" */
 	style: RawStyle;
 	/** Curve data for animation | 用于动画的曲线数据 */
 	curve?: CurveData;

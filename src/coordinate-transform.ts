@@ -2,7 +2,7 @@
 // 坐标系统转换工具
 
 import { parsePathString, path2string, pathToAbsolute } from './svg-path';
-import type { DefsInfo, ViewBoxInfo } from './types';
+import type { DefsInfo, RawStyle, ViewBoxInfo } from './types';
 
 /**
  * 坐标转换矩阵
@@ -388,9 +388,9 @@ function transformGradientValue(attr: string, value: string, matrix: TransformMa
  */
 export function updateDefsReferences(
 	pathData: string,
-	attrs: Record<string, any>,
+	attrs: RawStyle,
 	oldToNewIdMap: Record<string, string>,
-): { pathData: string; attrs: Record<string, any> } {
+): { pathData: string; attrs: RawStyle } {
 	const updatedAttrs = { ...attrs };
 
 	// 更新属性中的引用
@@ -398,7 +398,7 @@ export function updateDefsReferences(
 		if (typeof value === 'string' && value.startsWith('url(#')) {
 			const match = value.match(/url\(#([^)]+)\)/);
 			if (match && oldToNewIdMap[match[1]]) {
-				updatedAttrs[attr] = `url(#${oldToNewIdMap[match[1]]})`;
+				updatedAttrs[attr as keyof RawStyle] = `url(#${oldToNewIdMap[match[1]]})`;
 			}
 		}
 	}

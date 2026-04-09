@@ -17,7 +17,21 @@ export function parsePathString(pathString: any): any {
 	if (Array.isArray(pathString)) {
 		return pathString;
 	} else {
-		const paramCounts: any = { a: 7, c: 6, o: 2, h: 1, l: 2, m: 2, r: 4, q: 4, s: 4, t: 2, v: 1, u: 3, z: 0 };
+		const paramCounts: Record<string, number> = {
+			a: 7,
+			c: 6,
+			o: 2,
+			h: 1,
+			l: 2,
+			m: 2,
+			r: 4,
+			q: 4,
+			s: 4,
+			t: 2,
+			v: 1,
+			u: 3,
+			z: 0,
+		};
 		const data: any = [];
 
 		String(pathString).replace(pathCommand, (_, b, c) => {

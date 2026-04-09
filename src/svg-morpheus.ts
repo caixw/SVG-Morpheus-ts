@@ -371,7 +371,6 @@ export class SVGMorpheus {
 		if (!!toIconId && !!this._icons[toIconId]) {
 			this._toIconId = toIconId;
 			this._startTime = undefined;
-			let i: number, len: number;
 			this._fromIconItems = clone(this._curIconItems);
 			this._toIconItems = clone(this._icons[toIconId].items);
 
@@ -452,7 +451,7 @@ export class SVGMorpheus {
 				this._injectTransformedDefs(fromIcon, toIcon);
 			}
 
-			for (i = 0, len = this._morphNodes.length; i < len; i++) {
+			for (let i = 0, len = this._morphNodes.length; i < len; i++) {
 				const morphNode = this._morphNodes[i];
 				morphNode.fromIconItemIdx = i;
 				morphNode.toIconItemIdx = i;
@@ -460,7 +459,7 @@ export class SVGMorpheus {
 
 			const maxNum = Math.max(this._fromIconItems.length, this._toIconItems.length);
 			let toBB: BoundingBox;
-			for (i = 0; i < maxNum; i++) {
+			for (let i = 0; i < maxNum; i++) {
 				// Add items to fromIcon/toIcon if needed
 				if (!this._fromIconItems[i]) {
 					if (this._toIconItems[i]) {
@@ -519,7 +518,7 @@ export class SVGMorpheus {
 				}
 			}
 
-			for (i = 0; i < maxNum; i++) {
+			for (let i = 0; i < maxNum; i++) {
 				const fromIconItem = this._fromIconItems[i];
 				const toIconItem = this._toIconItems[i];
 
@@ -626,7 +625,7 @@ export class SVGMorpheus {
 	}
 
 	private _updateAnimationProgress(progress: number): void {
-		progress = (easings as EasingMap)[this._easing](progress);
+		progress = easings[this._easing](progress);
 
 		// Update path/attrs/transform
 		for (let i = 0, len = this._curIconItems.length; i < len; i++) {
@@ -686,13 +685,29 @@ export class SVGMorpheus {
 				morphNode.node.setAttribute('d', this._toIconItems[i].path);
 
 				// 设置最终的 attributes（包含更新后的 defs 引用）
-				Object.entries(this._toIconItems[i].attrs).forEach(([k, v]) => {
-					morphNode.node.setAttribute(k, v);
+				//
+				// 如果涉及到颜色，除了生成的过滤元素，原始元素都采用其原始值，这样可以响应 CSS 变量等内容。
+				const rawAttrs = this._icons[this._toIconId].items[i]?.attrs;
+				const attrs = this._toIconItems[i].attrs;
+				Object.entries(attrs).forEach(([k, v]) => {
+					if (rawAttrs && (k === 'fill' || k === 'stroke')) {
+						morphNode.node.setAttribute(k, rawAttrs[k]!);
+					} else {
+						morphNode.node.setAttribute(k, v);
+					}
 				});
 
 				// 设置最终的 styles
-				Object.entries(this._toIconItems[i].style).forEach(([k, v]) => {
-					morphNode.node.style.setProperty(k, v);
+				//
+				// 如果涉及到颜色，除了生成的过滤元素，原始元素都采用其原始值，这样可以响应 CSS 变量等内容。
+				const rawStyle = this._icons[this._toIconId].items[i]?.attrs;
+				const style = this._toIconItems[i].attrs;
+				Object.entries(style).forEach(([k, v]) => {
+					if (rawStyle && (k === 'fill' || k === 'stroke')) {
+						morphNode.node.style.setProperty(k, rawStyle[k]!);
+					} else {
+						morphNode.node.style.setProperty(k, v);
+					}
 				});
 
 				// 设置最终的 transform
