@@ -690,7 +690,7 @@ export class SVGMorpheus {
 				const rawAttrs = this._icons[this._toIconId].items[i]?.attrs;
 				const attrs = this._toIconItems[i].attrs;
 				Object.entries(attrs).forEach(([k, v]) => {
-					if (rawAttrs && (k === 'fill' || k === 'stroke')) {
+					if (rawAttrs && (k === 'fill' || k === 'stroke') && !rawAttrs[k]!.includes('url(')) {
 						morphNode.node.setAttribute(k, rawAttrs[k]!);
 					} else {
 						morphNode.node.setAttribute(k, v);
@@ -700,10 +700,10 @@ export class SVGMorpheus {
 				// 设置最终的 styles
 				//
 				// 如果涉及到颜色，除了生成的过滤元素，原始元素都采用其原始值，这样可以响应 CSS 变量等内容。
-				const rawStyle = this._icons[this._toIconId].items[i]?.attrs;
-				const style = this._toIconItems[i].attrs;
+				const rawStyle = this._icons[this._toIconId].items[i]?.style;
+				const style = this._toIconItems[i].style;
 				Object.entries(style).forEach(([k, v]) => {
-					if (rawStyle && (k === 'fill' || k === 'stroke')) {
+					if (rawStyle && (k === 'fill' || k === 'stroke') && !rawStyle[k]!.includes('url(')) {
 						morphNode.node.style.setProperty(k, rawStyle[k]!);
 					} else {
 						morphNode.node.style.setProperty(k, v);

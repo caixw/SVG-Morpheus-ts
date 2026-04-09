@@ -25,13 +25,10 @@ export interface SVGMorpheusOptions extends ToMethodOptions {
 	iconId?: string;
 
 	/**
-	 * 是否为轻量级模式
+	 * 只关注形状变化
 	 *
 	 * @remarks
-	 * 该模式下，仅保存最核心的样式变化功能，而颜色转换等功能将被忽略。
-	 *
-	 * 如果图标的颜色是由父元素上的变量决定的，那么在父元素的变量值改变时，图标并不会感知到父元素的颜色变化，
-	 * 如果需要保持图标与父元素的统一，将 lite 模式设置为 true 是最好的方法。
+	 * 如果是单色的 svg 集合，此值为值，有一定的性能提升。
 	 */
 	lite?: boolean;
 }
