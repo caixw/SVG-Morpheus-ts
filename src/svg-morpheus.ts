@@ -732,56 +732,44 @@ export class SVGMorpheus {
 	/**
 	 * 变形到目标图标
 	 *
-	 * @remarks
-	 * 当图标的颜色是 `currentColor` 时，颜色将自动向上一级元素获取，此时如果上一次的元素是变化的，
-	 * 比如存在 `:active` 伪类选择器，那么在点击时，获取的颜色可能是 `:active` 下指定的 color 属性，
-	 * 而不是平常设置的值。
-	 * ```css
-	 * button:active {color: green}
-	 * ```
-	 * ```html
-	 * <button style="color: red;">
-	 *     <svg style:"color:currentColor">...</svg>
-	 * </button>
-	 *```
-	 * 以上的代码，如果在点击 button 时调用当前方法，其图标的颜色会是 `green`，而不是 `red`。
-	 *
-	 * @param iconId - 要变形到的目标图标ID，必须匹配 SVG 中某个 <g> 元素的 ID
-	 *
-	 * @param options - 此次特定变形的动画选项
-	 *
-	 * @param callback - 此次特定变形的回调函数
-	 *     仅为此次动画覆盖构造器默认回调
-	 *     当此次特定变形动画完成时被调用
+	 * @param iconId - 要变形到的目标图标ID，必须匹配 SVG 中某个 <g> 元素的 ID；
+	 * @param options - 此次特定变形的动画选项；
+	 * @param callback - 此次特定变形的回调函数，只有发生了变形调用时才会调用此函数；
 	 */
 	public to(iconId: string, options?: ToMethodOptions, callback?: CallbackFunction): void {
-		if (iconId !== this._toIconId) {
-			if (!!options && typeof options !== 'object') {
-				throw new Error('SVGMorpheus.to() > "options" parameter must be an object');
-			}
-			options = options || {};
+		if (!this._icons[iconId]) {
+			throw new Error(`SVGMorpheus.to() > "${iconId}" is not a registered icon`);
+		}
 
-			if (!!callback && typeof callback !== 'function') {
-				throw new Error('SVGMorpheus.to() > "callback" parameter must be a function');
-			}
+		if (iconId === this._curIconId) {
+			return;
+		}
 
-			if (this._rafid) {
-				window.cancelAnimationFrame(this._rafid);
-			}
+		if (!!options && typeof options !== 'object') {
+			throw new Error('SVGMorpheus.to() > "options" parameter must be an object');
+		}
+		options = options || {};
 
-			this._duration = options.duration ?? this._defDuration; // 0 是一个有效值，不能用 ||
-			this._easing = options.easing || this._defEasing;
-			this._rotation = options.rotation || this._defRotation;
-			this._callback = callback || this._defCallback;
+		if (!!callback && typeof callback !== 'function') {
+			throw new Error('SVGMorpheus.to() > "callback" parameter must be a function');
+		}
 
-			this._setupAnimation(iconId);
+		if (this._rafid) {
+			window.cancelAnimationFrame(this._rafid);
+		}
 
-			if (this._duration === 0) {
-				this._updateAnimationProgress(1); // 设置进度为 1（100%）
-				this._animationEnd(); // 立即完成动画
-			} else {
-				this._rafid = window.requestAnimationFrame(this._fnTick);
-			}
+		this._duration = options.duration ?? this._defDuration; // 0 是一个有效值，不能用 ||
+		this._easing = options.easing || this._defEasing;
+		this._rotation = options.rotation || this._defRotation;
+		this._callback = callback || this._defCallback;
+
+		this._setupAnimation(iconId);
+
+		if (this._duration === 0) {
+			this._updateAnimationProgress(1); // 设置进度为 1（100%）
+			this._animationEnd(); // 立即完成动画
+		} else {
+			this._rafid = window.requestAnimationFrame(this._fnTick);
 		}
 	}
 

@@ -258,7 +258,9 @@ export function clone<T>(obj: T): T {
 //
 // colour 是从 fill 和 stroke 中获取的颜色值类型，可能是一个需要计算的类型，比如 currentColor 或是 var(--xxx)。
 function getRGB(svg: SVGSVGElement, colour: string): Color {
-	if (colour.includes('var(--')) {
+	colour = colour.trim();
+
+	if (colour.startsWith('var(--')) {
 		// 变量，直接放在 svg 上，进行计算。
 
 		const old = svg.style.getPropertyValue('color');
@@ -268,15 +270,23 @@ function getRGB(svg: SVGSVGElement, colour: string): Color {
 	} else if (colour.toUpperCase() === 'CURRENTCOLOR') {
 		const old = svg.style.getPropertyValue('color');
 
-		if (old === 'CURRENTCOLOR' || old.includes('var(--') || !old) {
-			// 特殊值，不影响 colour 的取值，直接在 svg 上设置 colour 后获取真实颜色值
+		if (!old) {
+			// svg 上没有设置 color，直接在 svg 上设置 colour 后获取真实颜色值
 			svg.style.setProperty('color', colour);
 			colour = getComputedStyle(svg).getPropertyValue('color')!;
 			svg.style.setProperty('color', old);
+		} else if (old.toUpperCase() === 'CURRENTCOLOR' || old.includes('var(--')) {
+			// svg 上是特殊值，直接计算并赋值给 colour
+			colour = getComputedStyle(svg).getPropertyValue('color')!;
 		} else {
-			// 其它正常值的颜色值，直接给到 colour
+			// svg 上其它正常值的颜色值，直接给到 colour
 			colour = old;
 		}
+	}
+
+	// 依然是 var(-- 模式，说明找不到该变量，使用一个默认值防止出错。
+	if (colour.startsWith('var(--')) {
+		colour = 'rgb(255,255,255)';
 	}
 
 	return new Color(colour).to('srgb');
