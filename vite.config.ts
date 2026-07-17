@@ -1,10 +1,11 @@
-import { readFileSync } from 'node:fs';
+//import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { defineConfig } from 'vite';
 import dts from 'vite-plugin-dts';
 
+import packageJson from './package.json' with { type: 'json' };
+
 // 读取 package.json 获取版本号
-const packageJson = JSON.parse(readFileSync(resolve(__dirname, 'package.json'), 'utf-8'));
 const version = packageJson.version;
 const homepage = packageJson.homepage;
 
